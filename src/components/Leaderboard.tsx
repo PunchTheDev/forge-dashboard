@@ -1,4 +1,4 @@
-import { api, LeaderboardEntry, Spec } from "../lib/api";
+import { api, allowableStress, LeaderboardEntry, Spec } from "../lib/api";
 import { useApi } from "../hooks/useApi";
 
 interface Props {
@@ -35,6 +35,8 @@ export function Leaderboard({ spec, onSelectEntry, selected }: Props) {
     () => api.leaderboard(spec.id),
     15000,
   );
+
+  const maxStress = allowableStress(spec);
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
@@ -79,10 +81,10 @@ export function Leaderboard({ spec, onSelectEntry, selected }: Props) {
           <tbody>
             {entries.map((e) => (
               <tr
-                key={e.submission_id}
+                key={e.commit_hash}
                 onClick={() => onSelectEntry(e)}
                 className={`border-b border-forge-border/40 cursor-pointer transition-colors hover:bg-forge-border/30 ${
-                  selected?.submission_id === e.submission_id
+                  selected?.commit_hash === e.commit_hash
                     ? "bg-forge-accent/10 border-l-2 border-l-forge-accent"
                     : ""
                 }`}
@@ -92,16 +94,16 @@ export function Leaderboard({ spec, onSelectEntry, selected }: Props) {
                 </td>
                 <td className="px-4 py-2.5 text-white font-medium">{e.contributor}</td>
                 <td className="px-4 py-2.5 text-right font-mono text-forge-green font-semibold tabular-nums">
-                  {e.mass_g.toFixed(2)}
+                  {e.mass_grams.toFixed(2)}
                 </td>
                 <td className="px-4 py-2.5">
-                  <StressBar value={e.max_stress_mpa} max={spec.max_stress_mpa} />
+                  <StressBar value={e.fea_stress_mpa} max={maxStress} />
                 </td>
                 <td className="px-4 py-2.5 font-mono text-forge-muted hidden md:table-cell text-xs">
                   {e.commit_hash.slice(0, 7)}
                 </td>
                 <td className="px-4 py-2.5 text-forge-muted text-xs hidden lg:table-cell text-right">
-                  {new Date(e.created_at).toLocaleDateString()}
+                  {new Date(e.submitted_at).toLocaleDateString()}
                 </td>
               </tr>
             ))}

@@ -44,7 +44,7 @@ export default function App() {
 
   const { data: submissions, loading: subsLoading } = useApi(
     useCallback(
-      () => (activeSpec ? api.submissions(activeSpec.id) : Promise.resolve([])),
+      () => (activeSpec ? api.submissions(activeSpec.id, false) : Promise.resolve([])),
       [activeSpec],
     ),
     15000,
@@ -71,7 +71,7 @@ export default function App() {
   // Build spec -> sota map for sidebar
   const sotaBySpec: Record<string, number> = {};
   if (allSota) {
-    for (const s of allSota) sotaBySpec[s.spec_id] = s.mass_g;
+    for (const s of allSota) sotaBySpec[s.spec_id] = s.score_grams;
   }
 
   // STEP URL: in future, forge-api will serve /submissions/{id}/step
@@ -159,7 +159,7 @@ export default function App() {
                 {selectedEntry && (
                   <StepViewer
                     stepUrl={stepUrl}
-                    label={`${selectedEntry.contributor} — ${selectedEntry.mass_g.toFixed(2)}g`}
+                    label={`${selectedEntry.contributor} — ${selectedEntry.mass_grams.toFixed(2)}g`}
                   />
                 )}
 
@@ -197,7 +197,7 @@ export default function App() {
                     <div className="mt-2 text-xs text-forge-muted">
                       Expected:{" "}
                       <span className="text-forge-green font-mono">
-                        {sota.mass_g.toFixed(2)}g
+                        {sota.score_grams.toFixed(2)}g
                       </span>
                     </div>
                   </div>
