@@ -41,10 +41,12 @@ export interface Submission {
   pr_number: number | null;
   notes: string | null;
   submitted_at: string;
+  has_step: boolean;
 }
 
 export interface LeaderboardEntry {
   rank: number;
+  submission_id: string;
   contributor: string;
   agent_path: string;
   mass_grams: number;
@@ -52,6 +54,7 @@ export interface LeaderboardEntry {
   commit_hash: string;
   submitted_at: string;
   pr_number: number | null;
+  has_step: boolean;
 }
 
 interface LeaderboardResponse {
@@ -87,6 +90,11 @@ async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json() as Promise<T>;
+}
+
+/** URL for the raw STEP bytes of a submission — used by the 3D viewer. */
+export function stepUrl(submissionId: string): string {
+  return `${BASE}/submissions/${submissionId}/step`;
 }
 
 export const api = {

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { api, LeaderboardEntry, Spec, SotaRecord } from "./lib/api";
+import { api, stepUrl, LeaderboardEntry, Spec, SotaRecord } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
@@ -74,9 +74,9 @@ export default function App() {
     for (const s of allSota) sotaBySpec[s.spec_id] = s.score_grams;
   }
 
-  // STEP URL: in future, forge-api will serve /submissions/{id}/step
-  // For now we show the viewer only when a step URL is actually available
-  const stepUrl: string | null = null; // TODO: wire when API endpoint added
+  // Show 3D viewer when a leaderboard entry is selected and it has a STEP file stored.
+  const activeStepUrl: string | null =
+    selectedEntry?.has_step ? stepUrl(selectedEntry.submission_id) : null;
 
   return (
     <div className="min-h-screen bg-forge-bg text-white font-mono">
@@ -158,7 +158,7 @@ export default function App() {
 
                 {selectedEntry && (
                   <StepViewer
-                    stepUrl={stepUrl}
+                    stepUrl={activeStepUrl}
                     label={`${selectedEntry.contributor} — ${selectedEntry.mass_grams.toFixed(2)}g`}
                   />
                 )}
