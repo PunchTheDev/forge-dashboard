@@ -24,20 +24,20 @@ interface ChartPoint {
 function buildSotaCurve(submissions: Submission[]): ChartPoint[] {
   const passed = submissions
     .filter((s) => s.passed)
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime());
 
   const points: ChartPoint[] = [];
   let best = Infinity;
 
   for (const s of passed) {
-    if (s.mass_g < best) {
-      best = s.mass_g;
+    if (s.mass_grams < best) {
+      best = s.mass_grams;
       points.push({
-        date: new Date(s.created_at).toLocaleDateString("en-US", {
+        date: new Date(s.submitted_at).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
         }),
-        mass: parseFloat(s.mass_g.toFixed(2)),
+        mass: parseFloat(s.mass_grams.toFixed(2)),
         contributor: s.contributor,
       });
     }

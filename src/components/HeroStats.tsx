@@ -49,13 +49,13 @@ export function HeroStats({ sota, submissionCount, specName }: Props) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat
           label="SOTA mass"
-          value={sota ? `${sota.mass_g.toFixed(2)}g` : "—"}
+          value={sota ? `${sota.score_grams.toFixed(2)}g` : "—"}
           sub={sota ? `by ${sota.contributor}` : "no submissions yet"}
           accent={false}
         />
         <Stat
           label="Stress headroom"
-          value={sota ? `${sota.max_stress_mpa.toFixed(1)} MPa` : "—"}
+          value={sota ? `${sota.fea_stress_mpa.toFixed(1)} MPa` : "—"}
           sub="max von Mises"
           accent={false}
         />

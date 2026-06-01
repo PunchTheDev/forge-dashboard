@@ -1,4 +1,4 @@
-import { Spec } from "../lib/api";
+import { allowableStress, Spec } from "../lib/api";
 
 interface Props {
   spec: Spec;
@@ -8,6 +8,9 @@ interface Props {
 }
 
 export function SpecCard({ spec, sotaMass, isSelected, onClick }: Props) {
+  const boltCount = spec.constraints.bolt_pattern_mm.length;
+  const maxStress = allowableStress(spec);
+
   return (
     <button
       onClick={onClick}
@@ -36,16 +39,16 @@ export function SpecCard({ spec, sotaMass, isSelected, onClick }: Props) {
 
       <div className="mt-3 flex flex-wrap gap-2 text-xs">
         <span className="bg-forge-border text-forge-muted px-2 py-0.5 rounded">
-          {(spec.load_n / 1000).toFixed(0)}kN load
+          {(spec.constraints.load_newtons / 1000).toFixed(1)}kN load
         </span>
         <span className="bg-forge-border text-forge-muted px-2 py-0.5 rounded">
           {spec.material}
         </span>
         <span className="bg-forge-border text-forge-muted px-2 py-0.5 rounded">
-          ≤{spec.max_stress_mpa}MPa
+          ≤{maxStress.toFixed(0)}MPa
         </span>
         <span className="bg-forge-border text-forge-muted px-2 py-0.5 rounded">
-          {spec.bolt_holes} bolts
+          {boltCount} bolts
         </span>
       </div>
     </button>
