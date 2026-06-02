@@ -1,4 +1,5 @@
 import { SotaRecord, Spec, allowableStress } from "../lib/api";
+import { SpecDiagram } from "./SpecDiagram";
 
 interface Props {
   spec: Spec;
@@ -51,7 +52,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <div className="flex flex-wrap items-center gap-2 mb-1">
           <h2 className="text-lg font-bold text-white">{spec.name}</h2>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
-            {spec.material.toUpperCase()}
+            {spec.material.toUpperCase().replace("_", " ")}
           </span>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
             {loadKg} kg load
@@ -63,9 +64,10 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
             ≤{allowable.toFixed(0)} MPa
           </span>
         </div>
-        <p className="text-forge-muted text-xs leading-relaxed max-w-xl">
+        <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-4">
           {spec.description}
         </p>
+        <SpecDiagram spec={spec} />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

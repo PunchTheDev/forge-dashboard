@@ -64,6 +64,8 @@ interface LeaderboardResponse {
 
 export interface SotaRecord {
   spec_id: string;
+  submission_id: string;
+  has_step: boolean;
   score_grams: number;
   agent: string;
   contributor: string;
@@ -122,6 +124,54 @@ export function stepUrl(submissionId: string): string {
   return `${BASE}/submissions/${submissionId}/step`;
 }
 
+export interface RoundSpec {
+  id: string;
+  tier: string;
+}
+
+export interface Round {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  starts: string;
+  ends: string | null;
+  scoring_metric: string;
+  scoring_direction: string;
+  specs: RoundSpec[];
+  notes: string | null;
+}
+
+export interface EvalPreviewResult {
+  passed: boolean;
+  score: number | null;
+  score_metric: string;
+  score_direction: string;
+  stage: string;
+  reason: string;
+  fea_stress_mpa: number | null;
+  fea_allowable_mpa: number | null;
+  fea_element_count: number | null;
+  fea_load_node_count: number | null;
+  fea_convergence_deviation: number | null;
+  fea_displacement_mm: number | null;
+  similarity: number | null;
+  elapsed_seconds: number;
+}
+
+async function post<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const detail = await res.json().then((d) => d?.detail ?? res.statusText).catch(() => res.statusText);
+    throw new Error(detail);
+  }
+  return res.json() as Promise<T>;
+}
+
 export const api = {
   specs: () => get<Spec[]>("/specs"),
   spec: (id: string) => get<Spec>(`/specs/${id}`),
@@ -135,4 +185,7 @@ export const api = {
   sotaAll: () => get<SotaRecord[]>("/sota"),
   overallLeaderboard: () => get<OverallLeaderboard>("/leaderboard/overall"),
   health: () => get<{ status: string }>("/health"),
+  evalPreview: (agentCode: string, specId: string) =>
+    post<EvalPreviewResult>("/eval/preview", { agent_code: agentCode, spec_id: specId }),
+  activeRounds: () => get<Round[]>("/rounds/active"),
 };
