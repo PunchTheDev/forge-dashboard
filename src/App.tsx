@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
-import { api, stepUrl, Submission, Spec, SotaRecord } from "./lib/api";
+import { api, Submission, Spec, SotaRecord } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
 import { SpecCard } from "./components/SpecCard";
 import { SubmissionPanel } from "./components/SubmissionPanel";
-import { StepViewer } from "./components/StepViewer";
+import { SubmissionJourney } from "./components/SubmissionJourney";
 import { HeroStats } from "./components/HeroStats";
 import { OverallLeaderboard } from "./components/OverallLeaderboard";
 import { QuickstartGuide } from "./components/QuickstartGuide";
@@ -176,9 +176,6 @@ export default function App() {
     for (const s of allSota) sotaBySpec[s.spec_id] = s.score_grams;
   }
 
-  const activeStepUrl: string | null =
-    selectedSubmission?.has_step ? stepUrl(selectedSubmission.id) : null;
-
   const passedSubmissions = (submissions ?? []).filter((s) => s.passed);
 
   return (
@@ -282,10 +279,12 @@ export default function App() {
                     selected={selectedSubmission}
                   />
 
-                  {selectedSubmission && (
-                    <StepViewer
-                      stepUrl={activeStepUrl}
-                      label={`${selectedSubmission.contributor} — ${selectedSubmission.mass_grams.toFixed(2)}g`}
+                  {selectedSubmission && activeSpec && (
+                    <SubmissionJourney
+                      submission={selectedSubmission}
+                      spec={activeSpec}
+                      sota={sota ?? null}
+                      onClose={() => setSelectedSubmission(null)}
                     />
                   )}
 
