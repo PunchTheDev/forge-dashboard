@@ -102,6 +102,8 @@ const YIELD_STRESS: Record<string, number> = {
   pla: 50,
   petg: 40,
   aluminum_6061: 276,
+  stainless_316: 205,
+  steel_mild: 250,
 };
 
 /** Allowable stress for a spec = material yield / safety factor. */

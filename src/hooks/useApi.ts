@@ -38,7 +38,9 @@ export function useApi<T>(
     return () => {
       cancelled = true;
     };
-  }, [tick]); // eslint-disable-line react-hooks/exhaustive-deps
+  // fetcher is intentionally included: re-fetch immediately when the query changes (e.g. spec switch)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tick, fetcher]);
 
   useEffect(() => {
     if (intervalMs <= 0) return;
