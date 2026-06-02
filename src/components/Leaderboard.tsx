@@ -1,10 +1,10 @@
-import { api, allowableStress, LeaderboardEntry, Spec } from "../lib/api";
-import { useApi } from "../hooks/useApi";
+import { Submission, Spec, allowableStress } from "../lib/api";
 
 interface Props {
   spec: Spec;
-  onSelectEntry: (entry: LeaderboardEntry) => void;
-  selected: LeaderboardEntry | null;
+  submissions: Submission[];
+  onSelectEntry: (s: Submission) => void;
+  selected: Submission | null;
 }
 
 function Medal({ rank }: { rank: number }) {
@@ -30,83 +30,82 @@ function StressBar({ value, max }: { value: number; max: number }) {
   );
 }
 
-export function Leaderboard({ spec, onSelectEntry, selected }: Props) {
-  const { data: entries, loading, error, refresh } = useApi(
-    () => api.leaderboard(spec.id),
-    15000,
-  );
+export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Props) {
+  // Show all passing submissions ranked by mass ascending.
+  // This lets the leaderboard tell the full competition story — every improvement step is visible.
+  const ranked = [...submissions]
+    .filter((s) => s.passed)
+    .sort((a, b) => a.mass_grams - b.mass_grams);
 
   const maxStress = allowableStress(spec);
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-forge-border">
-        <h2 className="text-sm font-semibold text-white">Leaderboard</h2>
-        <button
-          onClick={refresh}
-          className="text-xs text-forge-muted hover:text-white transition-colors"
-        >
-          refresh
-        </button>
+        <h2 className="text-sm font-semibold text-white">All submissions — ranked by mass</h2>
+        <span className="text-xs text-forge-muted">{ranked.length} passing</span>
       </div>
 
-      {loading && !entries && (
-        <div className="px-4 py-8 text-center text-forge-muted text-sm">Loading…</div>
-      )}
-
-      {error && (
-        <div className="px-4 py-4 text-forge-red text-sm">
-          API unavailable — {error}
-        </div>
-      )}
-
-      {entries && entries.length === 0 && (
+      {ranked.length === 0 && (
         <div className="px-4 py-8 text-center text-forge-muted text-sm">
           No submissions yet. Be first.
         </div>
       )}
 
-      {entries && entries.length > 0 && (
+      {ranked.length > 0 && (
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-forge-muted border-b border-forge-border">
               <th className="px-4 py-2 text-left font-medium">Rank</th>
-              <th className="px-4 py-2 text-left font-medium">Contributor</th>
+              <th className="px-4 py-2 text-left font-medium">Agent / Contributor</th>
               <th className="px-4 py-2 text-right font-medium">Mass (g)</th>
-              <th className="px-4 py-2 text-left font-medium">Stress</th>
+              <th className="px-4 py-2 text-left font-medium hidden sm:table-cell">Stress</th>
               <th className="px-4 py-2 text-left font-medium hidden md:table-cell">Commit</th>
               <th className="px-4 py-2 text-right font-medium hidden lg:table-cell">Date</th>
             </tr>
           </thead>
           <tbody>
-            {entries.map((e) => (
-              <tr
-                key={e.commit_hash}
-                onClick={() => onSelectEntry(e)}
-                className={`border-b border-forge-border/40 cursor-pointer transition-colors hover:bg-forge-border/30 ${
-                  selected?.commit_hash === e.commit_hash
-                    ? "bg-forge-accent/10 border-l-2 border-l-forge-accent"
-                    : ""
-                }`}
-              >
-                <td className="px-4 py-2.5 font-mono">
-                  <Medal rank={e.rank} />
-                </td>
-                <td className="px-4 py-2.5 text-white font-medium">{e.contributor}</td>
-                <td className="px-4 py-2.5 text-right font-mono text-forge-green font-semibold tabular-nums">
-                  {e.mass_grams.toFixed(2)}
-                </td>
-                <td className="px-4 py-2.5">
-                  <StressBar value={e.fea_stress_mpa} max={maxStress} />
-                </td>
-                <td className="px-4 py-2.5 font-mono text-forge-muted hidden md:table-cell text-xs">
-                  {e.commit_hash.slice(0, 7)}
-                </td>
-                <td className="px-4 py-2.5 text-forge-muted text-xs hidden lg:table-cell text-right">
-                  {new Date(e.submitted_at).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
+            {ranked.map((s, i) => {
+              const isLeader = i === 0;
+              const isSelected = selected?.id === s.id;
+              return (
+                <tr
+                  key={s.id}
+                  onClick={() => onSelectEntry(s)}
+                  className={`border-b border-forge-border/40 cursor-pointer transition-colors hover:bg-forge-border/30 ${
+                    isSelected
+                      ? "bg-forge-accent/10 border-l-2 border-l-forge-accent"
+                      : isLeader
+                      ? "bg-forge-green/5"
+                      : ""
+                  }`}
+                >
+                  <td className="px-4 py-2.5 font-mono">
+                    <Medal rank={i + 1} />
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="text-white font-medium text-xs">
+                      {s.agent_path.replace("agents/", "")}
+                    </div>
+                    <div className="text-forge-muted text-xs">{s.contributor}</div>
+                  </td>
+                  <td className="px-4 py-2.5 text-right font-mono font-semibold tabular-nums">
+                    <span className={isLeader ? "text-forge-gold" : "text-forge-green"}>
+                      {s.mass_grams.toFixed(2)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 hidden sm:table-cell">
+                    <StressBar value={s.fea_stress_mpa} max={maxStress} />
+                  </td>
+                  <td className="px-4 py-2.5 font-mono text-forge-muted hidden md:table-cell text-xs">
+                    {s.commit_hash.slice(0, 7)}
+                  </td>
+                  <td className="px-4 py-2.5 text-forge-muted text-xs hidden lg:table-cell text-right">
+                    {new Date(s.submitted_at).toLocaleDateString()}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

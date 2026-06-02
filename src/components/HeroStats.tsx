@@ -1,9 +1,9 @@
-import { SotaRecord } from "../lib/api";
+import { SotaRecord, Spec, allowableStress } from "../lib/api";
 
 interface Props {
+  spec: Spec;
   sota: SotaRecord | null;
   submissionCount: number;
-  specName: string;
 }
 
 function Stat({
@@ -34,15 +34,33 @@ function Stat({
   );
 }
 
-export function HeroStats({ sota, submissionCount, specName }: Props) {
+export function HeroStats({ spec, sota, submissionCount }: Props) {
+  const allowable = allowableStress(spec);
+  const loadKg = (spec.constraints.load_newtons / 9.81).toFixed(0);
+  const stressHeadroom = sota
+    ? (((allowable - sota.fea_stress_mpa) / allowable) * 100).toFixed(0)
+    : null;
+
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-white">
-          Forge — <span className="text-forge-accent">{specName}</span>
-        </h1>
-        <p className="text-forge-muted text-sm mt-1">
-          Competitive parametric CAD benchmark. Minimize mass. Survive the load.
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          <h2 className="text-lg font-bold text-white">{spec.name}</h2>
+          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
+            {spec.material.toUpperCase()}
+          </span>
+          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
+            {loadKg} kg load
+          </span>
+          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
+            SF {spec.constraints.safety_factor}×
+          </span>
+          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
+            ≤{allowable.toFixed(0)} MPa
+          </span>
+        </div>
+        <p className="text-forge-muted text-xs leading-relaxed max-w-xl">
+          {spec.description}
         </p>
       </div>
 
@@ -51,25 +69,23 @@ export function HeroStats({ sota, submissionCount, specName }: Props) {
           label="SOTA mass"
           value={sota ? `${sota.score_grams.toFixed(2)}g` : "—"}
           sub={sota ? `by ${sota.contributor}` : "no submissions yet"}
-          accent={false}
         />
         <Stat
           label="Stress headroom"
-          value={sota ? `${sota.fea_stress_mpa.toFixed(1)} MPa` : "—"}
-          sub="max von Mises"
-          accent={false}
+          value={stressHeadroom ? `${stressHeadroom}%` : "—"}
+          sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} / ${allowable.toFixed(0)} MPa` : "max von Mises"}
         />
         <Stat
-          label="Submissions"
+          label="Passing entries"
           value={String(submissionCount)}
-          sub="total attempts"
-          accent={true}
+          sub="verified by FEA"
+          accent
         />
         <Stat
           label="Status"
           value="Open"
           sub="accepting PRs"
-          accent={true}
+          accent
         />
       </div>
     </div>
