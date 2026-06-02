@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { api, Submission, Spec, SotaRecord } from "./lib/api";
+import { api, Submission, Spec, SotaRecord, stepUrl } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
@@ -10,6 +10,7 @@ import { HeroStats } from "./components/HeroStats";
 import { OverallLeaderboard } from "./components/OverallLeaderboard";
 import { QuickstartGuide } from "./components/QuickstartGuide";
 import { LiveEval } from "./components/LiveEval";
+import { StepViewer } from "./components/StepViewer";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = "http://143.244.191.193:8000/docs";
@@ -272,6 +273,13 @@ export default function App() {
                     sota={sota ?? null}
                     submissionCount={passedSubmissions.length}
                   />
+
+                  {sota?.has_step && (
+                    <StepViewer
+                      stepUrl={stepUrl(sota.submission_id)}
+                      label={`SOTA — ${sota.score_grams.toFixed(2)}g by ${sota.contributor}`}
+                    />
+                  )}
 
                   <SotaChart
                     submissions={submissions ?? []}

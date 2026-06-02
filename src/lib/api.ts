@@ -64,6 +64,8 @@ interface LeaderboardResponse {
 
 export interface SotaRecord {
   spec_id: string;
+  submission_id: string;
+  has_step: boolean;
   score_grams: number;
   agent: string;
   contributor: string;
