@@ -15,7 +15,8 @@ export interface SpecConstraints {
 export interface SpecScoring {
   metric: string;
   direction: string;
-  baseline_mass_grams: number;
+  baseline_mass_grams?: number;
+  baseline_stiffness_to_weight?: number;
 }
 
 export interface Spec {
