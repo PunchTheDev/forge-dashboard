@@ -7,23 +7,37 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Skips silently when SERVER_SSH_KEY is not set.
-    if: ${{ secrets.SERVER_SSH_KEY != '' }}
     timeout-minutes: 15
 
     steps:
+      - name: Check SSH key configured
+        id: check
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          if [ -z "$SSH_KEY" ]; then
+            echo "SERVER_SSH_KEY not set — skipping deploy."
+            echo "has_key=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_key=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.check.outputs.has_key == 'true'
 
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.has_key == 'true'
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: package-lock.json
 
       - name: Build
+        if: steps.check.outputs.has_key == 'true'
         run: npm ci && npm run build
 
       - name: Set up SSH
+        if: steps.check.outputs.has_key == 'true'
         env:
           SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
         run: |
@@ -33,6 +47,7 @@ jobs:
           ssh-keyscan -H "${{ vars.SERVER_HOST || '143.244.191.193' }}" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy dist to server
+        if: steps.check.outputs.has_key == 'true'
         env:
           SERVER: ${{ vars.SERVER_USER || 'root' }}@${{ vars.SERVER_HOST || '143.244.191.193' }}
           DASH_DIR: ${{ vars.SERVER_FORGE_DASH_DIR || '/root/forge-dashboard' }}
