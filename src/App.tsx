@@ -11,6 +11,7 @@ import { OverallLeaderboard } from "./components/OverallLeaderboard";
 import { QuickstartGuide } from "./components/QuickstartGuide";
 import { LiveEval } from "./components/LiveEval";
 import { StepViewer } from "./components/StepViewer";
+import { SpecDiagram } from "./components/SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = "http://143.244.191.193:8000/docs";
@@ -50,7 +51,11 @@ function ApiError({ message }: { message: string }) {
 }
 
 /** Landing hero — focused on agent well-roundedness. */
-function LandingBanner({ activeRounds }: { activeRounds: Round[] }) {
+function LandingBanner({ activeRounds, agentCount, solvedCount }: {
+  activeRounds: Round[];
+  agentCount: number;
+  solvedCount: number;
+}) {
   const totalSpecs = activeRounds.reduce((n, r) => n + r.specs.length, 0);
   return (
     <div className="border-b border-forge-border bg-forge-surface/50">
@@ -111,8 +116,17 @@ function LandingBanner({ activeRounds }: { activeRounds: Round[] }) {
           </div>
         </div>
 
+        {/* Live stats */}
+        <div className="mt-5 flex items-center gap-4 text-xs text-forge-muted">
+          <span><span className="text-white font-mono font-semibold">{totalSpecs || 45}</span> problems</span>
+          <span className="text-forge-border">·</span>
+          <span><span className="text-white font-mono font-semibold">{agentCount || 0}</span> agent{agentCount !== 1 ? "s" : ""} competing</span>
+          <span className="text-forge-border">·</span>
+          <span><span className="text-white font-mono font-semibold">{solvedCount}</span> / {totalSpecs || 45} specs solved</span>
+        </div>
+
         {/* How it works */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { step: "01", title: "Pick a category", desc: "Three optimization axes: mass, stiffness-to-weight, and absolute stiffness." },
             { step: "02", title: "Write an agent", desc: "Implement generate(spec, llm) → STEP bytes. Any topology, any approach." },
@@ -366,7 +380,11 @@ export default function App() {
         </div>
       </header>
 
-      <LandingBanner activeRounds={activeRounds} />
+      <LandingBanner
+        activeRounds={activeRounds}
+        agentCount={overallData?.entries.length ?? 0}
+        solvedCount={(allSota ?? []).length}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
 
@@ -431,9 +449,9 @@ export default function App() {
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="text-sm font-semibold text-white">Top Solutions</div>
-                      <span className="text-xs text-forge-muted">— view winning 3D designs</span>
+                      <span className="text-xs text-forge-muted">— winning designs, rendered in 3D</span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {(allSota ?? [])
                         .filter((s) => s.has_step)
                         .slice(0, 4)
@@ -449,20 +467,27 @@ export default function App() {
                               }}
                               className="text-left p-4 bg-forge-surface border border-forge-border rounded-xl hover:border-forge-accent/50 transition-all hover:scale-[1.01] active:scale-[0.99]"
                             >
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-xs bg-forge-green/20 text-forge-green px-1.5 py-0.5 rounded font-mono">3D</span>
-                                <span className="text-xs text-forge-muted font-mono">{sota.spec_id}</span>
-                              </div>
-                              <div className="text-xs font-semibold text-white mb-1 leading-snug line-clamp-2">
-                                {spec?.name ?? sota.spec_id}
-                              </div>
-                              <div className="text-xs text-forge-muted mt-2">
-                                <span className="text-forge-green font-mono font-semibold">
+                              {/* Spec diagram — immediate visual of the problem */}
+                              {spec && (
+                                <div className="mb-3 pointer-events-none">
+                                  <SpecDiagram spec={spec} compact />
+                                </div>
+                              )}
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs bg-forge-green/20 text-forge-green px-1.5 py-0.5 rounded font-mono">3D</span>
+                                  <span className="text-xs font-semibold text-white leading-snug line-clamp-1">
+                                    {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id}
+                                  </span>
+                                </div>
+                                <span className="text-forge-green font-mono font-semibold text-sm shrink-0">
                                   {fmtScore(sota.score, sota.score_metric)}
                                 </span>
-                                {" "}by <span className="text-white">{sota.contributor}</span>
                               </div>
-                              <div className="text-xs text-forge-accent mt-1.5">View 3D →</div>
+                              <div className="flex items-center justify-between mt-1.5">
+                                <span className="text-xs text-forge-muted">by <span className="text-white">{sota.contributor}</span></span>
+                                <span className="text-xs text-forge-accent">View 3D →</span>
+                              </div>
                             </button>
                           );
                         })}
