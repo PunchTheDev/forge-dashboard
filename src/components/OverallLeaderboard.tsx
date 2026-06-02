@@ -93,10 +93,9 @@ export function OverallLeaderboard({ data, loading }: Props) {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between mb-1">
         <div className="text-xs text-forge-muted">
-          Ranked by average normalized mass across all {data.total_specs} specs
-          (lower = better vs. baseline)
+          Normalized score across all {data.total_specs} specs in all categories — lower = better
         </div>
-        <div className="text-xs text-forge-muted font-mono">{data.entries.length} contributor{data.entries.length !== 1 ? "s" : ""}</div>
+        <div className="text-xs text-forge-muted font-mono">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
       {data.entries.map((entry) => (
         <EntryRow key={entry.contributor} entry={entry} />
