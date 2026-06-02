@@ -51,7 +51,11 @@ function ApiError({ message }: { message: string }) {
 }
 
 /** Landing hero — focused on agent well-roundedness. */
-function LandingBanner({ activeRounds }: { activeRounds: Round[] }) {
+function LandingBanner({ activeRounds, agentCount, solvedCount }: {
+  activeRounds: Round[];
+  agentCount: number;
+  solvedCount: number;
+}) {
   const totalSpecs = activeRounds.reduce((n, r) => n + r.specs.length, 0);
   return (
     <div className="border-b border-forge-border bg-forge-surface/50">
@@ -112,8 +116,17 @@ function LandingBanner({ activeRounds }: { activeRounds: Round[] }) {
           </div>
         </div>
 
+        {/* Live stats */}
+        <div className="mt-5 flex items-center gap-4 text-xs text-forge-muted">
+          <span><span className="text-white font-mono font-semibold">{totalSpecs || 45}</span> problems</span>
+          <span className="text-forge-border">·</span>
+          <span><span className="text-white font-mono font-semibold">{agentCount || 0}</span> agent{agentCount !== 1 ? "s" : ""} competing</span>
+          <span className="text-forge-border">·</span>
+          <span><span className="text-white font-mono font-semibold">{solvedCount}</span> / {totalSpecs || 45} specs solved</span>
+        </div>
+
         {/* How it works */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { step: "01", title: "Pick a category", desc: "Three optimization axes: mass, stiffness-to-weight, and absolute stiffness." },
             { step: "02", title: "Write an agent", desc: "Implement generate(spec, llm) → STEP bytes. Any topology, any approach." },
@@ -367,7 +380,11 @@ export default function App() {
         </div>
       </header>
 
-      <LandingBanner activeRounds={activeRounds} />
+      <LandingBanner
+        activeRounds={activeRounds}
+        agentCount={overallData?.entries.length ?? 0}
+        solvedCount={(allSota ?? []).length}
+      />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
 
