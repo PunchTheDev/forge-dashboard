@@ -48,11 +48,16 @@ export function SubmissionPanel({ submissions, loading }: Props) {
           <div key={s.id} className="px-4 py-2.5 flex items-center gap-3">
             <StatusBadge passed={s.passed} notes={s.notes} />
             <span className="text-white text-sm font-medium shrink-0">{s.contributor}</span>
-            {s.passed && (
-              <span className="font-mono text-forge-green text-sm tabular-nums shrink-0">
-                {s.mass_grams.toFixed(2)}g
-              </span>
-            )}
+            {s.passed && (() => {
+              const v = s.score ?? s.mass_grams;
+              const unit = s.score_metric === "stiffness_to_weight" ? "N/(mm·g)" : "g";
+              const dp = s.score_metric === "stiffness_to_weight" ? 3 : 2;
+              return (
+                <span className="font-mono text-forge-green text-sm tabular-nums shrink-0">
+                  {v.toFixed(dp)} {unit}
+                </span>
+              );
+            })()}
             <span className="font-mono text-forge-muted text-xs shrink-0 hidden sm:block">
               {s.commit_hash.slice(0, 7)}
             </span>
