@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { api, Submission, Spec, SotaRecord, Round, stepUrl } from "./lib/api";
+import { api, Submission, Spec, SotaRecord, Round, stepUrl, fmtScore } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
@@ -426,6 +426,50 @@ export default function App() {
                   </div>
                 )}
 
+                {/* SOTA Gallery — specs with winning 3D STEP designs */}
+                {(allSota ?? []).some((s) => s.has_step) && (
+                  <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="text-sm font-semibold text-white">Top Solutions</div>
+                      <span className="text-xs text-forge-muted">— view winning 3D designs</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {(allSota ?? [])
+                        .filter((s) => s.has_step)
+                        .slice(0, 4)
+                        .map((sota) => {
+                          const spec = specs?.find((sp) => sp.id === sota.spec_id);
+                          return (
+                            <button
+                              key={sota.spec_id}
+                              onClick={() => {
+                                setSelectedSpecId(sota.spec_id);
+                                setSelectedRoundId(null);
+                                setSelectedSubmission(null);
+                              }}
+                              className="text-left p-4 bg-forge-surface border border-forge-border rounded-xl hover:border-forge-accent/50 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs bg-forge-green/20 text-forge-green px-1.5 py-0.5 rounded font-mono">3D</span>
+                                <span className="text-xs text-forge-muted font-mono">{sota.spec_id}</span>
+                              </div>
+                              <div className="text-xs font-semibold text-white mb-1 leading-snug line-clamp-2">
+                                {spec?.name ?? sota.spec_id}
+                              </div>
+                              <div className="text-xs text-forge-muted mt-2">
+                                <span className="text-forge-green font-mono font-semibold">
+                                  {fmtScore(sota.score, sota.score_metric)}
+                                </span>
+                                {" "}by <span className="text-white">{sota.contributor}</span>
+                              </div>
+                              <div className="text-xs text-forge-accent mt-1.5">View 3D →</div>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+
                 {/* API/CLI access panel */}
                 <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 max-w-2xl">
                   <div className="text-sm font-semibold text-white mb-2">Train your agent on the problem pool</div>
@@ -442,6 +486,46 @@ export default function App() {
                     <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl http://143.244.191.193:8000/rounds/active</span></div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Standalone spec view — from gallery, no round context */}
+            {selectedSpecId && !selectedRoundId && activeSpec && (
+              <div className="max-w-4xl mx-auto">
+                <button
+                  onClick={() => { setSelectedSpecId(null); setSelectedSubmission(null); }}
+                  className="text-xs text-forge-muted hover:text-white mb-5 flex items-center gap-1 transition-colors"
+                >
+                  ← All categories
+                </button>
+                <HeroStats spec={activeSpec} sota={sota ?? null} submissionCount={passedSubmissions.length} />
+                {sota?.has_step && (
+                  <div className="mt-5">
+                    <StepViewer
+                      stepUrl={stepUrl(sota.submission_id)}
+                      label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
+                    />
+                  </div>
+                )}
+                <div className="mt-5"><SotaChart submissions={submissions ?? []} spec={activeSpec} /></div>
+                <div className="mt-5">
+                  <Leaderboard
+                    spec={activeSpec}
+                    submissions={submissions ?? []}
+                    onSelectEntry={(s) => setSelectedSubmission(s)}
+                    selected={selectedSubmission}
+                  />
+                </div>
+                {selectedSubmission && (
+                  <div className="mt-5">
+                    <SubmissionJourney
+                      submission={selectedSubmission}
+                      spec={activeSpec}
+                      sota={sota ?? null}
+                      onClose={() => setSelectedSubmission(null)}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -523,7 +607,7 @@ export default function App() {
                       {sota?.has_step && (
                         <StepViewer
                           stepUrl={stepUrl(sota.submission_id)}
-                          label={`SOTA — ${sota.score_grams.toFixed(2)}g by ${sota.contributor}`}
+                          label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
                         />
                       )}
 
