@@ -2,6 +2,23 @@ import { Submission, Spec, allowableStress } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
+const METRIC_LABELS: Record<string, string> = {
+  mass_grams: "Mass",
+  volume_mm3: "Volume",
+  stiffness_to_weight: "Stiffness/weight",
+};
+
+const METRIC_UNITS: Record<string, string> = {
+  mass_grams: "g",
+  volume_mm3: "mm³",
+  stiffness_to_weight: "N/(mm·g)",
+};
+
+function formatScore(value: number, metric: string): string {
+  if (metric === "volume_mm3") return value.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  return value.toFixed(metric === "stiffness_to_weight" ? 4 : 2);
+}
+
 interface Props {
   spec: Spec;
   submissions: Submission[];
@@ -33,19 +50,31 @@ function StressBar({ value, max }: { value: number; max: number }) {
 }
 
 export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Props) {
-  // Show all passing submissions ranked by mass ascending.
-  // This lets the leaderboard tell the full competition story — every improvement step is visible.
+  const metric = spec.scoring.metric;
+  const direction = spec.scoring.direction;
+  const metricLabel = METRIC_LABELS[metric] ?? metric;
+  const metricUnit = METRIC_UNITS[metric] ?? "";
+
+  // Rank by the submission's own score field; fall back to mass_grams for legacy rows.
+  const scoreOf = (s: Submission) => s.score ?? s.mass_grams;
+
   const ranked = [...submissions]
     .filter((s) => s.passed)
-    .sort((a, b) => a.mass_grams - b.mass_grams);
+    .sort((a, b) =>
+      direction === "maximize"
+        ? scoreOf(b) - scoreOf(a)
+        : scoreOf(a) - scoreOf(b),
+    );
 
   const maxStress = allowableStress(spec);
-  const baselineMass = spec.scoring.baseline_mass_grams;
+  const baseline = spec.scoring.baseline_mass_grams;
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-forge-border">
-        <h2 className="text-sm font-semibold text-white">All submissions — ranked by mass</h2>
+        <h2 className="text-sm font-semibold text-white">
+          All submissions — ranked by {metricLabel.toLowerCase()}
+        </h2>
         <span className="text-xs text-forge-muted">{ranked.length} passing</span>
       </div>
 
@@ -61,8 +90,12 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
             <tr className="text-xs text-forge-muted border-b border-forge-border">
               <th className="px-4 py-2 text-left font-medium">Rank</th>
               <th className="px-4 py-2 text-left font-medium">Agent / Contributor</th>
-              <th className="px-4 py-2 text-right font-medium">Mass (g)</th>
-              <th className="px-4 py-2 text-right font-medium hidden sm:table-cell">vs Baseline</th>
+              <th className="px-4 py-2 text-right font-medium">
+                {metricLabel} {metricUnit ? `(${metricUnit})` : ""}
+              </th>
+              {metric === "mass_grams" && (
+                <th className="px-4 py-2 text-right font-medium hidden sm:table-cell">vs Baseline</th>
+              )}
               <th className="px-4 py-2 text-left font-medium hidden md:table-cell">Stress</th>
               <th className="px-4 py-2 text-left font-medium hidden lg:table-cell">PR</th>
               <th className="px-4 py-2 text-right font-medium hidden xl:table-cell">Date</th>
@@ -72,9 +105,11 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
             {ranked.map((s, i) => {
               const isLeader = i === 0;
               const isSelected = selected?.id === s.id;
-              const improvePct = baselineMass
-                ? (((baselineMass - s.mass_grams) / baselineMass) * 100).toFixed(1)
-                : null;
+              const score = scoreOf(s);
+              const improvePct =
+                metric === "mass_grams" && baseline
+                  ? (((baseline - s.mass_grams) / baseline) * 100).toFixed(1)
+                  : null;
               return (
                 <tr
                   key={s.id}
@@ -105,9 +140,10 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                   </td>
                   <td className="px-4 py-2.5 text-right font-mono font-semibold tabular-nums">
                     <span className={isLeader ? "text-forge-gold" : "text-forge-green"}>
-                      {s.mass_grams.toFixed(2)}
+                      {formatScore(score, metric)}
                     </span>
                   </td>
+                  {metric === "mass_grams" && (
                   <td className="px-4 py-2.5 text-right hidden sm:table-cell">
                     {improvePct && (
                       <span className="font-mono text-xs text-forge-green">
@@ -115,6 +151,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                       </span>
                     )}
                   </td>
+                  )}
                   <td className="px-4 py-2.5 hidden md:table-cell">
                     <StressBar value={s.fea_stress_mpa} max={maxStress} />
                   </td>

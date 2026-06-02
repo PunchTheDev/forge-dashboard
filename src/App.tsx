@@ -330,7 +330,7 @@ export default function App() {
 
                   <SotaChart
                     submissions={submissions ?? []}
-                    specId={activeSpec.id}
+                    spec={activeSpec}
                   />
 
                   <Leaderboard
