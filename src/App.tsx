@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { api, Submission, Spec, SotaRecord, stepUrl } from "./lib/api";
+import { api, Submission, Spec, SotaRecord, Round, stepUrl } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
@@ -37,7 +37,43 @@ function ApiError({ message }: { message: string }) {
   );
 }
 
-function LandingBanner({ totalSota }: { totalSota: SotaRecord[] }) {
+function ActiveRoundCard({ round }: { round: Round }) {
+  const tiers = ["easy", "medium", "hard"];
+  const counts = Object.fromEntries(
+    tiers.map((t) => [t, round.specs.filter((s) => s.tier === t).length]),
+  );
+  const tierColors: Record<string, string> = {
+    easy: "text-forge-green",
+    medium: "text-forge-accent",
+    hard: "text-forge-red",
+  };
+  return (
+    <div className="mt-4 flex items-start gap-3 bg-forge-bg border border-forge-border rounded-xl px-4 py-3">
+      <div className="shrink-0 mt-0.5">
+        <span className="text-xs bg-forge-accent/20 text-forge-accent px-2 py-0.5 rounded-full font-medium">
+          Active Round
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-white truncate">{round.name}</div>
+        <div className="text-xs text-forge-muted mt-0.5 leading-relaxed">{round.description}</div>
+        <div className="flex flex-wrap gap-3 mt-2">
+          {tiers.filter((t) => counts[t] > 0).map((t) => (
+            <span key={t} className={`text-xs font-mono ${tierColors[t]}`}>
+              {counts[t]} {t}
+            </span>
+          ))}
+          <span className="text-xs text-forge-muted">·</span>
+          <span className="text-xs text-forge-muted font-mono">
+            metric: {round.scoring_metric}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingBanner({ totalSota, activeRounds }: { totalSota: SotaRecord[]; activeRounds: Round[] }) {
   return (
     <div className="border-b border-forge-border bg-forge-surface/50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -109,6 +145,12 @@ function LandingBanner({ totalSota }: { totalSota: SotaRecord[] }) {
             </div>
           ))}
         </div>
+
+        {activeRounds.length > 0 && (
+          <div className="mt-2">
+            {activeRounds.map((r) => <ActiveRoundCard key={r.id} round={r} />)}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -147,6 +189,11 @@ export default function App() {
   const { data: allSota } = useApi<SotaRecord[]>(
     useCallback(() => api.sotaAll(), []),
     60000,
+  );
+
+  const { data: activeRounds } = useApi<Round[]>(
+    useCallback(() => api.activeRounds().catch(() => []), []),
+    300000,
   );
 
   const activeSpec: Spec | null =
@@ -203,7 +250,7 @@ export default function App() {
         </div>
       </header>
 
-      <LandingBanner totalSota={allSota ?? []} />
+      <LandingBanner totalSota={allSota ?? []} activeRounds={activeRounds ?? []} />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === "rankings" && (

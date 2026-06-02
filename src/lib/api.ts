@@ -124,6 +124,24 @@ export function stepUrl(submissionId: string): string {
   return `${BASE}/submissions/${submissionId}/step`;
 }
 
+export interface RoundSpec {
+  id: string;
+  tier: string;
+}
+
+export interface Round {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  starts: string;
+  ends: string | null;
+  scoring_metric: string;
+  scoring_direction: string;
+  specs: RoundSpec[];
+  notes: string | null;
+}
+
 export interface EvalPreviewResult {
   passed: boolean;
   score: number | null;
@@ -169,4 +187,5 @@ export const api = {
   health: () => get<{ status: string }>("/health"),
   evalPreview: (agentCode: string, specId: string) =>
     post<EvalPreviewResult>("/eval/preview", { agent_code: agentCode, spec_id: specId }),
+  activeRounds: () => get<Round[]>("/rounds/active"),
 };
