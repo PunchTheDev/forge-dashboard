@@ -74,6 +74,29 @@ export interface SotaRecord {
   note: string | null;
 }
 
+export interface OverallSpecBest {
+  spec_id: string;
+  rank: number;
+  mass_grams: number;
+  normalized_score: number;
+  submission_id: string;
+  submitted_at: string;
+}
+
+export interface OverallEntry {
+  rank: number;
+  contributor: string;
+  specs_entered: number;
+  total_wins: number;
+  avg_normalized_score: number;
+  best: OverallSpecBest[];
+}
+
+export interface OverallLeaderboard {
+  total_specs: number;
+  entries: OverallEntry[];
+}
+
 // Yield stress by material key (MPa), matching forge benchmark/materials.py
 const YIELD_STRESS: Record<string, number> = {
   pla: 50,
@@ -108,5 +131,6 @@ export const api = {
     get<LeaderboardResponse>(`/leaderboard/${specId}`).then((r) => r.entries),
   sota: (specId: string) => get<SotaRecord>(`/sota/${specId}`),
   sotaAll: () => get<SotaRecord[]>("/sota"),
+  overallLeaderboard: () => get<OverallLeaderboard>("/leaderboard/overall"),
   health: () => get<{ status: string }>("/health"),
 };

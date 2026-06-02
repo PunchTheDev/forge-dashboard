@@ -7,6 +7,7 @@ import { SpecCard } from "./components/SpecCard";
 import { SubmissionPanel } from "./components/SubmissionPanel";
 import { StepViewer } from "./components/StepViewer";
 import { HeroStats } from "./components/HeroStats";
+import { OverallLeaderboard } from "./components/OverallLeaderboard";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
@@ -30,14 +31,22 @@ function ApiError({ message }: { message: string }) {
   );
 }
 
+type TabId = "problems" | "rankings";
+
 export default function App() {
   const { data: specs, loading: specsLoading, error: specsError } = useApi(
     api.specs,
     60000,
   );
 
+  const [activeTab, setActiveTab] = useState<TabId>("problems");
   const [selectedSpecId, setSelectedSpecId] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<LeaderboardEntry | null>(null);
+
+  const { data: overallData, loading: overallLoading } = useApi(
+    api.overallLeaderboard,
+    30000,
+  );
 
   const activeSpec: Spec | null =
     specs?.find((s) => s.id === selectedSpecId) ?? specs?.[0] ?? null;
@@ -87,6 +96,20 @@ export default function App() {
             <span className="text-forge-accent font-bold text-sm tracking-wide">FORGE</span>
             <span className="text-forge-border">|</span>
             <span className="text-forge-muted text-xs">Gittensor SN74</span>
+            <span className="text-forge-border">|</span>
+            {(["problems", "rankings"] as TabId[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`text-xs transition-colors capitalize ${
+                  activeTab === tab
+                    ? "text-white font-semibold"
+                    : "text-forge-muted hover:text-white"
+                }`}
+              >
+                {tab === "problems" ? "Problems" : "All-Time Rankings"}
+              </button>
+            ))}
           </div>
           <nav className="flex items-center gap-4 text-xs text-forge-muted">
             <a
@@ -110,6 +133,19 @@ export default function App() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {activeTab === "rankings" && (
+          <div className="max-w-2xl mx-auto">
+            <div className="mb-6">
+              <div className="text-lg font-bold text-white">All-Time Rankings</div>
+              <div className="text-xs text-forge-muted mt-1">
+                Contributors ranked by average normalized score across all active specs
+              </div>
+            </div>
+            <OverallLeaderboard data={overallData ?? null} loading={overallLoading} />
+          </div>
+        )}
+
+        {activeTab === "problems" && (
         <div className="flex gap-6">
           {/* Sidebar: spec selector */}
           <aside className="w-64 shrink-0 hidden lg:block">
@@ -212,6 +248,7 @@ export default function App() {
             )}
           </main>
         </div>
+        )}
       </div>
     </div>
   );
