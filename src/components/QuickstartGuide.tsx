@@ -1,6 +1,12 @@
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_BASE = "http://143.244.191.193:8000";
 
+const WHITELISTED_MODELS = [
+  { id: "anthropic/claude-haiku-4-5", provider: "Anthropic", desc: "Fast, cheap — good for iterative geometry generation" },
+  { id: "anthropic/claude-3-5-haiku", provider: "Anthropic", desc: "Stronger reasoning, still fast" },
+  { id: "openai/gpt-4o-mini", provider: "OpenAI", desc: "Alternative reasoning model" },
+];
+
 function CodeBlock({ code }: { code: string }) {
   return (
     <pre className="bg-forge-bg border border-forge-border rounded-lg p-3 text-xs text-forge-green font-mono overflow-x-auto whitespace-pre">
@@ -77,62 +83,106 @@ forge new your-name
 # Or manually:
 mkdir -p agents/your-name
 # Then write agents/your-name/agent.py`} />
+        <p className="text-forge-muted text-sm">
+          Two submission interfaces are supported:
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="bg-forge-bg border border-forge-border rounded-lg p-3">
+            <div className="text-forge-accent text-xs font-semibold mb-1">Static agent</div>
+            <div className="text-forge-muted text-xs leading-relaxed">
+              Hardcoded geometry. Fastest to write, no LLM needed. Good for algorithmic topology optimization.
+            </div>
+          </div>
+          <div className="bg-forge-bg border border-forge-green/30 rounded-lg p-3">
+            <div className="text-forge-green text-xs font-semibold mb-1">LLM agent (recommended)</div>
+            <div className="text-forge-muted text-xs leading-relaxed">
+              Observe → plan → act loop. Uses a harness-injected LLM client to reason about geometry. Network enabled.
+            </div>
+          </div>
+        </div>
         <CodeBlock code={`# agents/your-name/agent.py
-def generate(spec: dict) -> bytes:
-    """Return STEP file bytes for the given spec.
 
-    spec["constraints"] contains:
-      load_newtons, load_point_mm, safety_factor,
+# --- Option A: static agent ---
+def generate(spec: dict) -> bytes:
+    constraints = spec["constraints"]
+    # build geometry, return STEP bytes
+    ...
+
+# --- Option B: LLM agent (recommended) ---
+from forge.sdk import LLMClient  # injected by harness
+
+def generate(spec: dict, llm: LLMClient) -> bytes:
+    """
+    spec["constraints"]: load_newtons, load_point_mm, safety_factor,
       bolt_pattern_mm, bolt_diameter_clearance_mm,
       build_volume_mm, max_overhang_deg, min_wall_thickness_mm
-
-    spec["material"] is one of: pla, petg, aluminum_6061, stainless_316
-
-    Sandbox: 60s timeout, 4GB RAM, no network.
-    Available: build123d, OCP, gmsh, numpy, scipy
+    spec["material"]: pla | petg | aluminum_6061 | stainless_316
+    llm: whitelisted model, injected — do NOT hardcode API keys
+    Sandbox: 60s, 4GB RAM, network enabled for LLM calls
     """
-    ...
-    return step_bytes  # bytes from STEP export`} />
+    plan = llm.chat([
+        {"role": "system", "content": "You are a structural CAD engineer."},
+        {"role": "user", "content": f"Design a bracket for: {spec}"},
+    ])
+    # parse plan, execute geometry code, return STEP bytes
+    ...`} />
         <p className="text-forge-muted text-xs">
-          See <code className="bg-forge-border px-1 rounded">agents/baseline_steel/agent.py</code>{" "}
-          for a working reference. The template in <code className="bg-forge-border px-1 rounded">agents/template/</code>{" "}
-          has a minimal scaffold.
+          See <code className="bg-forge-border px-1 rounded">examples/llm-agent/agent.py</code>{" "}
+          for a complete working LLM agent example. Static baseline in{" "}
+          <code className="bg-forge-border px-1 rounded">agents/baseline_steel/agent.py</code>.
+        </p>
+      </Section>
+
+      {/* Whitelisted models */}
+      <Section title="Whitelisted models">
+        <p className="text-forge-muted text-sm leading-relaxed">
+          LLM agents receive a harness-injected <code className="bg-forge-border px-1 rounded">LLMClient</code>{" "}
+          that routes through OpenRouter. You do not supply an API key — the harness handles it.
+          Only these models are permitted:
+        </p>
+        <div className="flex flex-col gap-2">
+          {WHITELISTED_MODELS.map((m) => (
+            <div key={m.id} className="flex items-start gap-3 bg-forge-bg border border-forge-border rounded-lg px-3 py-2">
+              <div className="flex-1 min-w-0">
+                <div className="text-white text-xs font-mono font-semibold">{m.id}</div>
+                <div className="text-forge-muted text-xs mt-0.5">{m.desc}</div>
+              </div>
+              <div className="text-forge-muted text-xs shrink-0">{m.provider}</div>
+            </div>
+          ))}
+        </div>
+        <CodeBlock code={`# LLMClient usage in your agent:
+response = llm.chat([
+    {"role": "system", "content": "You are a structural CAD engineer."},
+    {"role": "user", "content": "Given this spec, produce Python build123d code..."},
+])
+# response is a string — parse it for code to exec
+
+# You can also stream:
+for chunk in llm.stream([...]):
+    print(chunk, end="", flush=True)`} />
+        <p className="text-forge-muted text-xs">
+          The model is fixed by the harness via <code className="bg-forge-border px-1 rounded">FORGE_MODEL</code>.
+          Your agent cannot override the model — this prevents gaming through model selection.
         </p>
       </Section>
 
       {/* AI / agentic miners */}
-      <Section title="Using AI to generate your agent">
+      <Section title="Agent architecture patterns">
         <p className="text-forge-muted text-sm leading-relaxed">
-          Forge is designed for AI-assisted engineering. You can use any LLM (Claude, GPT-4, Gemini)
-          to generate your <code className="bg-forge-border px-1 rounded">agent.py</code>.
-          Paste the spec JSON and prompt it to design a structurally optimal bracket. The best
-          miners use iterative AI-guided topology search.
+          The best LLM agents use a structured observe → plan → act loop rather than a single prompt.
         </p>
-        <CodeBlock code={`# Fetch the full spec to paste into your LLM:
-curl ${API_BASE}/specs/001_bracket | python3 -m json.tool`} />
         <div className="bg-forge-surface border border-forge-border rounded-lg p-4">
-          <div className="text-xs text-forge-accent font-semibold mb-2">Example LLM prompt:</div>
-          <p className="text-forge-muted text-xs leading-relaxed font-mono">
-            {`You are a structural engineer optimizing a 3D-printable bracket for minimum mass.
-The bracket must pass finite element analysis with CalculiX.
-
-Spec: <paste JSON from /specs/{id}>
-
-Write a Python function generate(spec) -> bytes that:
-1. Reads constraints from spec["constraints"]
-2. Uses build123d or raw OCP to create a STEP geometry
-3. Exports and returns the STEP file as bytes
-
-Topology hints: hollow box arms, I-beams, tapered sections.
-Minimize mass while keeping max von Mises stress ≤ allowable.`}
+          <div className="text-xs text-forge-accent font-semibold mb-2">Recommended loop pattern:</div>
+          <p className="text-forge-muted text-xs leading-relaxed font-mono whitespace-pre">
+            {`1. OBSERVE   — read spec constraints, compute allowable stress
+2. PLAN      — prompt LLM: "given load X at point Y, what topology?"
+3. ACT       — execute geometry code from LLM output
+4. VERIFY    — check build volume, bolt holes, wall thickness
+5. REFLECT   — if check fails, prompt LLM for correction
+6. EXPORT    — return STEP bytes`}
           </p>
         </div>
-        <p className="text-forge-muted text-xs leading-relaxed">
-          The eval sandbox has no network access — your agent must generate geometry from scratch.
-          Use the{" "}
-          <code className="bg-forge-border px-1 rounded">forge eval</code>{" "}
-          command locally to iterate before opening a PR.
-        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
           {[
             { title: "build123d", desc: "High-level OCP wrapper — easiest for complex shapes" },
@@ -264,7 +314,7 @@ git push mine your-name/my-design
             "3× determinism check — all three runs must return identical scores",
             "Duplicate detection — same commit hash is never scored twice",
             "Similarity check — agents must not copy existing agents' code",
-            "No network in eval — agents can't fetch answers at test time",
+            "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
             "60s / 4GB limits — prevents brute-force search",
             "Seeds fixed — geometry and mesh are deterministic",
           ].map((item) => (
