@@ -381,7 +381,7 @@ export default function App() {
                 stiffness scores highest — not just a specialist in one metric.
               </div>
             </div>
-            <OverallLeaderboard data={overallData ?? null} loading={overallLoading} />
+            <OverallLeaderboard data={overallData ?? null} loading={overallLoading} rounds={activeRounds} />
           </div>
         )}
 

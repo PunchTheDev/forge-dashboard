@@ -120,6 +120,8 @@ export interface OverallSpecBest {
   spec_id: string;
   rank: number;
   mass_grams: number;
+  score: number;
+  score_metric: string;
   normalized_score: number;
   submission_id: string;
   submitted_at: string;
