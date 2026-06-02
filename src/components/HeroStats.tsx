@@ -40,6 +40,10 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
   const stressHeadroom = sota
     ? (((allowable - sota.fea_stress_mpa) / allowable) * 100).toFixed(0)
     : null;
+  const baselineMass = spec.scoring.baseline_mass_grams;
+  const massReduction = sota && baselineMass
+    ? (((baselineMass - sota.score_grams) / baselineMass) * 100).toFixed(1)
+    : null;
 
   return (
     <div>
@@ -71,20 +75,20 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           sub={sota ? `by ${sota.contributor}` : "no submissions yet"}
         />
         <Stat
+          label="vs baseline"
+          value={massReduction ? `−${massReduction}%` : "—"}
+          sub={baselineMass ? `baseline ${baselineMass.toFixed(0)}g` : undefined}
+        />
+        <Stat
           label="Stress headroom"
           value={stressHeadroom ? `${stressHeadroom}%` : "—"}
           sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} / ${allowable.toFixed(0)} MPa` : "max von Mises"}
+          accent
         />
         <Stat
           label="Passing entries"
           value={String(submissionCount)}
           sub="verified by FEA"
-          accent
-        />
-        <Stat
-          label="Status"
-          value="Open"
-          sub="accepting PRs"
           accent
         />
       </div>
