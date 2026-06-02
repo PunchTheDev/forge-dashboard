@@ -428,7 +428,7 @@ export default function App() {
 
                 {/* SOTA Gallery — specs with winning 3D STEP designs */}
                 {(allSota ?? []).some((s) => s.has_step) && (
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="text-sm font-semibold text-white">Top Solutions</div>
                       <span className="text-xs text-forge-muted">— view winning 3D designs</span>
@@ -469,6 +469,54 @@ export default function App() {
                     </div>
                   </div>
                 )}
+
+                {/* Open Challenges — rounds with no SOTA submissions yet */}
+                {activeRounds.length > 0 && (() => {
+                  const solvedRoundIds = new Set(
+                    (allSota ?? []).map((s) => {
+                      const round = activeRounds.find((r) => r.specs.some((sp) => sp.id === s.spec_id));
+                      return round?.id;
+                    }).filter(Boolean)
+                  );
+                  const openRounds = activeRounds.filter((r) => !solvedRoundIds.has(r.id));
+                  if (!openRounds.length) return null;
+                  return (
+                    <div className="mb-8">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="text-sm font-semibold text-white">Open Challenges</div>
+                        <span className="text-xs text-forge-accent font-mono">unclaimed — be first</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {openRounds.map((r) => {
+                          const meta = CATEGORY_META[r.id] ?? { icon: "·", color: "text-forge-muted", bgColor: "bg-forge-surface", borderColor: "border-forge-border" };
+                          return (
+                            <button
+                              key={r.id}
+                              onClick={() => selectCategory(r.id)}
+                              className={`text-left p-5 rounded-xl border-2 border-dashed transition-all hover:scale-[1.01] active:scale-[0.99] ${meta.borderColor} ${meta.bgColor} hover:border-opacity-80`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <div className={`text-xs font-bold uppercase tracking-wide ${meta.color}`}>
+                                  {r.name.replace(/Round \d+ — /, "")}
+                                </div>
+                                <span className={`text-xs font-mono px-2 py-0.5 rounded border ${meta.bgColor} ${meta.color} ${meta.borderColor}`}>
+                                  {r.scoring_direction === "minimize" ? "↓" : "↑"} {r.scoring_metric}
+                                </span>
+                              </div>
+                              <div className="text-forge-muted text-xs leading-relaxed mb-3">
+                                {r.description}
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-forge-muted font-mono">{r.specs.length} specs open</span>
+                                <span className={`text-xs font-semibold ${meta.color}`}>Claim SOTA →</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* API/CLI access panel */}
                 <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 max-w-2xl">
