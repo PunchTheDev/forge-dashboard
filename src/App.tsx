@@ -57,15 +57,19 @@ function LandingBanner({ totalSota }: { totalSota: SotaRecord[] }) {
               that survives real finite element analysis. Every submission is auto-scored by CI.
               The best design earns Bittensor emissions on Gittensor subnet 74.
             </p>
-            {totalSota.length > 0 && (
+            {totalSota.filter((s) => !s.spec_id.startsWith("pub_")).length > 0 && (
               <div className="flex flex-wrap gap-4 mt-4">
-                {totalSota.map((s) => (
-                  <div key={s.spec_id} className="text-xs">
-                    <span className="text-forge-muted">{s.spec_id.split("_").slice(1).join(" ")}: </span>
-                    <span className="text-forge-green font-mono font-bold">{s.score_grams.toFixed(2)}g</span>
-                    <span className="text-forge-muted"> SOTA</span>
-                  </div>
-                ))}
+                {totalSota
+                  .filter((s) => !s.spec_id.startsWith("pub_"))
+                  .map((s) => (
+                    <div key={s.spec_id} className="text-xs">
+                      <span className="text-forge-muted">
+                        {s.spec_id.replace(/^\d+_/, "").replace(/_/g, " ")}:{" "}
+                      </span>
+                      <span className="text-forge-green font-mono font-bold">{s.score_grams.toFixed(2)}g</span>
+                      <span className="text-forge-muted"> SOTA</span>
+                    </div>
+                  ))}
               </div>
             )}
           </div>
