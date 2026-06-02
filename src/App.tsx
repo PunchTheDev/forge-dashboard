@@ -16,10 +16,10 @@ import { SpecDiagram } from "./components/SpecDiagram";
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = "http://143.244.191.193:8000/docs";
 
-const CATEGORY_META: Record<string, { icon: string; color: string; bgColor: string; borderColor: string }> = {
-  round_001: { icon: "⚖", color: "text-forge-green", bgColor: "bg-forge-green/10", borderColor: "border-forge-green/40" },
-  round_002: { icon: "⟳", color: "text-forge-accent", bgColor: "bg-forge-accent/10", borderColor: "border-forge-accent/40" },
-  round_003: { icon: "↕", color: "text-forge-red",    bgColor: "bg-forge-red/10",    borderColor: "border-forge-red/40" },
+const CATEGORY_META: Record<string, { icon: string; color: string; bgColor: string; borderColor: string; hex: string }> = {
+  round_001: { icon: "⚖", color: "text-forge-green", bgColor: "bg-forge-green/10", borderColor: "border-forge-green/40", hex: "#10b981" },
+  round_002: { icon: "⟳", color: "text-forge-accent", bgColor: "bg-forge-accent/10", borderColor: "border-forge-accent/40", hex: "#6366f1" },
+  round_003: { icon: "↕", color: "text-forge-red",    bgColor: "bg-forge-red/10",    borderColor: "border-forge-red/40",   hex: "#ef4444" },
 };
 
 const TIER_COLORS: Record<string, string> = {
@@ -309,6 +309,12 @@ export default function App() {
     return map;
   }, [allSota]);
 
+  // Count solved specs within active rounds only (excludes legacy pub_* entries)
+  const roundSolvedCount = useMemo(() => {
+    const roundSpecIds = new Set(activeRounds.flatMap((r) => r.specs.map((s) => s.id)));
+    return (allSota ?? []).filter((s) => roundSpecIds.has(s.spec_id)).length;
+  }, [activeRounds, allSota]);
+
   // Derive active spec — when category changes, auto-select first spec in that category
   const categorySpecs = useMemo(() => {
     if (!specs || !selectedRoundId) return specs ?? [];
@@ -383,7 +389,7 @@ export default function App() {
       <LandingBanner
         activeRounds={activeRounds}
         agentCount={overallData?.entries.length ?? 0}
-        solvedCount={(allSota ?? []).length}
+        solvedCount={roundSolvedCount}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -444,76 +450,105 @@ export default function App() {
                   </div>
                 )}
 
-                {/* SOTA Gallery — specs with winning 3D STEP designs */}
-                {(allSota ?? []).some((s) => s.has_step) && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="text-sm font-semibold text-white">Top Solutions</div>
-                      <span className="text-xs text-forge-muted">— winning designs, rendered in 3D</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {(allSota ?? [])
-                        .filter((s) => s.has_step)
-                        .slice(0, 4)
-                        .map((sota) => {
+                {/* SOTA Gallery — current round leaders + STEP-enabled entries */}
+                {(() => {
+                  // Prefer one entry per active round, then fill with STEP entries
+                  const seenRounds = new Set<string>();
+                  const featured: typeof allSota = [];
+                  for (const s of (allSota ?? [])) {
+                    const round = activeRounds.find((r) => r.specs.some((sp) => sp.id === s.spec_id));
+                    if (round && !seenRounds.has(round.id)) {
+                      seenRounds.add(round.id);
+                      featured.push(s);
+                    }
+                  }
+                  // Fill remaining slots (up to 6) with STEP-enabled entries not already featured
+                  const featuredIds = new Set(featured.map((s) => s.spec_id));
+                  for (const s of (allSota ?? [])) {
+                    if (featured.length >= 6) break;
+                    if (!featuredIds.has(s.spec_id) && s.has_step) {
+                      featured.push(s);
+                      featuredIds.add(s.spec_id);
+                    }
+                  }
+                  if (!featured.length) return null;
+                  return (
+                    <div className="mb-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="text-sm font-semibold text-white">Current Leaders</div>
+                        <span className="text-xs text-forge-muted">— best per category</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {featured.map((sota) => {
                           const spec = specs?.find((sp) => sp.id === sota.spec_id);
+                          const round = activeRounds.find((r) => r.specs.some((sp) => sp.id === sota.spec_id));
+                          const meta = round ? CATEGORY_META[round.id] : null;
                           return (
                             <button
                               key={sota.spec_id}
                               onClick={() => {
                                 setSelectedSpecId(sota.spec_id);
-                                setSelectedRoundId(null);
+                                setSelectedRoundId(round?.id ?? null);
                                 setSelectedSubmission(null);
                               }}
                               className="text-left p-4 bg-forge-surface border border-forge-border rounded-xl hover:border-forge-accent/50 transition-all hover:scale-[1.01] active:scale-[0.99]"
                             >
-                              {/* Spec diagram — immediate visual of the problem */}
+                              {/* Spec diagram */}
                               {spec && (
                                 <div className="mb-3 pointer-events-none">
                                   <SpecDiagram spec={spec} compact />
                                 </div>
                               )}
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs bg-forge-green/20 text-forge-green px-1.5 py-0.5 rounded font-mono">3D</span>
-                                  <span className="text-xs font-semibold text-white leading-snug line-clamp-1">
-                                    {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id}
-                                  </span>
+                              {/* Category badge */}
+                              {meta && (
+                                <div className={`text-xs font-semibold ${meta.color} mb-1`}>
+                                  {round?.name.replace(/Round \d+ — /, "")}
                                 </div>
-                                <span className="text-forge-green font-mono font-semibold text-sm shrink-0">
+                              )}
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-semibold text-white leading-snug line-clamp-1">
+                                  {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id}
+                                </span>
+                                <span className={`font-mono font-semibold text-sm shrink-0 ${meta?.color ?? "text-forge-green"}`}>
                                   {fmtScore(sota.score, sota.score_metric)}
                                 </span>
                               </div>
                               <div className="flex items-center justify-between mt-1.5">
                                 <span className="text-xs text-forge-muted">by <span className="text-white">{sota.contributor}</span></span>
-                                <span className="text-xs text-forge-accent">View 3D →</span>
+                                <span className="text-xs text-forge-accent">
+                                  {sota.has_step ? "View 3D →" : "Explore →"}
+                                </span>
                               </div>
                             </button>
                           );
                         })}
+                      </div>
                     </div>
-                  </div>
-                )}
-
-                {/* Open Challenges — rounds with no SOTA submissions yet */}
-                {activeRounds.length > 0 && (() => {
-                  const solvedRoundIds = new Set(
-                    (allSota ?? []).map((s) => {
-                      const round = activeRounds.find((r) => r.specs.some((sp) => sp.id === s.spec_id));
-                      return round?.id;
-                    }).filter(Boolean)
                   );
-                  const openRounds = activeRounds.filter((r) => !solvedRoundIds.has(r.id));
-                  if (!openRounds.length) return null;
+                })()}
+
+                {/* Open Challenges — rounds where SOTA hasn't saturated */}
+                {activeRounds.length > 0 && (() => {
+                  const solvedSpecIds = new Set((allSota ?? []).map((s) => s.spec_id));
+                  const roundsWithGaps = activeRounds
+                    .map((r) => {
+                      const solved = r.specs.filter((sp) => solvedSpecIds.has(sp.id)).length;
+                      const unclaimed = r.specs.length - solved;
+                      return { round: r, solved, unclaimed };
+                    })
+                    .filter(({ unclaimed }) => unclaimed > 0);
+                  if (!roundsWithGaps.length) return null;
+                  const totalUnclaimed = roundsWithGaps.reduce((n, { unclaimed }) => n + unclaimed, 0);
                   return (
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="text-sm font-semibold text-white">Open Challenges</div>
-                        <span className="text-xs text-forge-accent font-mono">unclaimed — be first</span>
+                        <span className="text-xs text-forge-accent font-mono">{totalUnclaimed} specs unclaimed</span>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {openRounds.map((r) => {
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {roundsWithGaps.map(({ round: r, solved, unclaimed }) => {
                           const meta = CATEGORY_META[r.id] ?? { icon: "·", color: "text-forge-muted", bgColor: "bg-forge-surface", borderColor: "border-forge-border" };
+                          const pct = Math.round((solved / r.specs.length) * 100);
                           return (
                             <button
                               key={r.id}
@@ -528,11 +563,17 @@ export default function App() {
                                   {r.scoring_direction === "minimize" ? "↓" : "↑"} {r.scoring_metric}
                                 </span>
                               </div>
-                              <div className="text-forge-muted text-xs leading-relaxed mb-3">
-                                {r.description}
+                              {/* Progress bar */}
+                              <div className="w-full bg-forge-border rounded-full h-1 mb-3">
+                                <div
+                                  className="h-1 rounded-full transition-all"
+                                  style={{ width: `${pct}%`, backgroundColor: meta.hex }}
+                                />
                               </div>
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-forge-muted font-mono">{r.specs.length} specs open</span>
+                                <span className="text-xs text-forge-muted font-mono">
+                                  <span className="text-white font-semibold">{unclaimed}</span> / {r.specs.length} unclaimed
+                                </span>
                                 <span className={`text-xs font-semibold ${meta.color}`}>Claim SOTA →</span>
                               </div>
                             </button>
