@@ -577,18 +577,32 @@ export default function App() {
                   </div>
                 </aside>
 
-                {/* Mobile: back button above content */}
+                {/* Mobile: back button + spec list */}
                 <div className="lg:hidden mb-4 w-full">
-                  <button onClick={clearCategory} className="text-xs text-forge-muted hover:text-white mb-2 flex items-center gap-1">
+                  <button onClick={clearCategory} className="text-xs text-forge-muted hover:text-white mb-3 flex items-center gap-1">
                     ← All categories
                   </button>
+                  {!selectedSpecId && (
+                    <CategorySpecList
+                      round={selectedRound}
+                      specs={specs ?? []}
+                      sotaBySpec={sotaBySpec}
+                      selectedTier={selectedTier}
+                      onTierChange={setSelectedTier}
+                      activeSpecId={selectedSpecId}
+                      onSelectSpec={(id) => {
+                        setSelectedSpecId(id);
+                        setSelectedSubmission(null);
+                      }}
+                    />
+                  )}
                 </div>
 
                 {/* Main content */}
                 <main className="flex-1 min-w-0 flex flex-col gap-5">
                   {!selectedSpecId ? (
-                    /* No spec selected — show category intro */
-                    <div className="py-8 text-center">
+                    /* Desktop: prompt to select from sidebar */
+                    <div className="hidden lg:block py-8 text-center">
                       <div className="text-forge-muted text-sm mb-2">
                         {categorySpecs.length} spec{categorySpecs.length !== 1 ? "s" : ""} in this category
                       </div>
@@ -639,7 +653,7 @@ export default function App() {
                         {sota ? (
                           <p className="text-forge-muted text-xs mb-3">
                             Current leader:{" "}
-                            <span className="text-forge-green font-mono">{sota.score_grams.toFixed(2)}g</span>{" "}
+                            <span className="text-forge-green font-mono">{fmtScore(sota.score, sota.score_metric)}</span>{" "}
                             by <span className="text-white">{sota.contributor}</span>.{" "}
                             Fork the repo, write a better design, open a PR.
                           </p>

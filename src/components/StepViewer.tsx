@@ -188,7 +188,7 @@ export function StepViewer({ stepUrl, label }: Props) {
           <span className="text-xs text-forge-green">drag to rotate</span>
         )}
       </div>
-      <div ref={mountRef} className="h-72 w-full" />
+      <div ref={mountRef} className="h-96 w-full" />
     </div>
   );
 }
