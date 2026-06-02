@@ -2,6 +2,8 @@ import { Spec } from "../lib/api";
 
 interface Props {
   spec: Spec;
+  /** When true, only renders the side view (no bolt pattern panel). */
+  compact?: boolean;
 }
 
 const MATERIAL_COLOR: Record<string, string> = {
@@ -13,7 +15,7 @@ const MATERIAL_COLOR: Record<string, string> = {
 };
 
 /** Compact 2-panel SVG diagram: side view (XZ) + front view (YZ bolt pattern). */
-export function SpecDiagram({ spec }: Props) {
+export function SpecDiagram({ spec, compact = false }: Props) {
   const c = spec.constraints;
   const [bvx, , bvz] = c.build_volume_mm;
   const [lx, , lz] = c.load_point_mm;
@@ -220,8 +222,8 @@ export function SpecDiagram({ spec }: Props) {
         </svg>
       </div>
 
-      {/* Front view — bolt pattern */}
-      <div className="shrink-0">
+      {/* Front view — bolt pattern (hidden in compact mode) */}
+      {!compact && <div className="shrink-0">
         <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
           Bolt pattern (YZ)
         </div>
@@ -299,7 +301,7 @@ export function SpecDiagram({ spec }: Props) {
             {c.bolt_pattern_mm.length} × M{(c.bolt_diameter_clearance_mm - 0.5).toFixed(0)}
           </text>
         </svg>
-      </div>
+      </div>}
     </div>
   );
 }

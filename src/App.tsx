@@ -11,6 +11,7 @@ import { OverallLeaderboard } from "./components/OverallLeaderboard";
 import { QuickstartGuide } from "./components/QuickstartGuide";
 import { LiveEval } from "./components/LiveEval";
 import { StepViewer } from "./components/StepViewer";
+import { SpecDiagram } from "./components/SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = "http://143.244.191.193:8000/docs";
@@ -431,9 +432,9 @@ export default function App() {
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="text-sm font-semibold text-white">Top Solutions</div>
-                      <span className="text-xs text-forge-muted">— view winning 3D designs</span>
+                      <span className="text-xs text-forge-muted">— winning designs, rendered in 3D</span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {(allSota ?? [])
                         .filter((s) => s.has_step)
                         .slice(0, 4)
@@ -449,20 +450,27 @@ export default function App() {
                               }}
                               className="text-left p-4 bg-forge-surface border border-forge-border rounded-xl hover:border-forge-accent/50 transition-all hover:scale-[1.01] active:scale-[0.99]"
                             >
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-xs bg-forge-green/20 text-forge-green px-1.5 py-0.5 rounded font-mono">3D</span>
-                                <span className="text-xs text-forge-muted font-mono">{sota.spec_id}</span>
-                              </div>
-                              <div className="text-xs font-semibold text-white mb-1 leading-snug line-clamp-2">
-                                {spec?.name ?? sota.spec_id}
-                              </div>
-                              <div className="text-xs text-forge-muted mt-2">
-                                <span className="text-forge-green font-mono font-semibold">
+                              {/* Spec diagram — immediate visual of the problem */}
+                              {spec && (
+                                <div className="mb-3 pointer-events-none">
+                                  <SpecDiagram spec={spec} compact />
+                                </div>
+                              )}
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs bg-forge-green/20 text-forge-green px-1.5 py-0.5 rounded font-mono">3D</span>
+                                  <span className="text-xs font-semibold text-white leading-snug line-clamp-1">
+                                    {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id}
+                                  </span>
+                                </div>
+                                <span className="text-forge-green font-mono font-semibold text-sm shrink-0">
                                   {fmtScore(sota.score, sota.score_metric)}
                                 </span>
-                                {" "}by <span className="text-white">{sota.contributor}</span>
                               </div>
-                              <div className="text-xs text-forge-accent mt-1.5">View 3D →</div>
+                              <div className="flex items-center justify-between mt-1.5">
+                                <span className="text-xs text-forge-muted">by <span className="text-white">{sota.contributor}</span></span>
+                                <span className="text-xs text-forge-accent">View 3D →</span>
+                              </div>
                             </button>
                           );
                         })}

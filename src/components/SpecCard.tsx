@@ -1,4 +1,4 @@
-import { allowableStress, Spec } from "../lib/api";
+import { allowableStress, fmtScore, Spec } from "../lib/api";
 
 const MATERIAL_SHORT: Record<string, string> = {
   pla: "PLA",
@@ -57,7 +57,7 @@ export function SpecCard({ spec, sotaMass, isSelected, onClick }: Props) {
           {sotaMass !== undefined ? (
             <>
               <div className="font-mono text-forge-green font-bold text-sm">
-                {sotaMass.toFixed(2)}g
+                {fmtScore(sotaMass, spec.scoring.metric)}
               </div>
               <div className="text-forge-muted text-xs">SOTA</div>
             </>
