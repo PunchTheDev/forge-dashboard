@@ -64,9 +64,23 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
   const stressRatio = submission.fea_stress_mpa / submission.fea_allowable_mpa;
   const stressUsed = (stressRatio * 100).toFixed(1);
   const stressHeadroom = ((1 - stressRatio) * 100).toFixed(1);
-  const baseline = spec.scoring.baseline_mass_grams;
-  const reductionPct = ((1 - submission.mass_grams / baseline) * 100).toFixed(1);
-  const vsSOTA = sota ? (sota.score_grams - submission.mass_grams) : null;
+
+  const metric = spec.scoring.metric;
+  const isMaximize = spec.scoring.direction === "maximize";
+  const displayScore = submission.score ?? submission.mass_grams;
+  const scoreUnit = metric === "stiffness_to_weight" ? "N/(mm·g)" : "g";
+  const baseline =
+    metric === "stiffness_to_weight"
+      ? spec.scoring.baseline_stiffness_to_weight ?? null
+      : spec.scoring.baseline_mass_grams ?? null;
+  const baselinePct =
+    baseline != null
+      ? isMaximize
+        ? ((displayScore / baseline - 1) * 100).toFixed(1)
+        : ((1 - displayScore / baseline) * 100).toFixed(1)
+      : null;
+  const sotaScore = sota ? sota.score : null;
+  const vsSOTA = sotaScore != null ? (isMaximize ? displayScore - sotaScore : sotaScore - displayScore) : null;
   const beatsSOTA = vsSOTA != null && vsSOTA > 0;
   const isSOTA = sota?.commit_hash === submission.commit_hash;
 
@@ -97,7 +111,9 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
       label: "Score",
       passed: submission.passed,
       detail: submission.passed
-        ? `${submission.mass_grams.toFixed(2)}g · −${reductionPct}% from baseline`
+        ? baselinePct != null
+          ? `${displayScore.toFixed(3)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs baseline`
+          : `${displayScore.toFixed(3)} ${scoreUnit}`
         : "No score (failed)",
     },
   ];
@@ -142,12 +158,14 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             {/* Mass */}
             <div>
               <div className="text-2xl font-bold text-white font-mono">
-                {submission.mass_grams.toFixed(2)}
-                <span className="text-sm text-forge-muted ml-1">g</span>
+                {displayScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)}
+                <span className="text-sm text-forge-muted ml-1">{scoreUnit}</span>
               </div>
-              <div className="text-xs text-forge-muted mt-0.5">
-                −{reductionPct}% vs {baseline.toFixed(0)}g baseline
-              </div>
+              {baselinePct != null && baseline != null && (
+                <div className="text-xs text-forge-muted mt-0.5">
+                  {isMaximize ? "+" : "−"}{baselinePct}% vs {baseline.toFixed(metric === "stiffness_to_weight" ? 1 : 0)} {scoreUnit} baseline
+                </div>
+              )}
             </div>
 
             {/* Stress bar */}
@@ -169,11 +187,11 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             </div>
 
             {/* vs SOTA */}
-            {sota && (
+            {sota && sotaScore != null && (
               <div className={`text-sm font-mono font-bold ${beatsSOTA ? "text-forge-green" : "text-forge-muted"}`}>
                 {beatsSOTA
-                  ? `−${vsSOTA!.toFixed(2)}g vs SOTA`
-                  : `+${Math.abs(vsSOTA!).toFixed(2)}g vs SOTA (${sota.score_grams.toFixed(2)}g)`}
+                  ? `${isMaximize ? "+" : "−"}${Math.abs(vsSOTA!).toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit} vs SOTA`
+                  : `${isMaximize ? "−" : "+"}${Math.abs(vsSOTA!).toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit} vs SOTA (${sotaScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit})`}
               </div>
             )}
 
@@ -197,7 +215,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
         <div className="flex-1 min-w-0">
           <StepViewer
             stepUrl={submission.has_step ? stepUrl(submission.id) : null}
-            label={`${agentName} — ${submission.mass_grams.toFixed(2)}g`}
+            label={`${agentName} — ${displayScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit}`}
           />
         </div>
         <div className="shrink-0 hidden lg:block">
