@@ -41,10 +41,26 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
   const stressHeadroom = sota
     ? (((allowable - sota.fea_stress_mpa) / allowable) * 100).toFixed(0)
     : null;
-  const baselineMass = spec.scoring.baseline_mass_grams;
-  const massReduction = sota && baselineMass
-    ? (((baselineMass - sota.score_grams) / baselineMass) * 100).toFixed(1)
-    : null;
+
+  const metric = spec.scoring.metric;
+  const isMaximize = spec.scoring.direction === "maximize";
+  const scoreUnit = metric === "stiffness_to_weight" ? "N/(mm·g)" : "g";
+  const baseline =
+    metric === "stiffness_to_weight"
+      ? spec.scoring.baseline_stiffness_to_weight
+      : spec.scoring.baseline_mass_grams;
+  const sotaScore = sota?.score ?? sota?.score_grams ?? null;
+  const baselineDelta =
+    sota && baseline && sotaScore != null
+      ? isMaximize
+        ? (((sotaScore / baseline) - 1) * 100).toFixed(1)
+        : (((baseline - sotaScore) / baseline) * 100).toFixed(1)
+      : null;
+  const metricLabel = {
+    mass_grams: "SOTA mass",
+    stiffness_to_weight: "SOTA stiffness/wt",
+    volume_mm3: "SOTA volume",
+  }[metric] ?? "SOTA score";
 
   return (
     <div>
@@ -72,14 +88,14 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat
-          label="SOTA mass"
-          value={sota ? `${sota.score_grams.toFixed(2)}g` : "—"}
+          label={metricLabel}
+          value={sotaScore != null ? `${sotaScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit}` : "—"}
           sub={sota ? `by ${sota.contributor}` : "no submissions yet"}
         />
         <Stat
           label="vs baseline"
-          value={massReduction ? `−${massReduction}%` : "—"}
-          sub={baselineMass ? `baseline ${baselineMass.toFixed(0)}g` : undefined}
+          value={baselineDelta ? `${isMaximize ? "+" : "−"}${baselineDelta}%` : "—"}
+          sub={baseline ? `baseline ${baseline.toFixed(metric === "stiffness_to_weight" ? 1 : 0)} ${scoreUnit}` : undefined}
         />
         <Stat
           label="Stress headroom"
