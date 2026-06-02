@@ -17,6 +17,36 @@ export interface SpecScoring {
   direction: string;
   baseline_mass_grams?: number;
   baseline_stiffness_to_weight?: number;
+  baseline_deflection_mm?: number;
+}
+
+export interface MetricConfig {
+  label: string;
+  unit: string;
+  decimals: number;
+  baselineKey: keyof SpecScoring;
+}
+
+export const METRIC_CONFIG: Record<string, MetricConfig> = {
+  mass_grams:          { label: "Mass",             unit: "g",        decimals: 2, baselineKey: "baseline_mass_grams" },
+  volume_mm3:          { label: "Volume",            unit: "mm³",      decimals: 0, baselineKey: "baseline_mass_grams" },
+  stiffness_to_weight: { label: "Stiffness/weight", unit: "N/(mm·g)", decimals: 3, baselineKey: "baseline_stiffness_to_weight" },
+  deflection_mm:       { label: "Deflection",       unit: "mm",       decimals: 4, baselineKey: "baseline_deflection_mm" },
+};
+
+export function metricConfig(metric: string): MetricConfig {
+  return METRIC_CONFIG[metric] ?? { label: metric, unit: "", decimals: 3, baselineKey: "baseline_mass_grams" };
+}
+
+export function fmtScore(value: number, metric: string): string {
+  const { decimals, unit } = metricConfig(metric);
+  return unit ? `${value.toFixed(decimals)} ${unit}` : value.toFixed(decimals);
+}
+
+export function specBaseline(scoring: SpecScoring): number | null {
+  const { baselineKey } = metricConfig(scoring.metric);
+  const v = scoring[baselineKey];
+  return typeof v === "number" ? v : null;
 }
 
 export interface Spec {

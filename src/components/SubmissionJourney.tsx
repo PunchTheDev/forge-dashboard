@@ -2,7 +2,7 @@
  * SubmissionJourney — shows the full story for a selected submission:
  * Spec → Agent → FEA test → Score vs SOTA
  */
-import { Submission, Spec, SotaRecord, stepUrl } from "../lib/api";
+import { Submission, Spec, SotaRecord, stepUrl, metricConfig, specBaseline } from "../lib/api";
 import { StepViewer } from "./StepViewer";
 import { SpecDiagram } from "./SpecDiagram";
 
@@ -68,11 +68,8 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
   const metric = spec.scoring.metric;
   const isMaximize = spec.scoring.direction === "maximize";
   const displayScore = submission.score ?? submission.mass_grams;
-  const scoreUnit = metric === "stiffness_to_weight" ? "N/(mm·g)" : "g";
-  const baseline =
-    metric === "stiffness_to_weight"
-      ? spec.scoring.baseline_stiffness_to_weight ?? null
-      : spec.scoring.baseline_mass_grams ?? null;
+  const { unit: scoreUnit, decimals } = metricConfig(metric);
+  const baseline = specBaseline(spec.scoring);
   const baselinePct =
     baseline != null
       ? isMaximize
@@ -112,8 +109,8 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
       passed: submission.passed,
       detail: submission.passed
         ? baselinePct != null
-          ? `${displayScore.toFixed(3)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs baseline`
-          : `${displayScore.toFixed(3)} ${scoreUnit}`
+          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs baseline`
+          : `${displayScore.toFixed(decimals)} ${scoreUnit}`
         : "No score (failed)",
     },
   ];
@@ -158,12 +155,12 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             {/* Mass */}
             <div>
               <div className="text-2xl font-bold text-white font-mono">
-                {displayScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)}
+                {displayScore.toFixed(decimals)}
                 <span className="text-sm text-forge-muted ml-1">{scoreUnit}</span>
               </div>
               {baselinePct != null && baseline != null && (
                 <div className="text-xs text-forge-muted mt-0.5">
-                  {isMaximize ? "+" : "−"}{baselinePct}% vs {baseline.toFixed(metric === "stiffness_to_weight" ? 1 : 0)} {scoreUnit} baseline
+                  {isMaximize ? "+" : "−"}{baselinePct}% vs {baseline.toFixed(decimals)} {scoreUnit} baseline
                 </div>
               )}
             </div>
@@ -190,8 +187,8 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             {sota && sotaScore != null && (
               <div className={`text-sm font-mono font-bold ${beatsSOTA ? "text-forge-green" : "text-forge-muted"}`}>
                 {beatsSOTA
-                  ? `${isMaximize ? "+" : "−"}${Math.abs(vsSOTA!).toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit} vs SOTA`
-                  : `${isMaximize ? "−" : "+"}${Math.abs(vsSOTA!).toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit} vs SOTA (${sotaScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit})`}
+                  ? `${isMaximize ? "+" : "−"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs SOTA`
+                  : `${isMaximize ? "−" : "+"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs SOTA (${sotaScore.toFixed(decimals)} ${scoreUnit})`}
               </div>
             )}
 
@@ -215,7 +212,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
         <div className="flex-1 min-w-0">
           <StepViewer
             stepUrl={submission.has_step ? stepUrl(submission.id) : null}
-            label={`${agentName} — ${displayScore.toFixed(metric === "stiffness_to_weight" ? 3 : 2)} ${scoreUnit}`}
+            label={`${agentName} — ${displayScore.toFixed(decimals)} ${scoreUnit}`}
           />
         </div>
         <div className="shrink-0 hidden lg:block">

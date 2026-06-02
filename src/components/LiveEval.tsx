@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, EvalPreviewResult, Spec } from "../lib/api";
+import { api, EvalPreviewResult, Spec, metricConfig } from "../lib/api";
 
 const EXAMPLE_AGENT = `from build123d import *
 from io import BytesIO
@@ -29,24 +29,11 @@ def generate(spec: dict, llm=None) -> bytes:
     return buf.getvalue()
 `;
 
-const METRIC_LABELS: Record<string, string> = {
-  mass_grams: "mass",
-  volume_mm3: "volume",
-  stiffness_to_weight: "stiffness/weight",
-};
-
-const METRIC_UNITS: Record<string, string> = {
-  mass_grams: "g",
-  volume_mm3: "mm³",
-  stiffness_to_weight: "N/(mm·g)",
-};
-
 function ResultCard({ result }: { result: EvalPreviewResult }) {
   const stress = result.fea_stress_mpa;
   const allowable = result.fea_allowable_mpa;
   const utilization = stress != null && allowable != null ? (stress / allowable) * 100 : null;
-  const metricLabel = METRIC_LABELS[result.score_metric] ?? result.score_metric;
-  const metricUnit = METRIC_UNITS[result.score_metric] ?? "";
+  const { label: metricLabel, unit: metricUnit, decimals } = metricConfig(result.score_metric);
 
   return (
     <div
@@ -84,7 +71,7 @@ function ResultCard({ result }: { result: EvalPreviewResult }) {
           <div className="font-mono text-2xl font-bold text-white">
             {result.score_metric === "volume_mm3"
               ? result.score.toLocaleString("en-US", { maximumFractionDigits: 0 })
-              : result.score.toFixed(3)}
+              : result.score.toFixed(decimals)}
             <span className="text-forge-muted text-sm ml-1">{metricUnit}</span>
           </div>
           <div className="text-xs text-forge-muted mt-0.5">

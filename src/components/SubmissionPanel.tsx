@@ -1,4 +1,4 @@
-import { Submission } from "../lib/api";
+import { Submission, metricConfig } from "../lib/api";
 
 interface Props {
   submissions: Submission[];
@@ -50,11 +50,10 @@ export function SubmissionPanel({ submissions, loading }: Props) {
             <span className="text-white text-sm font-medium shrink-0">{s.contributor}</span>
             {s.passed && (() => {
               const v = s.score ?? s.mass_grams;
-              const unit = s.score_metric === "stiffness_to_weight" ? "N/(mm·g)" : "g";
-              const dp = s.score_metric === "stiffness_to_weight" ? 3 : 2;
+              const { unit, decimals } = metricConfig(s.score_metric);
               return (
                 <span className="font-mono text-forge-green text-sm tabular-nums shrink-0">
-                  {v.toFixed(dp)} {unit}
+                  {v.toFixed(decimals)} {unit}
                 </span>
               );
             })()}

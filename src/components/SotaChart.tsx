@@ -8,13 +8,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import { Submission, Spec } from "../lib/api";
-
-const METRIC_UNITS: Record<string, string> = {
-  mass_grams: "g",
-  volume_mm3: "mm³",
-  stiffness_to_weight: "N/(mm·g)",
-};
+import { Submission, Spec, metricConfig } from "../lib/api";
 
 interface Props {
   submissions: Submission[];
@@ -89,7 +83,7 @@ function CustomTooltip({
 export function SotaChart({ submissions, spec }: Props) {
   const direction = spec.scoring.direction;
   const metric = spec.scoring.metric;
-  const unit = METRIC_UNITS[metric] ?? "";
+  const unit = metricConfig(metric).unit;
   const points = buildSotaCurve(submissions, direction);
 
   if (points.length === 0) {

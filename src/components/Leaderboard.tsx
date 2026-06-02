@@ -1,22 +1,11 @@
-import { Submission, Spec, allowableStress } from "../lib/api";
+import { Submission, Spec, allowableStress, metricConfig, specBaseline } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
-const METRIC_LABELS: Record<string, string> = {
-  mass_grams: "Mass",
-  volume_mm3: "Volume",
-  stiffness_to_weight: "Stiffness/weight",
-};
-
-const METRIC_UNITS: Record<string, string> = {
-  mass_grams: "g",
-  volume_mm3: "mm³",
-  stiffness_to_weight: "N/(mm·g)",
-};
-
 function formatScore(value: number, metric: string): string {
   if (metric === "volume_mm3") return value.toLocaleString("en-US", { maximumFractionDigits: 0 });
-  return value.toFixed(metric === "stiffness_to_weight" ? 4 : 2);
+  const { decimals } = metricConfig(metric);
+  return value.toFixed(decimals);
 }
 
 interface Props {
@@ -52,8 +41,7 @@ function StressBar({ value, max }: { value: number; max: number }) {
 export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Props) {
   const metric = spec.scoring.metric;
   const direction = spec.scoring.direction;
-  const metricLabel = METRIC_LABELS[metric] ?? metric;
-  const metricUnit = METRIC_UNITS[metric] ?? "";
+  const { label: metricLabel, unit: metricUnit } = metricConfig(metric);
 
   // Rank by the submission's own score field; fall back to mass_grams for legacy rows.
   const scoreOf = (s: Submission) => s.score ?? s.mass_grams;
@@ -67,7 +55,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
     );
 
   const maxStress = allowableStress(spec);
-  const baseline = spec.scoring.baseline_mass_grams;
+  const baseline = specBaseline(spec.scoring);
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
@@ -93,7 +81,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
               <th className="px-4 py-2 text-right font-medium">
                 {metricLabel} {metricUnit ? `(${metricUnit})` : ""}
               </th>
-              {metric === "mass_grams" && (
+              {baseline != null && (
                 <th className="px-4 py-2 text-right font-medium hidden sm:table-cell">vs Baseline</th>
               )}
               <th className="px-4 py-2 text-left font-medium hidden md:table-cell">Stress</th>
@@ -106,10 +94,11 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
               const isLeader = i === 0;
               const isSelected = selected?.id === s.id;
               const score = scoreOf(s);
-              const improvePct =
-                metric === "mass_grams" && baseline
-                  ? (((baseline - s.mass_grams) / baseline) * 100).toFixed(1)
-                  : null;
+              const improvePct = baseline != null
+                ? direction === "maximize"
+                  ? (((score / baseline) - 1) * 100).toFixed(1)
+                  : (((baseline - score) / baseline) * 100).toFixed(1)
+                : null;
               return (
                 <tr
                   key={s.id}
@@ -143,11 +132,11 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                       {formatScore(score, metric)}
                     </span>
                   </td>
-                  {metric === "mass_grams" && (
+                  {baseline != null && (
                   <td className="px-4 py-2.5 text-right hidden sm:table-cell">
                     {improvePct && (
                       <span className="font-mono text-xs text-forge-green">
-                        −{improvePct}%
+                        {direction === "maximize" ? "+" : "−"}{improvePct}%
                       </span>
                     )}
                   </td>
