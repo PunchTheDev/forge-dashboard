@@ -8,6 +8,7 @@ import { SubmissionPanel } from "./components/SubmissionPanel";
 import { StepViewer } from "./components/StepViewer";
 import { HeroStats } from "./components/HeroStats";
 import { OverallLeaderboard } from "./components/OverallLeaderboard";
+import { QuickstartGuide } from "./components/QuickstartGuide";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = "http://143.244.191.193:8000/docs";
@@ -15,24 +16,26 @@ const API_DOCS_URL = "http://143.244.191.193:8000/docs";
 function ApiError({ message }: { message: string }) {
   return (
     <div className="min-h-screen bg-forge-bg flex items-center justify-center">
-      <div className="text-center max-w-md">
-        <div className="text-forge-red text-4xl mb-4">⚠</div>
+      <div className="text-center max-w-md px-4">
+        <div className="text-forge-red text-4xl mb-4 font-mono">!</div>
         <div className="text-white text-lg font-semibold mb-2">API unreachable</div>
-        <div className="text-forge-muted text-sm mb-4">{message}</div>
+        <div className="text-forge-muted text-sm mb-4 bg-forge-surface border border-forge-border rounded-lg p-3 font-mono text-left">
+          {message}
+        </div>
         <div className="text-forge-muted text-xs">
-          Start forge-api with{" "}
-          <code className="bg-forge-border px-1.5 py-0.5 rounded">
-            docker-compose up
+          The benchmark API at{" "}
+          <code className="bg-forge-border px-1.5 py-0.5 rounded text-forge-accent">
+            http://143.244.191.193:8000
           </code>{" "}
-          or set{" "}
-          <code className="bg-forge-border px-1.5 py-0.5 rounded">VITE_API_URL</code>
+          is not responding. The competition is still live on{" "}
+          <a href={FORGE_REPO} className="text-forge-accent hover:underline">GitHub</a>.
         </div>
       </div>
     </div>
   );
 }
 
-function LandingBanner() {
+function LandingBanner({ totalSota }: { totalSota: SotaRecord[] }) {
   return (
     <div className="border-b border-forge-border bg-forge-surface/50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -51,9 +54,20 @@ function LandingBanner() {
             </h1>
             <p className="text-forge-muted text-sm leading-relaxed max-w-xl">
               AI agents and miners compete to design the lightest 3D-printable structural part
-              that survives real finite element analysis. Every submission is auto-scored.
-              The best design earns Bittensor emissions.
+              that survives real finite element analysis. Every submission is auto-scored by CI.
+              The best design earns Bittensor emissions on Gittensor subnet 74.
             </p>
+            {totalSota.length > 0 && (
+              <div className="flex flex-wrap gap-4 mt-4">
+                {totalSota.map((s) => (
+                  <div key={s.spec_id} className="text-xs">
+                    <span className="text-forge-muted">{s.spec_id.split("_").slice(1).join(" ")}: </span>
+                    <span className="text-forge-green font-mono font-bold">{s.score_grams.toFixed(2)}g</span>
+                    <span className="text-forge-muted"> SOTA</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-2 text-sm lg:text-right">
             <a
@@ -62,7 +76,7 @@ function LandingBanner() {
               rel="noopener noreferrer"
               className="bg-forge-accent text-white px-4 py-2 rounded-lg font-semibold hover:bg-forge-accent/80 transition-colors text-center"
             >
-              Compete on GitHub →
+              Fork and compete
             </a>
             <a
               href={API_DOCS_URL}
@@ -70,26 +84,17 @@ function LandingBanner() {
               rel="noopener noreferrer"
               className="border border-forge-border text-forge-muted px-4 py-2 rounded-lg hover:border-forge-accent/50 hover:text-white transition-colors text-center"
             >
-              API Docs (OpenAPI)
-            </a>
-            <a
-              href={`${FORGE_REPO}/blob/main/QUICKSTART.md`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-forge-muted text-xs hover:text-white transition-colors text-center"
-            >
-              Quickstart guide →
+              API docs
             </a>
           </div>
         </div>
 
-        {/* How it works */}
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-3">
           {[
-            { step: "01", title: "Pick a problem", desc: "Each spec defines a load, material, bolt pattern, and build volume." },
-            { step: "02", title: "Write an agent", desc: "Implement generate(spec) → STEP bytes. Any topology, any approach." },
-            { step: "03", title: "Open a PR", desc: "CI automatically runs FEA and scores your submission. No waiting." },
-            { step: "04", title: "Earn emissions", desc: "The lightest passing design holds the SOTA and earns contributor emissions." },
+            { step: "01", title: "Pick a problem", desc: "Each spec defines load, material, bolt pattern, and build volume." },
+            { step: "02", title: "Write an agent", desc: "Implement generate(spec) → STEP bytes. Any topology, any library." },
+            { step: "03", title: "Open a PR", desc: "CI runs FEA and scores your submission automatically in ~2 min." },
+            { step: "04", title: "Earn emissions", desc: "Lightest passing design holds SOTA and earns Bittensor TAO." },
           ].map((item) => (
             <div key={item.step} className="bg-forge-bg border border-forge-border rounded-xl p-4">
               <div className="text-forge-accent font-mono text-xs mb-1">{item.step}</div>
@@ -103,7 +108,20 @@ function LandingBanner() {
   );
 }
 
-type TabId = "problems" | "rankings";
+type TabId = "problems" | "rankings" | "guide";
+
+function TabButton({ active, onClick, label }: { id: TabId; active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-xs transition-colors ${
+        active ? "text-white font-semibold" : "text-forge-muted hover:text-white"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
 
 export default function App() {
   const { data: specs, loading: specsLoading, error: specsError } = useApi(
@@ -118,6 +136,11 @@ export default function App() {
   const { data: overallData, loading: overallLoading } = useApi(
     api.overallLeaderboard,
     30000,
+  );
+
+  const { data: allSota } = useApi<SotaRecord[]>(
+    useCallback(() => api.sotaAll(), []),
+    60000,
   );
 
   const activeSpec: Spec | null =
@@ -142,11 +165,6 @@ export default function App() {
     15000,
   );
 
-  const { data: allSota } = useApi<SotaRecord[]>(
-    useCallback(() => api.sotaAll(), []),
-    60000,
-  );
-
   if (specsError) return <ApiError message={specsError} />;
 
   const sotaBySpec: Record<string, number> = {};
@@ -154,7 +172,6 @@ export default function App() {
     for (const s of allSota) sotaBySpec[s.spec_id] = s.score_grams;
   }
 
-  // Show 3D viewer when a submission with a STEP file is selected.
   const activeStepUrl: string | null =
     selectedSubmission?.has_step ? stepUrl(selectedSubmission.id) : null;
 
@@ -162,25 +179,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-forge-bg text-white font-mono">
-      {/* Top nav */}
       <header className="border-b border-forge-border bg-forge-bg/80 backdrop-blur sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-forge-accent font-bold text-sm tracking-wide">FORGE</span>
             <span className="text-forge-border">|</span>
-            {(["problems", "rankings"] as TabId[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`text-xs transition-colors ${
-                  activeTab === tab
-                    ? "text-white font-semibold"
-                    : "text-forge-muted hover:text-white"
-                }`}
-              >
-                {tab === "problems" ? "Problems" : "Rankings"}
-              </button>
-            ))}
+            <TabButton id="problems" active={activeTab === "problems"} onClick={() => setActiveTab("problems")} label="Problems" />
+            <TabButton id="rankings" active={activeTab === "rankings"} onClick={() => setActiveTab("rankings")} label="Rankings" />
+            <TabButton id="guide" active={activeTab === "guide"} onClick={() => setActiveTab("guide")} label="Guide" />
           </div>
           <nav className="flex items-center gap-4 text-xs text-forge-muted">
             <a href={FORGE_REPO} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
@@ -193,8 +199,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Landing banner — always visible */}
-      <LandingBanner />
+      <LandingBanner totalSota={allSota ?? []} />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === "rankings" && (
@@ -202,19 +207,22 @@ export default function App() {
             <div className="mb-6">
               <div className="text-lg font-bold text-white">All-Time Rankings</div>
               <div className="text-xs text-forge-muted mt-1">
-                Contributors ranked by average normalized score across all active specs
+                Contributors ranked by normalized score across all active specs
               </div>
             </div>
             <OverallLeaderboard data={overallData ?? null} loading={overallLoading} />
           </div>
         )}
 
+        {activeTab === "guide" && (
+          <QuickstartGuide />
+        )}
+
         {activeTab === "problems" && (
           <div className="flex gap-6">
-            {/* Sidebar: spec selector */}
             <aside className="w-64 shrink-0 hidden lg:block">
               <div className="text-xs text-forge-muted font-semibold uppercase tracking-wider mb-3 px-1">
-                Problems
+                Problems ({specs?.length ?? 0})
               </div>
               {specsLoading && !specs && (
                 <div className="text-forge-muted text-sm px-1">Loading…</div>
@@ -233,9 +241,22 @@ export default function App() {
                   />
                 ))}
               </div>
+
+              {/* Miner CTA in sidebar */}
+              <div className="mt-4 p-3 bg-forge-surface border border-forge-border rounded-xl">
+                <div className="text-xs text-white font-semibold mb-1">New here?</div>
+                <div className="text-xs text-forge-muted mb-2 leading-relaxed">
+                  Design a lighter bracket, open a PR, and earn emissions.
+                </div>
+                <button
+                  onClick={() => setActiveTab("guide")}
+                  className="text-xs text-forge-accent hover:underline"
+                >
+                  See the guide →
+                </button>
+              </div>
             </aside>
 
-            {/* Main content */}
             <main className="flex-1 min-w-0 flex flex-col gap-5">
               {activeSpec ? (
                 <>
@@ -269,29 +290,36 @@ export default function App() {
                     loading={subsLoading && !(submissions ?? []).length}
                   />
 
-                  {/* How to beat the SOTA */}
-                  {sota && (
-                    <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
-                      <div className="text-sm font-semibold text-white mb-1">
-                        Beat the SOTA
-                      </div>
+                  {/* Beat the SOTA CTA */}
+                  <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
+                    <div className="text-sm font-semibold text-white mb-1">
+                      Beat the SOTA
+                    </div>
+                    {sota ? (
                       <p className="text-forge-muted text-xs mb-3">
-                        Current leader: <span className="text-forge-green font-mono">{sota.score_grams.toFixed(2)}g</span> by <span className="text-white">{sota.contributor}</span>.
+                        Current leader:{" "}
+                        <span className="text-forge-green font-mono">{sota.score_grams.toFixed(2)}g</span>{" "}
+                        by <span className="text-white">{sota.contributor}</span>.{" "}
                         Fork the repo, write a lighter design, open a PR — CI scores it automatically.
                       </p>
-                      <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs text-forge-green space-y-1">
-                        <div><span className="text-forge-muted">$ </span>git clone {FORGE_REPO}</div>
-                        <div><span className="text-forge-muted">$ </span>cd forge && pip install -e .</div>
-                        <div><span className="text-forge-muted">$ </span>cp -r agents/template agents/my-design</div>
-                        <div><span className="text-forge-muted">$ </span>forge eval agents/my-design/agent.py</div>
-                      </div>
+                    ) : (
+                      <p className="text-forge-muted text-xs mb-3">
+                        No submissions yet — be the first to set the SOTA for this problem.
+                        Fork the repo and open a PR.
+                      </p>
+                    )}
+                    <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs text-forge-green space-y-1">
+                      <div><span className="text-forge-muted">$ </span>git clone {FORGE_REPO}</div>
+                      <div><span className="text-forge-muted">$ </span>cd forge && pip install -e .</div>
+                      <div><span className="text-forge-muted">$ </span>forge new my-design</div>
+                      <div><span className="text-forge-muted">$ </span>forge eval agents/my-design/agent.py --spec {activeSpec.id.split("_")[0]}</div>
                     </div>
-                  )}
+                  </div>
                 </>
               ) : (
                 !specsLoading && (
                   <div className="text-forge-muted text-sm py-16 text-center">
-                    No problem specs found.
+                    No problem specs found. The API may be unavailable.
                   </div>
                 )
               )}
