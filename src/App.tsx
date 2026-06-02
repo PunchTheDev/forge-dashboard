@@ -9,6 +9,7 @@ import { SubmissionJourney } from "./components/SubmissionJourney";
 import { HeroStats } from "./components/HeroStats";
 import { OverallLeaderboard } from "./components/OverallLeaderboard";
 import { QuickstartGuide } from "./components/QuickstartGuide";
+import { LiveEval } from "./components/LiveEval";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = "http://143.244.191.193:8000/docs";
@@ -112,7 +113,7 @@ function LandingBanner({ totalSota }: { totalSota: SotaRecord[] }) {
   );
 }
 
-type TabId = "problems" | "rankings" | "guide";
+type TabId = "problems" | "rankings" | "playground" | "guide";
 
 function TabButton({ active, onClick, label }: { id: TabId; active: boolean; onClick: () => void; label: string }) {
   return (
@@ -187,6 +188,7 @@ export default function App() {
             <span className="text-forge-border">|</span>
             <TabButton id="problems" active={activeTab === "problems"} onClick={() => setActiveTab("problems")} label="Problems" />
             <TabButton id="rankings" active={activeTab === "rankings"} onClick={() => setActiveTab("rankings")} label="Rankings" />
+            <TabButton id="playground" active={activeTab === "playground"} onClick={() => setActiveTab("playground")} label="Playground" />
             <TabButton id="guide" active={activeTab === "guide"} onClick={() => setActiveTab("guide")} label="Guide" />
           </div>
           <nav className="flex items-center gap-4 text-xs text-forge-muted">
@@ -213,6 +215,10 @@ export default function App() {
             </div>
             <OverallLeaderboard data={overallData ?? null} loading={overallLoading} />
           </div>
+        )}
+
+        {activeTab === "playground" && (
+          <LiveEval specs={specs ?? []} />
         )}
 
         {activeTab === "guide" && (
