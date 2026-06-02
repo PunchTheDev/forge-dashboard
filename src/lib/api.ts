@@ -35,6 +35,9 @@ export interface Submission {
   contributor: string;
   commit_hash: string;
   mass_grams: number;
+  score: number | null;
+  score_metric: string;
+  score_direction: string;
   fea_stress_mpa: number;
   fea_allowable_mpa: number;
   passed: boolean;
@@ -50,6 +53,9 @@ export interface LeaderboardEntry {
   contributor: string;
   agent_path: string;
   mass_grams: number;
+  score: number;
+  score_metric: string;
+  score_direction: string;
   fea_stress_mpa: number;
   commit_hash: string;
   submitted_at: string;
@@ -67,6 +73,9 @@ export interface SotaRecord {
   submission_id: string;
   has_step: boolean;
   score_grams: number;
+  score: number;
+  score_metric: string;
+  score_direction: string;
   agent: string;
   contributor: string;
   fea_stress_mpa: number;
