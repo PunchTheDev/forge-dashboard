@@ -8,7 +8,7 @@ def generate(spec: dict, llm=None) -> bytes:
     """Minimal bracket — replace with your optimized design."""
     c = spec["constraints"]
     bv = c["build_volume_mm"]          # [x, y, z] max extents
-    bolts = c["bolt_pattern_mm"]       # [[x,y,z], ...] bolt centers
+    bolts = c["bolt_pattern_mm"]       # [[y,z], ...] bolt centers on mount face
     load_pt = c["load_point_mm"]       # [x, y, z] where load is applied
     load_n = c["load_newtons"]
 
@@ -149,8 +149,9 @@ interface Props {
 }
 
 export function LiveEval({ specs }: Props) {
-  const publicSpecs = specs.filter((s) => s.id.startsWith("pub_"));
-  const defaultSpec = publicSpecs[0] ?? specs[0];
+  // Default to an easy round spec so playground matches the actual competition
+  const roundSpecs = specs.filter((s) => /^r0[123]_\d+_easy$/.test(s.id));
+  const defaultSpec = roundSpecs[0] ?? specs.find((s) => s.id.startsWith("pub_")) ?? specs[0];
 
   const [specId, setSpecId] = useState<string>(defaultSpec?.id ?? "");
   const [code, setCode] = useState<string>(EXAMPLE_AGENT);
@@ -196,11 +197,26 @@ export function LiveEval({ specs }: Props) {
               onChange={(e) => setSpecId(e.target.value)}
               className="flex-1 bg-forge-surface border border-forge-border text-white text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-forge-accent/60 font-mono"
             >
-              {specs.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.id} — {s.name}
-                </option>
-              ))}
+              <optgroup label="Mass Optimization (Round 1)">
+                {specs.filter((s) => s.id.startsWith("r01_")).map((s) => (
+                  <option key={s.id} value={s.id}>{s.id}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Stiffness/Weight (Round 2)">
+                {specs.filter((s) => s.id.startsWith("r02_")).map((s) => (
+                  <option key={s.id} value={s.id}>{s.id}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Absolute Stiffness (Round 3)">
+                {specs.filter((s) => s.id.startsWith("r03_")).map((s) => (
+                  <option key={s.id} value={s.id}>{s.id}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Legacy">
+                {specs.filter((s) => !s.id.startsWith("r0")).map((s) => (
+                  <option key={s.id} value={s.id}>{s.id}</option>
+                ))}
+              </optgroup>
             </select>
           </div>
 
