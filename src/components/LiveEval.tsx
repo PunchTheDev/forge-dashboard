@@ -281,10 +281,18 @@ export function LiveEval({ specs }: Props) {
 
           {error && (
             <div className="rounded-xl border border-forge-red/40 bg-forge-red/5 p-4">
-              <div className="text-forge-red text-xs font-semibold mb-2">Error</div>
-              <div className="text-forge-muted text-xs font-mono leading-relaxed whitespace-pre-wrap break-all">
-                {error}
-              </div>
+              <div className="text-forge-red text-xs font-semibold mb-2">Eval error</div>
+              {error.includes("docker") || error.includes("Docker") ? (
+                <div className="text-forge-muted text-xs leading-relaxed">
+                  The live sandbox requires Docker on the server. Use{" "}
+                  <code className="text-forge-accent">forge eval</code> locally or open a PR to run
+                  the full CI pipeline. The PR eval always works — this is a server-side sandbox feature.
+                </div>
+              ) : (
+                <div className="text-forge-muted text-xs font-mono leading-relaxed whitespace-pre-wrap break-all">
+                  {error}
+                </div>
+              )}
             </div>
           )}
 
