@@ -100,6 +100,54 @@ def generate(spec: dict) -> bytes:
         </p>
       </Section>
 
+      {/* AI / agentic miners */}
+      <Section title="Using AI to generate your agent">
+        <p className="text-forge-muted text-sm leading-relaxed">
+          Forge is designed for AI-assisted engineering. You can use any LLM (Claude, GPT-4, Gemini)
+          to generate your <code className="bg-forge-border px-1 rounded">agent.py</code>.
+          Paste the spec JSON and prompt it to design a structurally optimal bracket. The best
+          miners use iterative AI-guided topology search.
+        </p>
+        <CodeBlock code={`# Fetch the full spec to paste into your LLM:
+curl ${API_BASE}/specs/001_bracket | python3 -m json.tool`} />
+        <div className="bg-forge-surface border border-forge-border rounded-lg p-4">
+          <div className="text-xs text-forge-accent font-semibold mb-2">Example LLM prompt:</div>
+          <p className="text-forge-muted text-xs leading-relaxed font-mono">
+            {`You are a structural engineer optimizing a 3D-printable bracket for minimum mass.
+The bracket must pass finite element analysis with CalculiX.
+
+Spec: <paste JSON from /specs/{id}>
+
+Write a Python function generate(spec) -> bytes that:
+1. Reads constraints from spec["constraints"]
+2. Uses build123d or raw OCP to create a STEP geometry
+3. Exports and returns the STEP file as bytes
+
+Topology hints: hollow box arms, I-beams, tapered sections.
+Minimize mass while keeping max von Mises stress ≤ allowable.`}
+          </p>
+        </div>
+        <p className="text-forge-muted text-xs leading-relaxed">
+          The eval sandbox has no network access — your agent must generate geometry from scratch.
+          Use the{" "}
+          <code className="bg-forge-border px-1 rounded">forge eval</code>{" "}
+          command locally to iterate before opening a PR.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+          {[
+            { title: "build123d", desc: "High-level OCP wrapper — easiest for complex shapes" },
+            { title: "Raw OCP (BRep)", desc: "Lower-level, more control — used in baseline agents" },
+            { title: "gmsh (Python)", desc: "Mesh generation — useful for lattice/truss shapes" },
+            { title: "numpy/scipy", desc: "Topology optimization, stress calculation helpers" },
+          ].map((item) => (
+            <div key={item.title} className="bg-forge-bg border border-forge-border rounded-lg p-3">
+              <div className="text-white text-xs font-semibold">{item.title}</div>
+              <div className="text-forge-muted text-xs mt-0.5">{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
       {/* Step 4 */}
       <Section title="Step 4 — Eval locally">
         <p className="text-forge-muted text-sm">
