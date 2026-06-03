@@ -20,6 +20,15 @@ function RankBadge({ rank }: { rank: number }) {
   return <span className="text-forge-muted">#{rank}</span>;
 }
 
+/** Display a normalized score % — capped at 999% with ">" prefix when absurd. */
+function fmtNorm(norm: number): { text: string; color: string } {
+  const pct = norm * 100;
+  if (pct <= 80)  return { text: `${pct.toFixed(1)}%`, color: "text-forge-green" };
+  if (pct <= 100) return { text: `${pct.toFixed(1)}%`, color: "text-forge-accent" };
+  if (pct > 999)  return { text: `>${(999).toFixed(0)}%`, color: "text-forge-red" };
+  return { text: `${pct.toFixed(1)}%`, color: "text-forge-red" };
+}
+
 function ScoreBar({ score }: { score: number }) {
   const pct = Math.min(score * 100, 100);
   const hue = Math.round(pct * 1.2);
@@ -102,7 +111,6 @@ function SpecBreakdown({ entry, specToRound }: {
           {sorted.map((b) => {
             const roundId = specToRound[b.spec_id];
             const meta = roundId ? CATEGORY_META[roundId] : null;
-            const vsBaseline = (b.normalized_score * 100).toFixed(1);
             const isSota = b.rank === 1;
             return (
               <tr key={b.spec_id} className="border-b border-forge-border/40 last:border-0">
@@ -117,7 +125,7 @@ function SpecBreakdown({ entry, specToRound }: {
                 <td className="py-1.5 text-right font-mono text-white">
                   {fmtScore(b.score, b.score_metric)}
                 </td>
-                <td className="py-1.5 text-right font-mono text-forge-muted">{vsBaseline}%</td>
+                <td className={`py-1.5 text-right font-mono ${fmtNorm(b.normalized_score).color}`}>{fmtNorm(b.normalized_score).text}</td>
                 <td className="py-1.5 text-right">
                   {isSota ? (
                     <span className="text-yellow-400 font-bold">#1 ★</span>
@@ -163,10 +171,17 @@ function EntryRow({ entry, specToRound, expanded, onToggle }: {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <div className="text-forge-accent font-mono text-sm font-semibold">
-              {(entry.avg_normalized_score * 100).toFixed(1)}%
-            </div>
-            <div className="text-xs text-forge-muted">avg of baseline</div>
+            {(() => {
+              const { text, color } = fmtNorm(entry.avg_normalized_score);
+              return (
+                <>
+                  <div className={`font-mono text-sm font-semibold ${color}`}>{text}</div>
+                  <div className="text-xs text-forge-muted">
+                    {entry.avg_normalized_score > 1 ? "above baseline" : "of baseline"}
+                  </div>
+                </>
+              );
+            })()}
           </div>
           <div className={`text-forge-muted transition-transform ${expanded ? "rotate-180" : ""}`}>
             ▾
@@ -212,7 +227,7 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between mb-1">
         <div className="text-xs text-forge-muted">
-          Normalized score across all {data.total_specs} specs — lower is better. 100% = baseline. Click an agent to expand.
+          Avg normalized score across {data.total_specs} specs. 100% = baseline; below 100% is better. Click to expand.
         </div>
         <div className="text-xs text-forge-muted font-mono">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
