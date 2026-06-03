@@ -414,14 +414,16 @@ git push mine your-name/my-design
             </thead>
             <tbody className="divide-y divide-forge-border/30">
               {[
-                ["GET /specs", "List all problem specs"],
-                ["GET /specs/{id}", "Single spec (constraints, material, scoring)"],
+                ["GET /specs", "List all specs (?tier=easy|medium|hard, ?round_id=round_001, ?material=pla)"],
+                ["GET /specs/{id}", "Single spec (constraints, material, scoring, tier, round_id)"],
+                ["GET /rounds/active", "Active competition rounds"],
                 ["GET /sota", "Current SOTA for all specs"],
                 ["GET /sota/{spec_id}", "SOTA for one spec"],
-                ["GET /leaderboard", "Full ranked leaderboard"],
-                ["GET /leaderboard/{spec_id}", "Ranked for one spec"],
-                ["GET /leaderboard/overall", "Cross-spec contributor rankings"],
-                ["GET /submissions", "All submissions (filter by spec, contributor)"],
+                ["GET /sota/{spec_id}/history", "Progressive SOTA record over time"],
+                ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim SOTA"],
+                ["GET /leaderboard/overall", "Cross-spec contributor rankings (overall_score)"],
+                ["GET /leaderboard/{spec_id}", "Per-spec ranked leaderboard"],
+                ["GET /submissions", "Submissions (?spec_id=, ?contributor=, ?limit=, ?passed_only=)"],
                 ["POST /submissions", "Submit a scored result (CI posts here)"],
               ].map(([ep, desc]) => (
                 <tr key={ep} className="hover:bg-forge-border/10">
