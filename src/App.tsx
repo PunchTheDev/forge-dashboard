@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, lazy, Suspense } from "react";
 import {
   Routes,
   Route,
@@ -21,15 +21,27 @@ import {
 } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
-import { SotaChart } from "./components/SotaChart";
 import { SubmissionPanel } from "./components/SubmissionPanel";
 import { SubmissionJourney } from "./components/SubmissionJourney";
 import { HeroStats } from "./components/HeroStats";
 import { OverallLeaderboard } from "./components/OverallLeaderboard";
 import { QuickstartGuide } from "./components/QuickstartGuide";
-import { StepViewer } from "./components/StepViewer";
 import { SpecDiagram } from "./components/SpecDiagram";
 import { Playground } from "./components/Playground";
+
+// Heavy bundles — lazy-loaded so they don't block the initial page render.
+// three.js (~464 KB) only loads when a STEP model is actually displayed.
+// recharts (~524 KB) only loads when the SOTA history chart is rendered.
+const StepViewer = lazy(() => import("./components/StepViewer").then((m) => ({ default: m.StepViewer })));
+const SotaChart = lazy(() => import("./components/SotaChart").then((m) => ({ default: m.SotaChart })));
+
+function ChartSkeleton() {
+  return <div className="h-48 rounded-xl bg-forge-surface border border-forge-border animate-pulse" />;
+}
+
+function ViewerSkeleton() {
+  return <div className="w-full min-h-[320px] rounded-xl bg-forge-surface border border-forge-border animate-pulse" />;
+}
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 const API_DOCS_URL = `${API_BASE_URL}/docs`;
@@ -333,7 +345,9 @@ function SotaHero({
     <div className="mb-8 rounded-2xl border border-forge-border bg-forge-surface overflow-hidden">
       <div className="flex flex-col lg:flex-row">
         <div className="flex-1 min-h-[320px] lg:min-h-[400px] relative">
-          <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} />
+          <Suspense fallback={<ViewerSkeleton />}>
+            <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} />
+          </Suspense>
         </div>
         <div className="lg:w-72 shrink-0 p-6 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-forge-border">
           <div>
@@ -1019,14 +1033,18 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         />
 
         {sota?.has_step && (
-          <StepViewer
-            stepUrl={stepUrl(sota.submission_id)}
-            label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
-            fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
-          />
+          <Suspense fallback={<ViewerSkeleton />}>
+            <StepViewer
+              stepUrl={stepUrl(sota.submission_id)}
+              label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
+              fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
+            />
+          </Suspense>
         )}
 
-        <SotaChart spec={activeSpec} />
+        <Suspense fallback={<ChartSkeleton />}>
+          <SotaChart spec={activeSpec} />
+        </Suspense>
 
         <Leaderboard
           spec={activeSpec}

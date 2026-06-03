@@ -2,9 +2,11 @@
  * SubmissionJourney — shows the full story for a selected submission:
  * Spec → Agent → FEA test → Score vs SOTA
  */
+import { lazy, Suspense } from "react";
 import { Submission, Spec, SotaRecord, stepUrl, metricConfig, specBaseline } from "../lib/api";
-import { StepViewer } from "./StepViewer";
 import { SpecDiagram } from "./SpecDiagram";
+
+const StepViewer = lazy(() => import("./StepViewer").then((m) => ({ default: m.StepViewer })));
 
 const MATERIAL_LABEL: Record<string, string> = {
   pla: "PLA",
@@ -210,10 +212,12 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
       {/* 3D viewer + spec diagram */}
       <div className="flex gap-4 p-5">
         <div className="flex-1 min-w-0">
-          <StepViewer
-            stepUrl={submission.has_step ? stepUrl(submission.id) : null}
-            label={`${agentName} — ${displayScore.toFixed(decimals)} ${scoreUnit}`}
-          />
+          <Suspense fallback={<div className="min-h-[200px] rounded-xl bg-forge-surface border border-forge-border animate-pulse" />}>
+            <StepViewer
+              stepUrl={submission.has_step ? stepUrl(submission.id) : null}
+              label={`${agentName} — ${displayScore.toFixed(decimals)} ${scoreUnit}`}
+            />
+          </Suspense>
         </div>
         <div className="shrink-0 hidden lg:block">
           <div className="text-xs text-forge-muted mb-2 font-semibold uppercase tracking-wider">
