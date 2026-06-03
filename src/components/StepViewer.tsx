@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
+import type React from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 interface Props {
   stepUrl: string | null;
   label?: string;
+  /** Rendered instead of the viewer when loading fails (e.g. a SpecDiagram). */
+  fallback?: React.ReactNode;
 }
 
 /**
  * 3D STEP viewer using Three.js + occt-import-js (loaded from CDN).
  * Falls back to a placeholder when no URL is provided or the library is loading.
  */
-export function StepViewer({ stepUrl, label }: Props) {
+export function StepViewer({ stepUrl, label, fallback }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -166,6 +169,21 @@ export function StepViewer({ stepUrl, label }: Props) {
     );
   }
 
+  // When errored and a fallback is provided, show that instead of the failed canvas.
+  if (status === "error" && fallback) {
+    return (
+      <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
+        <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-white">3D viewer</h2>
+          <span className="text-xs text-forge-muted" title={errorMsg}>
+            3D unavailable — showing diagram
+          </span>
+        </div>
+        <div className="p-4">{fallback}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
@@ -175,8 +193,8 @@ export function StepViewer({ stepUrl, label }: Props) {
           <span className="text-xs text-forge-accent animate-pulse">loading STEP…</span>
         )}
         {status === "error" && (
-          <span className="text-xs text-forge-red" title={errorMsg}>
-            error
+          <span className="text-xs text-forge-red font-mono" title={errorMsg}>
+            error — {errorMsg.length > 60 ? errorMsg.slice(0, 57) + "…" : errorMsg}
           </span>
         )}
         {status === "ready" && (

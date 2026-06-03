@@ -23,9 +23,10 @@ const SAMPLE_OUTPUT = `forge eval agents/my-agent/agent.py --spec r01_001_easy
 
 interface Props {
   specs: Spec[];
+  loading?: boolean;
 }
 
-export function Playground({ specs }: Props) {
+export function Playground({ specs, loading }: Props) {
   const [selectedSpecId, setSelectedSpecId] = useState<string>("");
   const [search, setSearch] = useState("");
 
@@ -72,18 +73,22 @@ export function Playground({ specs }: Props) {
             />
 
             {/* Dropdown */}
-            <select
-              value={selectedSpecId}
-              onChange={(e) => setSelectedSpecId(e.target.value)}
-              className="w-full bg-forge-bg border border-forge-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-forge-accent/50 mb-4"
-            >
-              <option value="">— pick a spec —</option>
-              {filteredSpecs.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.id} — {s.name.replace(/ — .*$/, "")}
-                </option>
-              ))}
-            </select>
+            {loading && specs.length === 0 ? (
+              <div className="text-forge-muted text-xs py-3 text-center">Loading specs…</div>
+            ) : (
+              <select
+                value={selectedSpecId}
+                onChange={(e) => setSelectedSpecId(e.target.value)}
+                className="w-full bg-forge-bg border border-forge-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-forge-accent/50 mb-4"
+              >
+                <option value="">{specs.length === 0 ? "— no specs available —" : "— pick a spec —"}</option>
+                {filteredSpecs.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.id} — {s.name.replace(/ — .*$/, "")}
+                  </option>
+                ))}
+              </select>
+            )}
 
             {selectedSpec ? (
               <>
