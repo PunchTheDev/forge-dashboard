@@ -261,7 +261,7 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between mb-1">
         <div className="text-xs text-forge-muted">
-          Average rank position across {data.total_specs} specs. #1.0 = first place on every entered spec. Click to expand.
+          Normalized score across all {data.total_specs} active specs. Lower is better — 1.0 = baseline, &lt;1.0 = beating baseline. Unentered specs count as 1.0. Click to expand.
         </div>
         <div className="text-xs text-forge-muted font-mono">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
