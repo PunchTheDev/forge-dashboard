@@ -1004,7 +1004,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               {round.name.replace(/Round \d+ — /, "")}
             </div>
             <div className="text-xs text-forge-muted mt-0.5 font-mono">
-              {round.scoring_direction === "minimize" ? "↓" : "↑"} {round.scoring_metric}
+              {round.scoring_direction === "minimize" ? "↓" : "↑"} {metricConfig(round.scoring_metric).label}
             </div>
           </div>
 
@@ -1121,7 +1121,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             </div>
             <div>
               <span className="text-forge-muted">$ </span>forge eval agents/my-agent/agent.py
-              --spec {activeSpec.id}
+              --spec {activeSpec.id} --docker
             </div>
           </div>
         </div>
