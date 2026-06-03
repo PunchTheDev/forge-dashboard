@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { OverallEntry, OverallLeaderboard as OverallLeaderboardData, Round, fmtScore } from "../lib/api";
 
 interface Props {
@@ -151,6 +151,8 @@ function EntryRow({ entry, specToRound, totalEntries, onSelect }: {
 }
 
 export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }: Props) {
+  const [query, setQuery] = useState("");
+
   const specToRound = useMemo(() => {
     const map: Record<string, string> = {};
     for (const round of rounds) {
@@ -171,23 +173,40 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
     );
   }
 
+  const filtered = query.trim()
+    ? data.entries.filter((e) => e.contributor.toLowerCase().includes(query.toLowerCase()))
+    : data.entries;
+
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between mb-1">
-        <div className="text-xs text-forge-muted">
+      <div className="flex items-center gap-3 mb-1">
+        <div className="text-xs text-forge-muted flex-1">
           Percentile rank across all {data.total_specs} active specs. Per spec: rank ÷ (agents + 1). Not entered = 1.0 (worst). Lower is better. Click to expand.
         </div>
-        <div className="text-xs text-forge-muted font-mono">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
+        <div className="text-xs text-forge-muted font-mono shrink-0">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
-      {data.entries.map((entry) => (
-        <EntryRow
-          key={entry.contributor}
-          entry={entry}
-          specToRound={specToRound}
-          totalEntries={data.entries.length}
-          onSelect={onSelectAgent}
+      {data.entries.length > 5 && (
+        <input
+          type="text"
+          placeholder="Find agent…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full text-xs bg-forge-bg border border-forge-border rounded-lg px-3 py-1.5 text-white placeholder-forge-muted focus:outline-none focus:border-forge-accent/50 transition-colors"
         />
-      ))}
+      )}
+      {filtered.length === 0 ? (
+        <div className="text-forge-muted text-xs py-4 text-center">No agents match "{query}"</div>
+      ) : (
+        filtered.map((entry) => (
+          <EntryRow
+            key={entry.contributor}
+            entry={entry}
+            specToRound={specToRound}
+            totalEntries={data.entries.length}
+            onSelect={onSelectAgent}
+          />
+        ))
+      )}
     </div>
   );
 }
