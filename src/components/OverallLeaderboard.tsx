@@ -175,7 +175,7 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between mb-1">
         <div className="text-xs text-forge-muted">
-          Normalized score across all {data.total_specs} active specs. Lower is better — 1.0 = baseline, &lt;1.0 = beating baseline. Unentered specs count as 1.0. Click to expand.
+          Percentile rank across all {data.total_specs} active specs. Per spec: rank ÷ (agents + 1). Not entered = 1.0 (worst). Lower is better. Click to expand.
         </div>
         <div className="text-xs text-forge-muted font-mono">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
