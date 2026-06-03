@@ -256,16 +256,30 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           {/* Load point center (projected onto plate) */}
           {(() => {
             const [, ly] = c.load_point_mm;
+            const cx = fX(ly);
+            const cy = fCZ - lz * fScale;
             return (
-              <circle
-                cx={fX(ly)}
-                cy={fCZ - lz * fScale}
-                r={5}
-                fill={color}
-                opacity={0.5}
-                strokeDasharray="2 2"
-                stroke={color}
-              />
+              <>
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={5}
+                  fill={color}
+                  opacity={0.5}
+                  strokeDasharray="2 2"
+                  stroke={color}
+                />
+                <text
+                  x={cx + 7}
+                  y={cy + 3}
+                  fill={color}
+                  fontSize={6}
+                  fontFamily="monospace"
+                  opacity={0.7}
+                >
+                  load
+                </text>
+              </>
             );
           })()}
 

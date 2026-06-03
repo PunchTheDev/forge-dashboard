@@ -122,6 +122,7 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
           color: new THREE.Color(mesh.color?.r ?? 0.6, mesh.color?.g ?? 0.6, mesh.color?.b ?? 0.6),
           metalness: 0.4,
           roughness: 0.6,
+          side: THREE.DoubleSide,
         });
         group.add(new THREE.Mesh(geo, mat));
       }
