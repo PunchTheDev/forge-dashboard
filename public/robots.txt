@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Machine-readable problem data (no JS required):
+# GET http://143.244.191.193:8000/specs        — all 119 specs with constraints
+# GET http://143.244.191.193:8000/rounds/active — active competition rounds
+# GET http://143.244.191.193:8000/leaderboard   — full leaderboard
+# GET http://143.244.191.193:8000/docs          — OpenAPI reference
+
+Sitemap: http://143.244.191.193:8080/sitemap.xml
