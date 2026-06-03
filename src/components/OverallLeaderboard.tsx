@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { OverallEntry, OverallLeaderboard as OverallLeaderboardData, Round, fmtScore } from "../lib/api";
 
 interface Props {
@@ -21,14 +21,6 @@ function RankBadge({ rank }: { rank: number }) {
   return <span className="text-forge-muted">#{rank}</span>;
 }
 
-/** Display a normalized score % — capped at 999% with ">" prefix when absurd. */
-function fmtNorm(norm: number): { text: string; color: string } {
-  const pct = norm * 100;
-  if (pct <= 80)  return { text: `${pct.toFixed(1)}%`, color: "text-forge-green" };
-  if (pct <= 100) return { text: `${pct.toFixed(1)}%`, color: "text-forge-accent" };
-  if (pct > 999)  return { text: `>${(999).toFixed(0)}%`, color: "text-forge-red" };
-  return { text: `${pct.toFixed(1)}%`, color: "text-forge-red" };
-}
 
 /** Display an average rank — #1.0 is green, higher ranks shade toward amber/red. */
 function fmtOverallScore(score: number): { text: string; color: string } {
@@ -101,77 +93,17 @@ function CategoryBreakdown({ entry, specToRound }: {
   );
 }
 
-function SpecBreakdown({ entry, specToRound }: {
+
+function EntryRow({ entry, specToRound, totalEntries, onSelect }: {
   entry: OverallEntry;
   specToRound: Record<string, string>;
-}) {
-  const sorted = useMemo(
-    () => [...entry.best].sort((a, b) => a.spec_id.localeCompare(b.spec_id)),
-    [entry.best],
-  );
-
-  return (
-    <div className="mt-3 border-t border-forge-border pt-3">
-      <div className="text-xs text-forge-muted mb-2 font-semibold uppercase tracking-wide">Per-spec results</div>
-      <table className="w-full text-xs">
-        <thead>
-          <tr className="text-forge-muted border-b border-forge-border">
-            <th className="text-left pb-1.5 font-normal">Spec</th>
-            <th className="text-left pb-1.5 font-normal">Category</th>
-            <th className="text-right pb-1.5 font-normal">Score</th>
-            <th className="text-right pb-1.5 font-normal">vs Baseline</th>
-            <th className="text-right pb-1.5 font-normal">Rank</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((b) => {
-            const roundId = specToRound[b.spec_id];
-            const meta = roundId ? CATEGORY_META[roundId] : null;
-            const isSota = b.rank === 1;
-            return (
-              <tr key={b.spec_id} className="border-b border-forge-border/40 last:border-0">
-                <td className="py-1.5 font-mono text-white/80">{b.spec_id}</td>
-                <td className="py-1.5">
-                  {meta ? (
-                    <span className={`${meta.color} font-medium`}>{meta.label}</span>
-                  ) : (
-                    <span className="text-forge-muted">—</span>
-                  )}
-                </td>
-                <td className="py-1.5 text-right font-mono text-white">
-                  {fmtScore(b.score, b.score_metric)}
-                </td>
-                <td className={`py-1.5 text-right font-mono ${fmtNorm(b.normalized_score).color}`}>{fmtNorm(b.normalized_score).text}</td>
-                <td className="py-1.5 text-right">
-                  {isSota ? (
-                    <span className="text-yellow-400 font-bold">#1 ★</span>
-                  ) : (
-                    <span className="text-forge-muted">#{b.rank}</span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries, onSelect }: {
-  entry: OverallEntry;
-  specToRound: Record<string, string>;
-  expanded: boolean;
-  onToggle: () => void;
   totalEntries: number;
   onSelect?: (contributor: string) => void;
 }) {
   return (
     <div
-      className={`bg-forge-surface border rounded-xl px-5 py-4 flex flex-col gap-2 cursor-pointer transition-colors ${
-        expanded ? "border-forge-accent/50" : "border-forge-border hover:border-forge-border/80"
-      }`}
-      onClick={onToggle}
+      className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-2 cursor-pointer transition-all hover:border-forge-accent/50 hover:scale-[1.005] active:scale-[0.998]"
+      onClick={() => onSelect?.(entry.contributor)}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -179,17 +111,7 @@ function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries, onSele
             <RankBadge rank={entry.rank} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold text-white">{entry.contributor}</div>
-              {onSelect && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); onSelect(entry.contributor); }}
-                  className="text-xs text-forge-accent hover:underline"
-                >
-                  Details →
-                </button>
-              )}
-            </div>
+            <div className="text-sm font-semibold text-white">{entry.contributor}</div>
             <div className="text-xs text-forge-muted mt-0.5">
               {entry.specs_entered} spec{entry.specs_entered !== 1 ? "s" : ""}
               {" · "}
@@ -217,26 +139,18 @@ function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries, onSele
               );
             })()}
           </div>
-          <div className={`text-forge-muted transition-transform ${expanded ? "rotate-180" : ""}`}>
-            ▾
-          </div>
+          <div className="text-forge-accent text-xs">→</div>
         </div>
       </div>
 
       <ScoreBar score={entry.overall_score ?? (entry.avg_rank / (totalEntries || 1))} />
 
       <CategoryBreakdown entry={entry} specToRound={specToRound} />
-
-      {expanded && (
-        <SpecBreakdown entry={entry} specToRound={specToRound} />
-      )}
     </div>
   );
 }
 
 export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }: Props) {
-  const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
-
   const specToRound = useMemo(() => {
     const map: Record<string, string> = {};
     for (const round of rounds) {
@@ -270,8 +184,6 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
           key={entry.contributor}
           entry={entry}
           specToRound={specToRound}
-          expanded={expandedAgent === entry.contributor}
-          onToggle={() => setExpandedAgent(expandedAgent === entry.contributor ? null : entry.contributor)}
           totalEntries={data.entries.length}
           onSelect={onSelectAgent}
         />

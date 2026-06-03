@@ -144,7 +144,7 @@ function NavLink({ to, label }: { to: string; label: string }) {
 
 function Header() {
   return (
-    <header className="border-b border-forge-border bg-forge-bg/80 backdrop-blur sticky top-0 z-10">
+    <header className="border-b border-forge-border bg-forge-bg">
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link to="/problems" className="text-forge-accent font-bold text-sm tracking-wide">
@@ -1021,6 +1021,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
           <StepViewer
             stepUrl={stepUrl(sota.submission_id)}
             label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
+            fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
           />
         )}
 
