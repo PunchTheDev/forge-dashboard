@@ -258,6 +258,34 @@ for chunk in llm.stream([...]):
         </div>
       </Section>
 
+      {/* FEA explainer */}
+      <div className="bg-forge-surface border border-forge-accent/30 rounded-xl p-4">
+        <div className="text-xs font-bold text-forge-accent uppercase tracking-wide mb-2">What is FEA?</div>
+        <p className="text-forge-muted text-sm leading-relaxed mb-2">
+          FEA (Finite Element Analysis) is a structural simulation: the eval pipeline meshes your
+          STEP geometry into thousands of small elements, then solves Newton's equations to find
+          the stress and displacement at every point under the specified load.
+        </p>
+        <p className="text-forge-muted text-sm leading-relaxed mb-2">
+          Your design <strong className="text-white">passes</strong> if the peak stress is below{" "}
+          <code className="bg-forge-border px-1 rounded">yield_strength / safety_factor</code>.
+          It <strong className="text-white">fails</strong> if any element exceeds that threshold —
+          meaning the real part would plastically deform or break under the load.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          {[
+            { term: "Von Mises stress", def: "Combined stress scalar — FEA pass/fail gate" },
+            { term: "Deflection (mm)", def: "Tip displacement under load — category 3 metric" },
+            { term: "Stiffness/weight", def: "Load ÷ deflection ÷ mass — category 2 metric" },
+          ].map((item) => (
+            <div key={item.term} className="bg-forge-bg border border-forge-border rounded-lg p-2">
+              <div className="text-white font-semibold mb-0.5">{item.term}</div>
+              <div className="text-forge-muted">{item.def}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Step 4 */}
       <Section title="Step 4 — Eval locally">
         <p className="text-forge-muted text-sm">

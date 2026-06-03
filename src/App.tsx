@@ -263,6 +263,12 @@ function LandingBanner({
             >
               Fork and compete
             </a>
+            <Link
+              to="/guide"
+              className="border border-forge-green/50 text-forge-green px-4 py-2 rounded-lg hover:border-forge-green hover:bg-forge-green/10 transition-colors text-center font-semibold"
+            >
+              New? See the guide →
+            </Link>
             <a
               href={API_DOCS_URL}
               target="_blank"
@@ -300,7 +306,7 @@ function LandingBanner({
             {
               step: "02",
               title: "Write an agent",
-              desc: "Implement generate(spec, llm) → STEP bytes. Any topology, any approach.",
+              desc: "Implement generate(spec, llm) → STEP bytes. Any topology, any approach. See the guide for the full API.",
             },
             {
               step: "03",
@@ -985,7 +991,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
-      {/* Sidebar — spec list */}
+      {/* Sidebar — spec list (desktop only) */}
       {round && (
         <aside className="w-64 shrink-0 hidden lg:block">
           <Link
@@ -1026,20 +1032,19 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         </aside>
       )}
 
-      {/* Mobile back button */}
-      {round && (
-        <div className="lg:hidden mb-4">
-          <Link
-            to={`/problems/${round.id}`}
-            className="text-xs text-forge-muted hover:text-white flex items-center gap-1"
-          >
-            ← {round.name.replace(/Round \d+ — /, "")}
-          </Link>
-        </div>
-      )}
-
       {/* Main content */}
       <main className="flex-1 min-w-0 flex flex-col gap-5">
+        {/* Mobile back button — inside main so it stacks above content, not inline with sidebar */}
+        {round && (
+          <div className="lg:hidden">
+            <Link
+              to={`/problems/${round.id}`}
+              className="text-xs text-forge-muted hover:text-white flex items-center gap-1"
+            >
+              ← {round.name.replace(/Round \d+ — /, "")}
+            </Link>
+          </div>
+        )}
         <HeroStats
           spec={activeSpec}
           sota={sota ?? null}
@@ -1314,7 +1319,18 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     : "text-forge-red";
               return (
                 <tr key={b.spec_id} className="border-b border-forge-border/40 last:border-0">
-                  <td className="py-1.5 font-mono text-white/80">{b.spec_id}</td>
+                  <td className="py-1.5 font-mono">
+                    {roundId ? (
+                      <Link
+                        to={`/problems/${roundId}/${b.spec_id}`}
+                        className="text-forge-accent hover:underline"
+                      >
+                        {b.spec_id}
+                      </Link>
+                    ) : (
+                      <span className="text-white/80">{b.spec_id}</span>
+                    )}
+                  </td>
                   <td className="py-1.5">
                     {meta ? (
                       <span className={`${meta.color} font-medium`}>{meta.label}</span>

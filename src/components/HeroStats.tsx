@@ -12,14 +12,16 @@ function Stat({
   value,
   sub,
   accent,
+  title,
 }: {
   label: string;
   value: string;
   sub?: string;
   accent?: boolean;
+  title?: string;
 }) {
   return (
-    <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-1">
+    <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-1" title={title}>
       <div className="text-forge-muted text-xs font-medium uppercase tracking-wider">
         {label}
       </div>
@@ -95,12 +97,14 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           value={stressHeadroom ? `${stressHeadroom}%` : "—"}
           sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} / ${allowable.toFixed(0)} MPa` : "max von Mises"}
           accent
+          title="FEA (Finite Element Analysis) simulates the load on your design. Stress headroom = how far the peak Von Mises stress is below the allowable limit. Higher % = more safety margin."
         />
         <Stat
           label="Passing entries"
           value={String(submissionCount)}
-          sub="verified by FEA"
+          sub="designs that survived FEA"
           accent
+          title="A passing entry fits in the build volume, has bolt hole clearance, meets wall thickness and overhang constraints, and survives FEA (peak stress ≤ yield / safety factor)."
         />
       </div>
     </div>
