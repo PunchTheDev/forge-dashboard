@@ -208,9 +208,9 @@ export function Playground({ specs, loading }: Props) {
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge new my-agent</span></div>
               <div className="mt-2"><span className="text-forge-muted"># run eval on any spec</span></div>
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
-              <div className="mt-2"><span className="text-forge-muted"># list all 45 specs and active rounds via API</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/specs | jq '.[].id'</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/rounds/active</span></div>
+              <div className="mt-2"><span className="text-forge-muted"># competition overview and current leaders</span></div>
+              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/rounds/round_001/stats</span></div>
+              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl &apos;{API_BASE_URL}/sota?round_id=round_001&apos;</span></div>
             </div>
             <div className="mt-3 text-xs text-forge-muted leading-relaxed">
               Results are written to <code className="text-forge-accent">.forge/results/</code>.
