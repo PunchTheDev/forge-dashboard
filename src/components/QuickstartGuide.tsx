@@ -3,9 +3,24 @@ import { API_BASE_URL } from "../lib/api";
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
 const WHITELISTED_MODELS = [
-  { id: "anthropic/claude-haiku-4-5", provider: "Anthropic", desc: "Fast, cheap — good for iterative geometry generation" },
-  { id: "anthropic/claude-3-5-haiku", provider: "Anthropic", desc: "Stronger reasoning, still fast" },
-  { id: "openai/gpt-4o-mini", provider: "OpenAI", desc: "Alternative reasoning model" },
+  { id: "anthropic/claude-haiku-4-5", provider: "Anthropic" },
+  { id: "anthropic/claude-haiku-4-5-20251001", provider: "Anthropic" },
+  { id: "anthropic/claude-3-5-haiku", provider: "Anthropic" },
+  { id: "anthropic/claude-3-5-sonnet", provider: "Anthropic" },
+  { id: "anthropic/claude-sonnet-4-5", provider: "Anthropic" },
+  { id: "anthropic/claude-sonnet-4-6", provider: "Anthropic" },
+  { id: "anthropic/claude-opus-4-6", provider: "Anthropic" },
+  { id: "openai/gpt-4o-mini", provider: "OpenAI" },
+  { id: "openai/gpt-4o", provider: "OpenAI" },
+  { id: "deepseek/deepseek-r1", provider: "DeepSeek" },
+  { id: "deepseek/deepseek-r1-distill-llama-70b", provider: "DeepSeek" },
+  { id: "deepseek/deepseek-chat-v3-0324", provider: "DeepSeek" },
+  { id: "meta-llama/llama-3.1-70b-instruct", provider: "Meta" },
+  { id: "meta-llama/llama-3.1-405b-instruct", provider: "Meta" },
+  { id: "google/gemini-2.0-flash-001", provider: "Google" },
+  { id: "google/gemini-flash-1.5", provider: "Google" },
+  { id: "mistralai/mixtral-8x7b-instruct", provider: "Mistral" },
+  { id: "qwen/qwen-2.5-72b-instruct", provider: "Qwen" },
 ];
 
 function CodeBlock({ code }: { code: string }) {
@@ -182,16 +197,17 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
         <p className="text-forge-muted text-sm leading-relaxed">
           LLM agents receive a harness-injected <code className="bg-forge-border px-1 rounded">LLMClient</code>{" "}
           that routes through OpenRouter. You do not supply an API key — the harness handles it.
-          Only these models are permitted:
+          Full list in{" "}
+          <a href={`${FORGE_REPO}/blob/main/config/model-whitelist.txt`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">
+            config/model-whitelist.txt
+          </a>
+          :
         </p>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
           {WHITELISTED_MODELS.map((m) => (
-            <div key={m.id} className="flex items-start gap-3 bg-forge-bg border border-forge-border rounded-lg px-3 py-2">
-              <div className="flex-1 min-w-0">
-                <div className="text-white text-xs font-mono font-semibold">{m.id}</div>
-                <div className="text-forge-muted text-xs mt-0.5">{m.desc}</div>
-              </div>
-              <div className="text-forge-muted text-xs shrink-0">{m.provider}</div>
+            <div key={m.id} className="flex items-center gap-2 bg-forge-bg border border-forge-border rounded px-2.5 py-1.5">
+              <span className="text-white text-xs font-mono flex-1 min-w-0 truncate">{m.id}</span>
+              <span className="text-forge-muted text-xs shrink-0">{m.provider}</span>
             </div>
           ))}
         </div>
