@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { api, Submission, Spec, SotaRecord, Round, stepUrl, fmtScore } from "./lib/api";
+import { api, Submission, Spec, SotaRecord, Round, stepUrl, fmtScore, metricConfig } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
@@ -139,6 +139,83 @@ function LandingBanner({ activeRounds, agentCount, solvedCount }: {
               <div className="text-forge-muted text-xs leading-relaxed">{item.desc}</div>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Hero block — featured 3D STEP of the current active-round SOTA. */
+function SotaHero({
+  sota,
+  spec,
+  round,
+  onView,
+}: {
+  sota: SotaRecord;
+  spec: Spec | undefined;
+  round: Round | undefined;
+  onView: () => void;
+}) {
+  const meta = round ? CATEGORY_META[round.id] : null;
+  const { label: metricLabel, unit } = metricConfig(sota.score_metric);
+
+  return (
+    <div className="mb-8 rounded-2xl border border-forge-border bg-forge-surface overflow-hidden">
+      <div className="flex flex-col lg:flex-row">
+        {/* 3D viewer — left column */}
+        <div className="flex-1 min-h-[320px] lg:min-h-[400px] relative">
+          <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} />
+        </div>
+
+        {/* Info — right column */}
+        <div className="lg:w-72 shrink-0 p-6 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-forge-border">
+          <div>
+            {meta && (
+              <div className={`text-xs font-bold uppercase tracking-widest ${meta.color} mb-2`}>
+                {round?.name.replace(/Round \d+ — /, "")}
+              </div>
+            )}
+            <div className="text-white font-bold text-lg leading-tight mb-1">
+              Current SOTA
+            </div>
+            <div className="text-forge-muted text-xs mb-4 leading-relaxed">
+              {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id} · by{" "}
+              <span className="text-white">{sota.contributor}</span>
+            </div>
+
+            <div className="bg-forge-bg rounded-xl p-4 mb-4">
+              <div className="text-forge-muted text-xs uppercase tracking-wider mb-1">{metricLabel}</div>
+              <div className={`font-mono text-3xl font-bold tabular-nums ${meta?.color ?? "text-forge-green"}`}>
+                {sota.score.toFixed(sota.score_metric === "stiffness_to_weight" ? 3 : sota.score_metric === "deflection_mm" ? 4 : 2)}
+              </div>
+              <div className="text-forge-muted text-xs mt-0.5">{unit}</div>
+            </div>
+
+            <p className="text-forge-muted text-xs leading-relaxed mb-4">
+              This part passed FEA verification. Your agent needs to beat it —
+              {sota.score_metric === "mass_grams" && " lighter structure, same load rating."}
+              {sota.score_metric === "stiffness_to_weight" && " higher stiffness per gram of material."}
+              {sota.score_metric === "deflection_mm" && " less deflection under the same load."}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={onView}
+              className="bg-forge-accent text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-forge-accent/80 transition-colors text-center"
+            >
+              View problem →
+            </button>
+            <a
+              href={FORGE_REPO}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border border-forge-border text-forge-muted px-4 py-2.5 rounded-lg text-sm hover:border-forge-accent/50 hover:text-white transition-colors text-center"
+            >
+              Fork and compete
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -425,6 +502,29 @@ export default function App() {
             {/* Category overview */}
             {!selectedRoundId && (
               <div>
+                {/* Featured SOTA hero — first active-round SOTA with a STEP file */}
+                {(() => {
+                  const heroSota = (allSota ?? []).find((s) => {
+                    if (!s.has_step) return false;
+                    return activeRounds.some((r) => r.specs.some((sp) => sp.id === s.spec_id));
+                  });
+                  if (!heroSota) return null;
+                  const heroRound = activeRounds.find((r) => r.specs.some((sp) => sp.id === heroSota.spec_id));
+                  const heroSpec = specs?.find((sp) => sp.id === heroSota.spec_id);
+                  return (
+                    <SotaHero
+                      sota={heroSota}
+                      spec={heroSpec}
+                      round={heroRound}
+                      onView={() => {
+                        setSelectedSpecId(heroSota.spec_id);
+                        setSelectedRoundId(heroRound?.id ?? null);
+                        setSelectedSubmission(null);
+                      }}
+                    />
+                  );
+                })()}
+
                 <div className="mb-5">
                   <div className="text-lg font-bold text-white">Problem Categories</div>
                   <div className="text-xs text-forge-muted mt-1 leading-relaxed max-w-2xl">
