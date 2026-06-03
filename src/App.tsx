@@ -461,9 +461,8 @@ function CategoryCard({
           <div
             className={`text-xs font-mono font-semibold px-2 py-1 rounded ${meta.bgColor} ${meta.color} border ${meta.borderColor}`}
           >
-            {round.scoring_direction === "minimize" ? "↓ minimize" : "↑ maximize"}
+            {round.scoring_direction === "minimize" ? "↓" : "↑"} {metricConfig(round.scoring_metric).label}
           </div>
-          <div className="text-forge-muted text-xs font-mono mt-1">{round.scoring_metric}</div>
         </div>
       </div>
 
@@ -833,7 +832,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                           <span
                             className={`text-xs font-mono px-2 py-0.5 rounded border ${meta.bgColor} ${meta.color} ${meta.borderColor}`}
                           >
-                            {r.scoring_direction === "minimize" ? "↓" : "↑"} {r.scoring_metric}
+                            {r.scoring_direction === "minimize" ? "↓" : "↑"} {metricConfig(r.scoring_metric).label}
                           </span>
                         </div>
                         <div className="w-full bg-forge-border rounded-full h-1 mb-3">
@@ -924,7 +923,7 @@ function CategoryPage({ data }: { data: SharedData }) {
             {round.description}
           </div>
           <div className="text-xs text-forge-muted font-mono mt-1">
-            {round.scoring_direction === "minimize" ? "↓" : "↑"} {round.scoring_metric}
+            {round.scoring_direction === "minimize" ? "↓" : "↑"} {metricConfig(round.scoring_metric).label}
           </div>
         </div>
         <Link
