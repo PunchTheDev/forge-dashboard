@@ -142,7 +142,9 @@ curl ${API_BASE_URL}/sota`} />
         <p className="text-forge-muted text-sm">
           Create a folder <code className="bg-forge-border px-1 rounded">agents/your-name/</code> with
           an <code className="bg-forge-border px-1 rounded">agent.py</code> that implements{" "}
-          <code className="bg-forge-border px-1 rounded">generate(spec) → bytes</code>.
+          <code className="bg-forge-border px-1 rounded">generate(spec, llm) → bytes</code>.
+          The harness injects the LLM client — your agent must accept both parameters.
+          Agents that only accept <code className="bg-forge-border px-1 rounded">spec</code> are rejected at eval.
         </p>
         <CodeBlock code={`# Scaffold from template:
 forge new your-name
@@ -150,32 +152,7 @@ forge new your-name
 # Or manually:
 mkdir -p agents/your-name
 # Then write agents/your-name/agent.py`} />
-        <p className="text-forge-muted text-sm">
-          Two submission interfaces are supported:
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="bg-forge-bg border border-forge-border rounded-lg p-3">
-            <div className="text-forge-accent text-xs font-semibold mb-1">Static agent</div>
-            <div className="text-forge-muted text-xs leading-relaxed">
-              Hardcoded geometry. Fastest to write, no LLM needed. Good for algorithmic topology optimization.
-            </div>
-          </div>
-          <div className="bg-forge-bg border border-forge-green/30 rounded-lg p-3">
-            <div className="text-forge-green text-xs font-semibold mb-1">LLM agent (recommended)</div>
-            <div className="text-forge-muted text-xs leading-relaxed">
-              Observe → plan → act loop. Uses a harness-injected LLM client to reason about geometry. Network enabled.
-            </div>
-          </div>
-        </div>
         <CodeBlock code={`# agents/your-name/agent.py
-
-# --- Option A: static agent ---
-def generate(spec: dict) -> bytes:
-    constraints = spec["constraints"]
-    # build geometry, return STEP bytes
-    ...
-
-# --- Option B: LLM agent (recommended) ---
 from forge.sdk import LLMClient  # injected by harness
 
 def generate(spec: dict, llm: LLMClient) -> bytes:
@@ -186,6 +163,7 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
     spec["material"]: pla | petg | aluminum_6061 | stainless_316
     llm: whitelisted model, injected — do NOT hardcode API keys
     Sandbox: 60s, 4GB RAM, network enabled for LLM calls
+    Returns: STEP file bytes
     """
     plan = llm.chat([
         {"role": "system", "content": "You are a structural CAD engineer."},
@@ -195,8 +173,7 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
     ...`} />
         <p className="text-forge-muted text-xs">
           See <code className="bg-forge-border px-1 rounded">examples/llm-agent/agent.py</code>{" "}
-          for a complete working LLM agent example. Static baseline in{" "}
-          <code className="bg-forge-border px-1 rounded">agents/baseline_steel/agent.py</code>.
+          for a complete working example.
         </p>
       </Section>
 
