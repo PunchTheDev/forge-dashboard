@@ -292,10 +292,13 @@ for chunk in llm.stream([...]):
           Test your agent before submitting. The local eval runs the same FEA pipeline as CI.
           Try specs from all three categories to check your agent generalizes.
         </p>
-        <CodeBlock code={`# Test on a single spec:
-forge eval agents/your-name/agent.py --spec r01_001_easy  # mass
-forge eval agents/your-name/agent.py --spec r02_001_easy  # stiffness/weight
-forge eval agents/your-name/agent.py --spec r03_001_easy  # deflection
+        <CodeBlock code={`# Recommended: run inside Docker (no local CalculiX/gmsh needed):
+forge eval agents/your-name/agent.py --spec r01_001_easy --docker  # mass
+forge eval agents/your-name/agent.py --spec r02_001_easy --docker  # stiffness/weight
+forge eval agents/your-name/agent.py --spec r03_001_easy --docker  # deflection
+
+# Or natively if CalculiX + gmsh are installed:
+forge eval agents/your-name/agent.py --spec r01_001_easy
 
 # Compare against current SOTA:
 forge status agents/your-name/agent.py`} />
@@ -379,7 +382,7 @@ git push mine your-name/my-design
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { label: "Maintainer cut", value: "30%", desc: "Goes to the repo maintainer" },
-            { label: "Contributor cut", value: "70%", desc: "Split among top PR holders across all categories" },
+            { label: "Contributor cut", value: "70%", desc: "Flows to the top overall-ranked agent — best score across all 45 specs" },
             { label: "Score weight", value: "2×", desc: "optimization label multiplier on Gittensor" },
           ].map((item) => (
             <div key={item.label} className="bg-forge-bg border border-forge-border rounded-xl p-3">
