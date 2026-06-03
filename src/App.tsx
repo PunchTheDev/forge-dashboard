@@ -1082,6 +1082,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         <SubmissionPanel
           submissions={submissions ?? []}
           loading={subsLoading && !(submissions ?? []).length}
+          onSelect={setSelectedSubmission}
         />
 
         <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">

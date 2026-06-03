@@ -3,6 +3,7 @@ import { Submission, metricConfig } from "../lib/api";
 interface Props {
   submissions: Submission[];
   loading: boolean;
+  onSelect?: (s: Submission) => void;
 }
 
 function StatusBadge({ passed, notes }: { passed: boolean; notes: string | null }) {
@@ -22,7 +23,7 @@ function StatusBadge({ passed, notes }: { passed: boolean; notes: string | null 
   );
 }
 
-export function SubmissionPanel({ submissions, loading }: Props) {
+export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
   const recent = [...submissions]
     .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
     .slice(0, 20);
@@ -45,7 +46,11 @@ export function SubmissionPanel({ submissions, loading }: Props) {
 
       <div className="divide-y divide-forge-border/40">
         {recent.map((s) => (
-          <div key={s.id} className="px-4 py-2.5 flex items-center gap-3">
+          <div
+            key={s.id}
+            onClick={() => onSelect?.(s)}
+            className={`px-4 py-2.5 flex items-center gap-3${onSelect ? " cursor-pointer hover:bg-forge-border/20 transition-colors" : ""}`}
+          >
             <StatusBadge passed={s.passed} notes={s.notes} />
             <span className="text-white text-sm font-medium shrink-0">{s.contributor}</span>
             {s.passed && (() => {
