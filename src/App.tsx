@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import {
   api,
+  API_BASE_URL,
   Submission,
   Spec,
   SotaRecord,
@@ -32,7 +33,7 @@ import { SpecDiagram } from "./components/SpecDiagram";
 import { Playground } from "./components/Playground";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
-const API_DOCS_URL = "http://143.244.191.193:8000/docs";
+const API_DOCS_URL = `${API_BASE_URL}/docs`;
 
 const CATEGORY_META: Record<
   string,
@@ -110,7 +111,7 @@ function ApiError({ message }: { message: string }) {
         <div className="text-forge-muted text-xs">
           Benchmark API at{" "}
           <code className="bg-forge-border px-1.5 py-0.5 rounded text-forge-accent">
-            http://143.244.191.193:8000
+            {API_BASE_URL}
           </code>{" "}
           is not responding. Competition is still live on{" "}
           <a href={FORGE_REPO} className="text-forge-accent hover:underline">

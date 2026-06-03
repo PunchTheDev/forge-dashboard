@@ -1,5 +1,8 @@
 const BASE = import.meta.env.VITE_API_URL ?? "/api";
 
+/** Public API base URL — use this in components that display it to users. */
+export const API_BASE_URL: string = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+
 export interface SpecConstraints {
   load_newtons: number;
   load_point_mm: number[];

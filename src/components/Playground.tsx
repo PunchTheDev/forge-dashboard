@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Spec } from "../lib/api";
+import { Spec, API_BASE_URL_URL } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
-const API_BASE = "http://143.244.191.193:8000";
 
 const SAMPLE_OUTPUT = `forge eval agents/my-agent/agent.py --spec r01_001_easy
 
@@ -207,7 +206,7 @@ export function Playground({ specs, loading }: Props) {
               <div className="mt-2"><span className="text-forge-muted"># run eval on any spec</span></div>
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
               <div className="mt-2"><span className="text-forge-muted"># list all available specs</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE}/specs | jq '.[].id'</span></div>
+              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/specs | jq '.[].id'</span></div>
             </div>
             <div className="mt-3 text-xs text-forge-muted leading-relaxed">
               The eval harness runs the same FEA pipeline as CI — deterministic and reproducible.
@@ -225,11 +224,11 @@ export function Playground({ specs, loading }: Props) {
         </div>
         <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
           <div><span className="text-forge-muted"># list all specs</span></div>
-          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE}/specs</span></div>
+          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/specs</span></div>
           <div className="mt-2"><span className="text-forge-muted"># run local eval on a specific spec</span></div>
           <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge eval agents/my-agent/agent.py --spec r01_001_easy</span></div>
           <div className="mt-2"><span className="text-forge-muted"># fetch active rounds and their spec pools</span></div>
-          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE}/rounds/active</span></div>
+          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/rounds/active</span></div>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
+import { API_BASE_URL_URL } from "../lib/api";
+
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
-const API_BASE = "http://143.244.191.193:8000";
 
 const WHITELISTED_MODELS = [
   { id: "anthropic/claude-haiku-4-5", provider: "Anthropic", desc: "Fast, cheap — good for iterative geometry generation" },
@@ -131,9 +132,9 @@ forge leaderboard              # show current SOTA`} />
         <p className="text-forge-muted text-sm">
           Or directly via the API:
         </p>
-        <CodeBlock code={`curl ${API_BASE}/specs
-curl ${API_BASE}/rounds/active
-curl ${API_BASE}/sota`} />
+        <CodeBlock code={`curl ${API_BASE_URL}/specs
+curl ${API_BASE_URL}/rounds/active
+curl ${API_BASE_URL}/sota`} />
       </Section>
 
       {/* Step 3 */}
@@ -341,8 +342,8 @@ git push mine your-name/my-design
         </div>
         <p className="text-forge-muted text-xs">
           Interactive docs:{" "}
-          <a href={`${API_BASE}/docs`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">
-            {API_BASE}/docs
+          <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">
+            {API_BASE_URL}/docs
           </a>
         </p>
       </Section>
@@ -416,7 +417,7 @@ git push mine your-name/my-design
           Full Quickstart
         </a>
         <a
-          href={`${API_BASE}/docs`}
+          href={`${API_BASE_URL}/docs`}
           target="_blank"
           rel="noopener noreferrer"
           className="border border-forge-border text-forge-muted px-4 py-2 rounded-lg text-sm hover:border-forge-accent/50 hover:text-white transition-colors"
