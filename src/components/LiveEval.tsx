@@ -207,7 +207,7 @@ export function LiveEval({ specs }: Props) {
                   <option key={s.id} value={s.id}>{s.id}</option>
                 ))}
               </optgroup>
-              <optgroup label="Absolute Stiffness (Round 3)">
+              <optgroup label="Deflection (Round 3)">
                 {specs.filter((s) => s.id.startsWith("r03_")).map((s) => (
                   <option key={s.id} value={s.id}>{s.id}</option>
                 ))}
