@@ -81,6 +81,23 @@ interface SharedData {
 
 // ─── Small helpers ─────────────────────────────────────────────────────────────
 
+function NotFoundPage() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+      <div className="text-forge-muted font-mono text-5xl mb-4">404</div>
+      <div className="text-white text-lg font-semibold mb-2">Page not found</div>
+      <div className="text-forge-muted text-sm mb-6">
+        That URL doesn't exist. Check the address or head back to a known page.
+      </div>
+      <div className="flex items-center justify-center gap-4 text-xs">
+        <Link to="/problems" className="text-forge-accent hover:underline">Problems</Link>
+        <Link to="/rankings" className="text-forge-accent hover:underline">Rankings</Link>
+        <Link to="/guide" className="text-forge-accent hover:underline">Guide</Link>
+      </div>
+    </div>
+  );
+}
+
 function ApiError({ message }: { message: string }) {
   return (
     <div className="min-h-screen bg-forge-bg flex items-center justify-center">
@@ -1349,13 +1366,13 @@ export default function App() {
           path="/playground"
           element={
             <div className="max-w-7xl mx-auto px-4 py-6">
-              <Playground specs={specs ?? []} />
+              <Playground specs={specs ?? []} loading={specsLoading} />
             </div>
           }
         />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/problems" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
   );
