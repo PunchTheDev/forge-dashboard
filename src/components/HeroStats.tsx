@@ -86,9 +86,9 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           sub={sota ? `by ${sota.contributor}` : "no submissions yet"}
         />
         <Stat
-          label="vs baseline"
+          label="vs. reference agent"
           value={baselineDelta ? `${isMaximize ? "+" : "−"}${baselineDelta}%` : "—"}
-          sub={baseline != null ? `baseline ${baseline.toFixed(decimals)} ${scoreUnit}` : undefined}
+          sub={baseline != null ? `ref: ${baseline.toFixed(decimals)} ${scoreUnit} (our seed)` : undefined}
         />
         <Stat
           label="Stress headroom"

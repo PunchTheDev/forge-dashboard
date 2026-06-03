@@ -284,9 +284,9 @@ function LandingBanner({
             {agentCount !== 1 ? "s" : ""} competing
           </span>
           <span className="text-forge-border">·</span>
-          <span>
+          <span title="'Solved' = at least one agent has a passing FEA submission for that spec">
             <span className="text-white font-mono font-semibold">{solvedCount}</span> /{" "}
-            {totalSpecs || 45} specs solved
+            {totalSpecs || 45} specs claimed
           </span>
         </div>
 
@@ -356,7 +356,10 @@ function SotaHero({
                 {round?.name.replace(/Round \d+ — /, "")}
               </div>
             )}
-            <div className="text-white font-bold text-lg leading-tight mb-1">Current SOTA</div>
+            <div className="text-white font-bold text-lg leading-tight mb-1">
+              Current leader — one problem
+            </div>
+            <div className="text-forge-muted text-xs mb-1 font-mono">{sota.spec_id}</div>
             <div className="text-forge-muted text-xs mb-4 leading-relaxed">
               {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id} · by{" "}
               <span className="text-white">{sota.contributor}</span>
@@ -364,7 +367,7 @@ function SotaHero({
 
             <div className="bg-forge-bg rounded-xl p-4 mb-4">
               <div className="text-forge-muted text-xs uppercase tracking-wider mb-1">
-                {metricLabel}
+                Best {metricLabel} on this spec
               </div>
               <div
                 className={`font-mono text-3xl font-bold tabular-nums ${meta?.color ?? "text-forge-green"}`}
@@ -381,11 +384,12 @@ function SotaHero({
             </div>
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
-              This part passed FEA verification. Your agent needs to beat it —
-              {sota.score_metric === "mass_grams" && " lighter structure, same load rating."}
+              This part passed real FEA (CalculiX). Your agent generates a fresh bracket
+              per-problem — beat this score on that spec and all others to win.
+              {sota.score_metric === "mass_grams" && " Lightest structure that survives the load wins."}
               {sota.score_metric === "stiffness_to_weight" &&
-                " higher stiffness per gram of material."}
-              {sota.score_metric === "deflection_mm" && " less deflection under the same load."}
+                " Highest stiffness-per-gram wins."}
+              {sota.score_metric === "deflection_mm" && " Least deflection under load wins."}
             </p>
           </div>
 
@@ -468,8 +472,8 @@ function CategoryCard({
             ))}
         </div>
         <span className="text-forge-border">·</span>
-        <span className="text-xs text-forge-muted">
-          {sotaCount}/{round.specs.length} solved
+        <span className="text-xs text-forge-muted" title="'Claimed' = at least one passing FEA submission exists">
+          {sotaCount}/{round.specs.length} claimed
         </span>
         <span className="ml-auto text-xs text-forge-accent font-medium">Browse →</span>
       </div>
@@ -863,6 +867,16 @@ function CategoryPage({ data }: { data: SharedData }) {
   const round = allRounds.find((r) => r.id === roundId) ?? null;
 
   if (!round) {
+    // Legacy URL pattern: /problems/:specId (pre-round routing).
+    // If roundId matches a spec that belongs to a known round, redirect there.
+    const ownerRound = allRounds.find((r) => r.specs.some((sp) => sp.id === roundId));
+    if (ownerRound) {
+      return <Navigate to={`/problems/${ownerRound.id}/${roundId}`} replace />;
+    }
+    // Legacy spec not in any active round — render directly without round context.
+    if (specs?.find((s) => s.id === roundId)) {
+      return <Navigate to={`/problems/_legacy/${roundId}`} replace />;
+    }
     return (
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="text-forge-muted text-sm">Category not found.</div>
@@ -1124,9 +1138,12 @@ function RankingsPage({ data }: { data: SharedData }) {
         <div className="mb-6">
           <div className="text-lg font-bold text-white">Agent Rankings</div>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
-            Agents ranked by normalized performance across all active problem categories. A
-            well-rounded agent that excels at mass, stiffness-to-weight, <em>and</em> absolute
-            stiffness scores highest — not just a specialist in one metric.
+            Agents ranked by <strong className="text-white">overall score</strong> — mean normalized
+            performance across all 45 active specs in all three categories. Each spec contributes
+            equally: your score on that spec ÷ the current SOTA. Unentered specs count as 1.0
+            (baseline). Lower overall score = better. 0.60 means ~40% better than SOTA on average;
+            0.97 means slightly beating SOTA on entered specs only. Win by being well-rounded, not
+            just a specialist.
           </div>
         </div>
         <OverallLeaderboard
@@ -1380,6 +1397,8 @@ export default function App() {
         <Route path="/" element={<Navigate to="/problems" replace />} />
 
         <Route path="/problems" element={<ProblemsLanding data={sharedData} />} />
+        {/* Legacy route: /problems/_legacy/:specId for specs not in any active round */}
+        <Route path="/problems/_legacy/:specId" element={<SpecDetailPage data={sharedData} />} />
         <Route path="/problems/:roundId" element={<CategoryPage data={sharedData} />} />
         <Route path="/problems/:roundId/:specId" element={<SpecDetailPage data={sharedData} />} />
 
