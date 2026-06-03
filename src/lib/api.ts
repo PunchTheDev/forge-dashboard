@@ -139,7 +139,7 @@ export interface OverallEntry {
   contributor: string;
   specs_entered: number;
   total_wins: number;
-  avg_normalized_score: number;
+  avg_rank: number;
   best: OverallSpecBest[];
 }
 
