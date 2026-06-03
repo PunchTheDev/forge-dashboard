@@ -64,83 +64,78 @@ export function StepViewer({ stepUrl, label }: Props) {
 
     setStatus("loading");
 
-    // Load STEP via occt-import-js (loaded globally from CDN in index.html)
-    const occtModule = (window as unknown as { occtimportjs?: () => Promise<unknown> }).occtimportjs;
-    if (!occtModule) {
-      setStatus("error");
-      setErrorMsg("occt-import-js not available — 3D viewer requires CDN access");
-      return;
-    }
-
     let cancelled = false;
 
-    occtModule().then((occt: unknown) => {
+    // occt-import-js is loaded async from CDN — poll until it's ready or timeout.
+    function waitForOcct(timeout = 15000, interval = 100): Promise<() => Promise<unknown>> {
+      return new Promise((resolve, reject) => {
+        const deadline = Date.now() + timeout;
+        function check() {
+          const fn = (window as unknown as { occtimportjs?: () => Promise<unknown> }).occtimportjs;
+          if (fn) return resolve(fn);
+          if (Date.now() > deadline) return reject(new Error("occt-import-js timed out — check CDN connectivity"));
+          setTimeout(check, interval);
+        }
+        check();
+      });
+    }
+
+    type OcctMesh = {
+      attributes: {
+        position: { array: number[] };
+        normal: { array: number[] };
+        index: { array: number[] };
+      };
+      color: { r: number; g: number; b: number };
+    };
+    type OcctInstance = {
+      ReadStepFile: (bytes: Uint8Array, params: null) => { success: boolean; meshes: OcctMesh[] };
+    };
+
+    async function loadStep(url: string) {
+      const occtModule = await waitForOcct();
+      const occt = (await occtModule()) as OcctInstance;
       if (cancelled) return;
 
-      fetch(stepUrl)
-        .then((r) => {
-          if (!r.ok) throw new Error(`${r.status}`);
-          return r.arrayBuffer();
-        })
-        .then((buf) => {
-          if (cancelled) return;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const buf = await r.arrayBuffer();
+      if (cancelled) return;
 
-          const occtAny = occt as {
-            ReadStepFile: (
-              bytes: Uint8Array,
-              params: null,
-            ) => { success: boolean; meshes: Array<{
-              attributes: {
-                position: { array: number[] };
-                normal: { array: number[] };
-                index: { array: number[] };
-              };
-              color: { r: number; g: number; b: number };
-            }> };
-          };
+      const result = occt.ReadStepFile(new Uint8Array(buf), null);
+      if (!result.success) throw new Error("failed to parse STEP");
 
-          const result = occtAny.ReadStepFile(new Uint8Array(buf), null);
-          if (!result.success) throw new Error("failed to parse STEP");
-
-          const group = new THREE.Group();
-          for (const mesh of result.meshes) {
-            const geo = new THREE.BufferGeometry();
-            geo.setAttribute(
-              "position",
-              new THREE.Float32BufferAttribute(mesh.attributes.position.array, 3),
-            );
-            geo.setAttribute(
-              "normal",
-              new THREE.Float32BufferAttribute(mesh.attributes.normal.array, 3),
-            );
-            geo.setIndex(mesh.attributes.index.array);
-
-            const mat = new THREE.MeshStandardMaterial({
-              color: new THREE.Color(mesh.color.r, mesh.color.g, mesh.color.b),
-              metalness: 0.4,
-              roughness: 0.6,
-            });
-            group.add(new THREE.Mesh(geo, mat));
-          }
-
-          scene.add(group);
-
-          // Center and fit
-          const box = new THREE.Box3().setFromObject(group);
-          const center = box.getCenter(new THREE.Vector3());
-          const size = box.getSize(new THREE.Vector3()).length();
-          controls.target.copy(center);
-          camera.position.copy(center).addScaledVector(new THREE.Vector3(1, 0.7, 1).normalize(), size * 1.5);
-          controls.update();
-
-          setStatus("ready");
-        })
-        .catch((e: Error) => {
-          if (!cancelled) {
-            setStatus("error");
-            setErrorMsg(e.message);
-          }
+      const group = new THREE.Group();
+      for (const mesh of result.meshes) {
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.Float32BufferAttribute(mesh.attributes.position.array, 3));
+        geo.setAttribute("normal", new THREE.Float32BufferAttribute(mesh.attributes.normal.array, 3));
+        geo.setIndex(mesh.attributes.index.array);
+        const mat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(mesh.color.r, mesh.color.g, mesh.color.b),
+          metalness: 0.4,
+          roughness: 0.6,
         });
+        group.add(new THREE.Mesh(geo, mat));
+      }
+
+      scene.add(group);
+
+      const box = new THREE.Box3().setFromObject(group);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3()).length();
+      controls.target.copy(center);
+      camera.position.copy(center).addScaledVector(new THREE.Vector3(1, 0.7, 1).normalize(), size * 1.5);
+      controls.update();
+
+      setStatus("ready");
+    }
+
+    loadStep(stepUrl).catch((e: Error) => {
+      if (!cancelled) {
+        setStatus("error");
+        setErrorMsg(e.message);
+      }
     });
 
     const handleResize = () => {
