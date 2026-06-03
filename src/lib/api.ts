@@ -140,6 +140,7 @@ export interface OverallEntry {
   specs_entered: number;
   total_wins: number;
   avg_rank: number;
+  overall_score?: number; // mean normalized score across ALL active specs; < 1.0 = beating baseline
   best: OverallSpecBest[];
 }
 

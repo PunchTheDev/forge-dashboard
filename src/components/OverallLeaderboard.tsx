@@ -31,15 +31,22 @@ function fmtNorm(norm: number): { text: string; color: string } {
 }
 
 /** Display an average rank — #1.0 is green, higher ranks shade toward amber/red. */
+function fmtOverallScore(score: number): { text: string; color: string } {
+  // overall_score < 1.0 = beating baseline. Closer to 0 = better.
+  if (score <= 0.80) return { text: score.toFixed(3), color: "text-forge-green" };
+  if (score <= 0.95) return { text: score.toFixed(3), color: "text-forge-accent" };
+  return { text: score.toFixed(3), color: "text-forge-muted" };
+}
+
 function fmtAvgRank(avg: number): { text: string; color: string } {
   if (avg <= 1.5) return { text: `#${avg.toFixed(1)}`, color: "text-forge-green" };
   if (avg <= 3.0) return { text: `#${avg.toFixed(1)}`, color: "text-forge-accent" };
   return { text: `#${avg.toFixed(1)}`, color: "text-forge-red" };
 }
 
-function RankBar({ avgRank, totalEntries }: { avgRank: number; totalEntries: number }) {
-  // Fill ratio: 1.0 when avgRank = 1 (best), approaches 0 as avgRank → totalEntries
-  const fill = totalEntries <= 1 ? 1 : Math.max(0, (totalEntries - avgRank) / (totalEntries - 1));
+function ScoreBar({ score }: { score: number }) {
+  // overall_score <= 1.0. Bar fills from right: 0 = full green, 1.0 = empty.
+  const fill = Math.max(0, Math.min(1, 1 - score));
   const hue = Math.round(fill * 120);
   return (
     <div className="w-full bg-forge-border rounded-full h-1.5 mt-1">
@@ -192,7 +199,15 @@ function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries, onSele
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            {(() => {
+            {entry.overall_score !== undefined ? (() => {
+              const { text, color } = fmtOverallScore(entry.overall_score);
+              return (
+                <>
+                  <div className={`font-mono text-sm font-semibold ${color}`}>{text}</div>
+                  <div className="text-xs text-forge-muted">overall</div>
+                </>
+              );
+            })() : (() => {
               const { text, color } = fmtAvgRank(entry.avg_rank);
               return (
                 <>
@@ -208,7 +223,7 @@ function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries, onSele
         </div>
       </div>
 
-      <RankBar avgRank={entry.avg_rank} totalEntries={totalEntries} />
+      <ScoreBar score={entry.overall_score ?? (entry.avg_rank / (totalEntries || 1))} />
 
       <CategoryBreakdown entry={entry} specToRound={specToRound} />
 
