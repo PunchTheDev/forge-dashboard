@@ -721,7 +721,7 @@ export default function App() {
                     />
                   </div>
                 )}
-                <div className="mt-5"><SotaChart submissions={submissions ?? []} spec={activeSpec} /></div>
+                <div className="mt-5"><SotaChart spec={activeSpec} /></div>
                 <div className="mt-5">
                   <Leaderboard
                     spec={activeSpec}
@@ -839,7 +839,7 @@ export default function App() {
                         />
                       )}
 
-                      <SotaChart submissions={submissions ?? []} spec={activeSpec} />
+                      <SotaChart spec={activeSpec} />
 
                       <Leaderboard
                         spec={activeSpec}

@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -8,10 +9,10 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import { Submission, Spec, metricConfig } from "../lib/api";
+import { useApi } from "../hooks/useApi";
+import { api, Spec, SotaHistoryPoint, metricConfig } from "../lib/api";
 
 interface Props {
-  submissions: Submission[];
   spec: Spec;
 }
 
@@ -21,32 +22,15 @@ interface ChartPoint {
   contributor: string;
 }
 
-function buildSotaCurve(submissions: Submission[], direction: string): ChartPoint[] {
-  const passed = submissions
-    .filter((s) => s.passed)
-    .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime());
-
-  const points: ChartPoint[] = [];
-  const scoreOf = (s: Submission) => s.score ?? s.mass_grams;
-  let best = direction === "maximize" ? -Infinity : Infinity;
-
-  for (const s of passed) {
-    const score = scoreOf(s);
-    const improved = direction === "maximize" ? score > best : score < best;
-    if (improved) {
-      best = score;
-      points.push({
-        date: new Date(s.submitted_at).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-        score: parseFloat(score.toFixed(4)),
-        contributor: s.contributor,
-      });
-    }
-  }
-
-  return points;
+function toChartPoints(history: SotaHistoryPoint[]): ChartPoint[] {
+  return history.map((h) => ({
+    date: new Date(h.submitted_at).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    }),
+    score: parseFloat(h.score.toFixed(4)),
+    contributor: h.contributor,
+  }));
 }
 
 interface TooltipPayload {
@@ -80,11 +64,22 @@ function CustomTooltip({
   );
 }
 
-export function SotaChart({ submissions, spec }: Props) {
-  const direction = spec.scoring.direction;
+export function SotaChart({ spec }: Props) {
   const metric = spec.scoring.metric;
   const unit = metricConfig(metric).unit;
-  const points = buildSotaCurve(submissions, direction);
+
+  const fetcher = useCallback(() => api.sotaHistory(spec.id), [spec.id]);
+  const { data: history, loading } = useApi(fetcher, 15000);
+
+  if (loading) {
+    return (
+      <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-8 text-center text-forge-muted text-sm">
+        Loading…
+      </div>
+    );
+  }
+
+  const points = toChartPoints(history ?? []);
 
   if (points.length === 0) {
     return (
