@@ -22,7 +22,6 @@ import {
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
 import { SotaChart } from "./components/SotaChart";
-import { SpecCard } from "./components/SpecCard";
 import { SubmissionPanel } from "./components/SubmissionPanel";
 import { SubmissionJourney } from "./components/SubmissionJourney";
 import { HeroStats } from "./components/HeroStats";
@@ -556,69 +555,73 @@ function CompactSpecTable({
   );
 }
 
-// ─── CategorySpecList — kept for legacy sidebar use ───────────────────────────
-// (used on spec detail page sidebar)
-function CategorySpecList({
+// ─── SidebarSpecList — compact nav rows for the spec detail sidebar ───────────
+
+const TIER_DOT: Record<string, string> = {
+  easy: "bg-forge-green",
+  medium: "bg-forge-accent",
+  hard: "bg-forge-red",
+};
+
+function SidebarSpecList({
   round,
   specs,
   sotaBySpec,
-  selectedTier,
-  onTierChange,
   activeSpecId,
   onSelectSpec,
 }: {
   round: Round;
   specs: Spec[];
   sotaBySpec: Record<string, number>;
-  selectedTier: string | null;
-  onTierChange: (tier: string | null) => void;
   activeSpecId: string | null;
   onSelectSpec: (specId: string) => void;
 }) {
   const roundSpecIds = new Set(round.specs.map((s) => s.id));
   const tierMap = Object.fromEntries(round.specs.map((s) => [s.id, s.tier]));
-
-  const visibleSpecs = specs.filter((s) => {
-    if (!roundSpecIds.has(s.id)) return false;
-    if (selectedTier && tierMap[s.id] !== selectedTier) return false;
-    return true;
-  });
-
   const tiers = ["easy", "medium", "hard"].filter((t) => round.specs.some((s) => s.tier === t));
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-1 text-xs">
-        <button
-          onClick={() => onTierChange(null)}
-          className={`px-2.5 py-1 rounded-lg transition-colors ${!selectedTier ? "bg-forge-accent text-white font-semibold" : "text-forge-muted hover:text-white"}`}
-        >
-          All
-        </button>
-        {tiers.map((t) => (
-          <button
-            key={t}
-            onClick={() => onTierChange(t)}
-            className={`px-2.5 py-1 rounded-lg transition-colors capitalize ${selectedTier === t ? `${TIER_COLORS[t]} font-semibold bg-forge-surface` : "text-forge-muted hover:text-white"}`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      <div className="text-xs text-forge-muted px-1">
-        {visibleSpecs.length} spec{visibleSpecs.length !== 1 ? "s" : ""}
-      </div>
-
-      {visibleSpecs.map((spec) => (
-        <SpecCard
-          key={spec.id}
-          spec={spec}
-          sotaMass={sotaBySpec[spec.id]}
-          isSelected={activeSpecId === spec.id}
-          onClick={() => onSelectSpec(spec.id)}
-        />
-      ))}
+      {tiers.map((tier) => {
+        const tierSpecs = specs.filter(
+          (s) => roundSpecIds.has(s.id) && tierMap[s.id] === tier,
+        );
+        if (!tierSpecs.length) return null;
+        return (
+          <div key={tier}>
+            <div className={`text-xs font-semibold uppercase tracking-wide mb-1.5 px-1 ${TIER_COLORS[tier]}`}>
+              {tier}
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {tierSpecs.map((spec) => {
+                const sota = sotaBySpec[spec.id];
+                const isActive = spec.id === activeSpecId;
+                return (
+                  <button
+                    key={spec.id}
+                    onClick={() => onSelectSpec(spec.id)}
+                    className={`w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${
+                      isActive
+                        ? "bg-forge-accent/15 border border-forge-accent/30 text-white"
+                        : "hover:bg-forge-surface text-forge-muted hover:text-white"
+                    }`}
+                  >
+                    <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${TIER_DOT[tier]}`} />
+                    <span className="font-mono text-xs flex-1 min-w-0 truncate">{spec.id}</span>
+                    {sota != null ? (
+                      <span className="shrink-0 text-forge-green font-mono text-xs">
+                        {fmtScore(sota, round.scoring_metric)}
+                      </span>
+                    ) : (
+                      <span className="shrink-0 text-forge-border text-xs">—</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -914,7 +917,6 @@ function CategoryPage({ data }: { data: SharedData }) {
 function SpecDetailPage({ data }: { data: SharedData }) {
   const { roundId, specId } = useParams<{ roundId: string; specId: string }>();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const navigate = useNavigate();
   const { specs, allRounds, sotaBySpec } = data;
 
@@ -973,12 +975,10 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             </div>
           </div>
 
-          <CategorySpecList
+          <SidebarSpecList
             round={round}
             specs={specs ?? []}
             sotaBySpec={sotaBySpec}
-            selectedTier={selectedTier}
-            onTierChange={setSelectedTier}
             activeSpecId={specId ?? null}
             onSelectSpec={(id) => {
               setSelectedSubmission(null);
