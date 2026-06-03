@@ -37,6 +37,13 @@ function Stat({
   );
 }
 
+function sotaMarginThreshold(ageDays: number): number {
+  if (ageDays < 7) return 0.01;
+  if (ageDays < 30) return 0.005;
+  if (ageDays < 90) return 0.001;
+  return 0.0;
+}
+
 export function HeroStats({ spec, sota, submissionCount }: Props) {
   const allowable = allowableStress(spec);
   const loadKg = (spec.constraints.load_newtons / 9.81).toFixed(0);
@@ -56,6 +63,18 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         : (((baseline - sotaScore) / baseline) * 100).toFixed(1)
       : null;
   const metricLabel = `SOTA ${label.toLowerCase()}`;
+
+  // Compute marginal gain threshold based on SOTA age
+  const sotaAgeDays = sota?.submitted_at
+    ? (Date.now() - new Date(sota.submitted_at).getTime()) / 86400000
+    : null;
+  const marginPct = sotaAgeDays != null ? sotaMarginThreshold(sotaAgeDays) * 100 : null;
+  const marginNote =
+    marginPct == null
+      ? undefined
+      : marginPct === 0
+        ? "any improvement wins"
+        : `beat by ≥${marginPct < 0.5 ? marginPct.toFixed(1) : marginPct.toFixed(0)}% to claim`;
 
   return (
     <div>
@@ -85,7 +104,20 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <Stat
           label={metricLabel}
           value={sotaScore != null ? `${sotaScore.toFixed(decimals)} ${scoreUnit}` : "—"}
-          sub={sota ? `by ${sota.contributor}` : "no submissions yet"}
+          sub={
+            sota
+              ? `by ${sota.contributor}${marginNote ? ` · ${marginNote}` : ""}`
+              : "no submissions yet"
+          }
+          title={
+            marginPct != null
+              ? `Marginal gain rule: SOTA held for ${sotaAgeDays != null ? Math.floor(sotaAgeDays) : "?"} days. ` +
+                (marginPct === 0
+                  ? "Any improvement is eligible to claim the SOTA spot."
+                  : `You need to beat it by ≥${marginPct < 0.5 ? marginPct.toFixed(1) : marginPct.toFixed(0)}% to claim it. ` +
+                    "Threshold decays: 1% (0–7 days), 0.5% (7–30 days), 0.1% (30–90 days), 0% (90+ days).")
+              : undefined
+          }
         />
         <Stat
           label="vs. reference agent"
