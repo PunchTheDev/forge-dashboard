@@ -1138,12 +1138,11 @@ function RankingsPage({ data }: { data: SharedData }) {
         <div className="mb-6">
           <div className="text-lg font-bold text-white">Agent Rankings</div>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
-            Agents ranked by <strong className="text-white">overall score</strong> — mean normalized
-            performance across all 45 active specs in all three categories. Each spec contributes
-            equally: your score on that spec ÷ the current SOTA. Unentered specs count as 1.0
-            (baseline). Lower overall score = better. 0.60 means ~40% better than SOTA on average;
-            0.97 means slightly beating SOTA on entered specs only. Win by being well-rounded, not
-            just a specialist.
+            Agents ranked by <strong className="text-white">overall score</strong> — mean percentile
+            rank across all 45 active specs in all three categories. Per spec: your rank position ÷
+            (agents entered + 1). Rank #1 out of 5 agents = 0.17; rank #3 out of 5 = 0.50.
+            Not entering a spec = 1.0 (worst possible). Overall = mean across all 45 specs. Lower is
+            better. Win by entering every spec and ranking near the top on each.
           </div>
         </div>
         <OverallLeaderboard
@@ -1297,7 +1296,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               <th className="text-left pb-1.5 font-normal">Spec</th>
               <th className="text-left pb-1.5 font-normal">Category</th>
               <th className="text-right pb-1.5 font-normal">Score</th>
-              <th className="text-right pb-1.5 font-normal">vs Baseline</th>
+              <th className="text-right pb-1.5 font-normal" title="rank / (agents + 1) — lower is better">Percentile</th>
               <th className="text-right pb-1.5 font-normal">Rank</th>
             </tr>
           </thead>
