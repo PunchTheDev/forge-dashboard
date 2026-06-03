@@ -190,45 +190,28 @@ export function Playground({ specs, loading }: Props) {
             </pre>
           </div>
 
-          {/* Run locally */}
+          {/* Run locally + problem pool */}
           <div className="bg-forge-surface border border-forge-border rounded-xl p-4">
             <div className="text-sm font-semibold text-white mb-2">Run Locally</div>
             <div className="text-xs text-forge-muted mb-3 leading-relaxed">
-              Install the forge CLI, scaffold an agent, and run evals against any spec.
+              Install the forge CLI, scaffold an agent, and run evals against any spec in the pool.
+              The eval harness is identical to CI — deterministic and reproducible.
             </div>
             <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
-              <div><span className="text-forge-muted"># clone the repo</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone {FORGE_REPO}</span></div>
-              <div className="mt-2"><span className="text-forge-muted"># install forge CLI</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">cd forge && pip install -e .</span></div>
+              <div><span className="text-forge-muted"># clone and install</span></div>
+              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone {FORGE_REPO} && cd forge && pip install -e .</span></div>
               <div className="mt-2"><span className="text-forge-muted"># scaffold a new agent</span></div>
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge new my-agent</span></div>
               <div className="mt-2"><span className="text-forge-muted"># run eval on any spec</span></div>
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
-              <div className="mt-2"><span className="text-forge-muted"># list all available specs</span></div>
+              <div className="mt-2"><span className="text-forge-muted"># list all 45 specs and active rounds via API</span></div>
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/specs | jq '.[].id'</span></div>
+              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/rounds/active</span></div>
             </div>
             <div className="mt-3 text-xs text-forge-muted leading-relaxed">
-              The eval harness runs the same FEA pipeline as CI — deterministic and reproducible.
-              Results are scored and written to <code className="text-forge-accent">.forge/results/</code>.
+              Results are written to <code className="text-forge-accent">.forge/results/</code>.
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Train your agent block — moved here from Problems landing */}
-      <div className="mt-6 bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
-        <div className="text-sm font-semibold text-white mb-2">Train your agent on the problem pool</div>
-        <div className="text-xs text-forge-muted mb-3 leading-relaxed">
-          Fetch any spec by ID to test locally. The eval harness runs the same FEA pipeline as CI — deterministic, reproducible.
-        </div>
-        <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
-          <div><span className="text-forge-muted"># list all specs</span></div>
-          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/specs</span></div>
-          <div className="mt-2"><span className="text-forge-muted"># run local eval on a specific spec</span></div>
-          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge eval agents/my-agent/agent.py --spec r01_001_easy</span></div>
-          <div className="mt-2"><span className="text-forge-muted"># fetch active rounds and their spec pools</span></div>
-          <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl {API_BASE_URL}/rounds/active</span></div>
         </div>
       </div>
     </div>
