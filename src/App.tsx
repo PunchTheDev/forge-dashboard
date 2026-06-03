@@ -1162,7 +1162,7 @@ function RankingsPage({ data }: { data: SharedData }) {
 
 function AgentDetailPage({ data }: { data: SharedData }) {
   const { agentId } = useParams<{ agentId: string }>();
-  const { overallData, overallLoading, allRounds } = data;
+  const { overallData, overallLoading, allRounds, specs, sotaBySpec } = data;
   const contributor = agentId ? decodeURIComponent(agentId) : "";
 
   const entry = overallData?.entries.find((e) => e.contributor === contributor) ?? null;
@@ -1341,6 +1341,86 @@ function AgentDetailPage({ data }: { data: SharedData }) {
           </tbody>
         </table>
       </div>
+
+      {/* Unentered specs — show what's dragging the overall score up */}
+      {(() => {
+        const enteredIds = new Set(entry.best.map((b) => b.spec_id));
+        const unenteredByRound = allRounds
+          .map((r) => ({
+            round: r,
+            specs: r.specs.filter((s) => !enteredIds.has(s.id)),
+          }))
+          .filter(({ specs: s }) => s.length > 0);
+
+        if (!unenteredByRound.length) return null;
+
+        const totalUnentered = unenteredByRound.reduce((n, { specs: s }) => n + s.length, 0);
+
+        return (
+          <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-xs font-semibold text-white">
+                Unentered specs — {totalUnentered} missing
+              </div>
+              <div
+                className="text-xs text-forge-muted"
+                title="Each unentered spec contributes 1.0 (worst possible percentile) to your overall score"
+              >
+                each scores 1.0
+              </div>
+            </div>
+            <p className="text-xs text-forge-muted mb-3 leading-relaxed">
+              These specs count as 1.0 in your overall score — the worst possible. Submitting
+              any entry, even a passing baseline, immediately improves your ranking.
+            </p>
+            <div className="flex flex-col gap-3">
+              {unenteredByRound.map(({ round, specs: rSpecs }) => {
+                const meta = CATEGORY_META_OL[round.id];
+                return (
+                  <div key={round.id}>
+                    {meta && (
+                      <div className={`text-xs font-semibold ${meta.color} mb-1.5`}>
+                        {meta.label} — {rSpecs.length} unentered
+                      </div>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                      {rSpecs.map((rs) => {
+                        const sota = sotaBySpec[rs.id];
+                        const fullSpec = (specs ?? []).find((s) => s.id === rs.id);
+                        return (
+                          <Link
+                            key={rs.id}
+                            to={`/problems/${round.id}/${rs.id}`}
+                            className="flex items-center gap-2 px-2.5 py-1.5 bg-forge-bg border border-forge-border/50 rounded-lg hover:border-forge-accent/40 transition-all text-xs"
+                          >
+                            <span
+                              className={`shrink-0 font-mono capitalize ${TIER_COLORS[rs.tier] ?? "text-forge-muted"}`}
+                            >
+                              {rs.tier}
+                            </span>
+                            <span className="flex-1 min-w-0 font-mono text-white/70 truncate">
+                              {fullSpec?.name?.replace(/ — .*$/, "") ?? rs.id}
+                            </span>
+                            {sota != null ? (
+                              <span className="shrink-0 text-forge-muted font-mono">
+                                SOTA: {fmtScore(sota, round.scoring_metric)}
+                              </span>
+                            ) : (
+                              <span className="shrink-0 text-forge-accent font-mono text-xs font-semibold">
+                                unclaimed →
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
