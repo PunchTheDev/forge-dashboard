@@ -12,7 +12,8 @@ interface Props {
 
 /**
  * 3D STEP viewer using Three.js + occt-import-js (loaded from CDN).
- * Falls back to a placeholder when no URL is provided or the library is loading.
+ * Renders the actual agent-generated CAD output — the STEP file produced
+ * by the winning submission's CadQuery code.
  */
 export function StepViewer({ stepUrl, label, fallback }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -37,21 +38,29 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(w, h);
+    renderer.shadowMap.enabled = true;
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
 
-    // Lights
-    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+    // Lights — four-point rig to eliminate dark-face gaps
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambient);
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-    sun.position.set(300, 400, 200);
-    scene.add(sun);
-    const fill = new THREE.DirectionalLight(0x6080ff, 0.3);
-    fill.position.set(-200, -100, -100);
+
+    const key = new THREE.DirectionalLight(0xffffff, 1.0);
+    key.position.set(300, 400, 200);
+    scene.add(key);
+
+    const fill = new THREE.DirectionalLight(0x8090ff, 0.45);
+    fill.position.set(-250, 80, -150);
     scene.add(fill);
+
+    const rim = new THREE.DirectionalLight(0xffffff, 0.3);
+    rim.position.set(0, -300, 150);
+    scene.add(rim);
 
     // Grid
     const grid = new THREE.GridHelper(400, 20, "#1e1e2e", "#1e1e2e");
@@ -92,7 +101,7 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
       color: { r: number; g: number; b: number };
     };
     type OcctInstance = {
-      ReadStepFile: (bytes: Uint8Array, params: null) => { success: boolean; meshes: OcctMesh[] };
+      ReadStepFile: (bytes: Uint8Array, params: { linearTolerance: number; angularTolerance: number } | null) => { success: boolean; meshes: OcctMesh[] };
     };
 
     async function loadStep(url: string) {
@@ -105,23 +114,31 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
       const buf = await r.arrayBuffer();
       if (cancelled) return;
 
-      const result = occt.ReadStepFile(new Uint8Array(buf), null);
+      // Finer tessellation reduces gaps between adjacent faces
+      const result = occt.ReadStepFile(new Uint8Array(buf), {
+        linearTolerance: 0.005,
+        angularTolerance: 0.3,
+      });
       if (!result.success) throw new Error("failed to parse STEP");
 
       const group = new THREE.Group();
       for (const mesh of result.meshes) {
         const pos = mesh.attributes?.position?.array;
-        if (!pos?.length) continue; // skip degenerate meshes
+        if (!pos?.length) continue;
         const geo = new THREE.BufferGeometry();
         geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
         const nor = mesh.attributes?.normal?.array;
-        if (nor?.length) geo.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+        if (nor?.length) {
+          geo.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+        } else {
+          geo.computeVertexNormals();
+        }
         const idx = mesh.attributes?.index?.array;
         if (idx?.length) geo.setIndex(idx);
         const mat = new THREE.MeshStandardMaterial({
           color: new THREE.Color(mesh.color?.r ?? 0.6, mesh.color?.g ?? 0.6, mesh.color?.b ?? 0.6),
-          metalness: 0.4,
-          roughness: 0.6,
+          metalness: 0.25,
+          roughness: 0.55,
           side: THREE.DoubleSide,
         });
         group.add(new THREE.Mesh(geo, mat));
@@ -134,7 +151,13 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
       const size = box.getSize(new THREE.Vector3()).length();
       controls.target.copy(center);
       camera.position.copy(center).addScaledVector(new THREE.Vector3(1, 0.7, 1).normalize(), size * 1.5);
+      camera.near = size * 0.001;
+      camera.far = size * 50;
+      camera.updateProjectionMatrix();
       controls.update();
+
+      // Snap grid to base of part
+      grid.position.y = box.min.y;
 
       setStatus("ready");
     }
@@ -191,20 +214,34 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-white">3D viewer</h2>
-        {label && <span className="text-xs text-forge-muted">{label}</span>}
-        {status === "loading" && (
-          <span className="text-xs text-forge-accent animate-pulse">loading STEP…</span>
-        )}
-        {status === "error" && (
-          <span className="text-xs text-forge-red font-mono" title={errorMsg}>
-            error — {errorMsg.length > 60 ? errorMsg.slice(0, 57) + "…" : errorMsg}
-          </span>
-        )}
-        {status === "ready" && (
-          <span className="text-xs text-forge-green">drag to rotate</span>
-        )}
+      <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <h2 className="text-sm font-semibold text-white shrink-0">Agent-generated CAD</h2>
+          {label && <span className="text-xs text-forge-muted truncate">{label}</span>}
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          {status === "loading" && (
+            <span className="text-xs text-forge-accent animate-pulse">loading STEP…</span>
+          )}
+          {status === "error" && (
+            <span className="text-xs text-forge-red font-mono" title={errorMsg}>
+              error — {errorMsg.length > 50 ? errorMsg.slice(0, 47) + "…" : errorMsg}
+            </span>
+          )}
+          {status === "ready" && (
+            <span className="text-xs text-forge-green">drag to rotate · scroll to zoom</span>
+          )}
+          {stepUrl && (
+            <a
+              href={stepUrl}
+              download
+              className="text-xs text-forge-accent hover:text-white transition-colors border border-forge-border/60 hover:border-forge-accent px-2 py-0.5 rounded"
+              title="Download STEP file — open in FreeCAD, Fusion 360, SolidWorks, etc."
+            >
+              ↓ STEP
+            </a>
+          )}
+        </div>
       </div>
       <div ref={mountRef} className="h-96 w-full" />
     </div>
