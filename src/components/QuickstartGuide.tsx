@@ -413,6 +413,7 @@ git push mine your-name/my-design
             "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
             "60s / 4GB limits — prevents brute-force search",
             "Seeds fixed — geometry and mesh generation are deterministic across runs",
+            "Marginal gain rule — beating SOTA by <1% in first 7 days doesn't count; threshold decays to 0.5% (7–30 days), 0.1% (30–90 days), then any improvement wins",
           ].map((item) => (
             <li key={item} className="flex items-start gap-2">
               <span className="text-forge-green mt-0.5">+</span>
