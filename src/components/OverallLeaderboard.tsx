@@ -29,14 +29,22 @@ function fmtNorm(norm: number): { text: string; color: string } {
   return { text: `${pct.toFixed(1)}%`, color: "text-forge-red" };
 }
 
-function ScoreBar({ score }: { score: number }) {
-  const pct = Math.min(score * 100, 100);
-  const hue = Math.round(pct * 1.2);
+/** Display an average rank — #1.0 is green, higher ranks shade toward amber/red. */
+function fmtAvgRank(avg: number): { text: string; color: string } {
+  if (avg <= 1.5) return { text: `#${avg.toFixed(1)}`, color: "text-forge-green" };
+  if (avg <= 3.0) return { text: `#${avg.toFixed(1)}`, color: "text-forge-accent" };
+  return { text: `#${avg.toFixed(1)}`, color: "text-forge-red" };
+}
+
+function RankBar({ avgRank, totalEntries }: { avgRank: number; totalEntries: number }) {
+  // Fill ratio: 1.0 when avgRank = 1 (best), approaches 0 as avgRank → totalEntries
+  const fill = totalEntries <= 1 ? 1 : Math.max(0, (totalEntries - avgRank) / (totalEntries - 1));
+  const hue = Math.round(fill * 120);
   return (
     <div className="w-full bg-forge-border rounded-full h-1.5 mt-1">
       <div
         className="h-1.5 rounded-full transition-all"
-        style={{ width: `${pct}%`, backgroundColor: `hsl(${120 - hue}, 70%, 50%)` }}
+        style={{ width: `${fill * 100}%`, backgroundColor: `hsl(${hue}, 70%, 50%)` }}
       />
     </div>
   );
@@ -65,7 +73,7 @@ function CategoryBreakdown({ entry, specToRound }: {
         const meta = CATEGORY_META[rid];
         const bests = byRound[rid];
         const wins = bests.filter((b) => b.rank === 1).length;
-        const bestNorm = Math.min(...bests.map((b) => b.normalized_score));
+        const bestRank = Math.min(...bests.map((b) => b.rank));
         const rep = bests.find((b) => b.rank === 1) ?? bests[0];
         return (
           <div key={rid} className={`rounded-lg border px-3 py-2 ${meta.bg} ${meta.border}`}>
@@ -76,7 +84,7 @@ function CategoryBreakdown({ entry, specToRound }: {
             <div className="text-xs text-forge-muted mt-0.5">
               {bests.length} spec{bests.length !== 1 ? "s" : ""}
               {wins > 0 && <span className="text-yellow-400 ml-1">· {wins} win{wins !== 1 ? "s" : ""}</span>}
-              <span className="ml-1 font-mono">{(bestNorm * 100).toFixed(0)}%</span>
+              <span className={`ml-1 font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>#{bestRank}</span>
             </div>
           </div>
         );
@@ -142,11 +150,12 @@ function SpecBreakdown({ entry, specToRound }: {
   );
 }
 
-function EntryRow({ entry, specToRound, expanded, onToggle }: {
+function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries }: {
   entry: OverallEntry;
   specToRound: Record<string, string>;
   expanded: boolean;
   onToggle: () => void;
+  totalEntries: number;
 }) {
   return (
     <div
@@ -172,13 +181,11 @@ function EntryRow({ entry, specToRound, expanded, onToggle }: {
         <div className="flex items-center gap-3">
           <div className="text-right">
             {(() => {
-              const { text, color } = fmtNorm(entry.avg_normalized_score);
+              const { text, color } = fmtAvgRank(entry.avg_rank);
               return (
                 <>
                   <div className={`font-mono text-sm font-semibold ${color}`}>{text}</div>
-                  <div className="text-xs text-forge-muted">
-                    {entry.avg_normalized_score > 1 ? "above baseline" : "of baseline"}
-                  </div>
+                  <div className="text-xs text-forge-muted">avg rank</div>
                 </>
               );
             })()}
@@ -189,7 +196,7 @@ function EntryRow({ entry, specToRound, expanded, onToggle }: {
         </div>
       </div>
 
-      <ScoreBar score={entry.avg_normalized_score} />
+      <RankBar avgRank={entry.avg_rank} totalEntries={totalEntries} />
 
       <CategoryBreakdown entry={entry} specToRound={specToRound} />
 
@@ -227,7 +234,7 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between mb-1">
         <div className="text-xs text-forge-muted">
-          Avg normalized score across {data.total_specs} specs. 100% = baseline; below 100% is better. Click to expand.
+          Average rank position across {data.total_specs} specs. #1.0 = first place on every entered spec. Click to expand.
         </div>
         <div className="text-xs text-forge-muted font-mono">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
@@ -238,6 +245,7 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
           specToRound={specToRound}
           expanded={expandedAgent === entry.contributor}
           onToggle={() => setExpandedAgent(expandedAgent === entry.contributor ? null : entry.contributor)}
+          totalEntries={data.entries.length}
         />
       ))}
     </div>
