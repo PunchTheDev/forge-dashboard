@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -31,9 +32,67 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+const TOC_ITEMS = [
+  { id: "categories", label: "The three categories" },
+  { id: "setup", label: "Step 1 — Set up" },
+  { id: "explore", label: "Step 2 — Explore problems" },
+  { id: "write", label: "Step 3 — Write your agent" },
+  { id: "eval", label: "Step 4 — Eval locally" },
+  { id: "submit", label: "Step 5 — Submit" },
+  { id: "api", label: "API reference" },
+  { id: "rewards", label: "Rewards" },
+  { id: "anti-gaming", label: "Anti-gaming" },
+];
+
+function TableOfContents() {
+  const [activeId, setActiveId] = useState<string>("");
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        }
+      },
+      { rootMargin: "-20% 0% -70% 0%", threshold: 0 }
+    );
+    TOC_ITEMS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observerRef.current?.observe(el);
+    });
+    return () => observerRef.current?.disconnect();
+  }, []);
+
   return (
-    <div className="flex flex-col gap-3">
+    <nav className="bg-forge-surface border border-forge-border rounded-xl p-4 flex flex-col gap-1.5">
+      <p className="text-xs font-semibold text-forge-muted uppercase tracking-wider mb-1">Contents</p>
+      {TOC_ITEMS.map(({ id, label }) => (
+        <a
+          key={id}
+          href={`#${id}`}
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          className={`text-xs py-0.5 transition-colors ${
+            activeId === id
+              ? "text-forge-accent font-semibold"
+              : "text-forge-muted hover:text-white"
+          }`}
+        >
+          {label}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+function Section({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) {
+  return (
+    <div id={id} className="flex flex-col gap-3 scroll-mt-8">
       <h3 className="text-sm font-bold text-white">{title}</h3>
       {children}
     </div>
@@ -78,7 +137,16 @@ const CATEGORIES = [
 
 export function QuickstartGuide() {
   return (
-    <div className="max-w-3xl mx-auto flex flex-col gap-8">
+    <div className="max-w-5xl mx-auto flex gap-8">
+      {/* Sidebar TOC — hidden on small screens */}
+      <aside className="hidden lg:block w-44 shrink-0">
+        <div className="sticky top-8">
+          <TableOfContents />
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col gap-8 min-w-0">
       {/* Intro */}
       <div>
         <h2 className="text-xl font-bold text-white mb-2">Compete in Forge</h2>
@@ -92,7 +160,7 @@ export function QuickstartGuide() {
       </div>
 
       {/* Category overview */}
-      <Section title="The three categories">
+      <Section id="categories" title="The three categories">
         <p className="text-forge-muted text-sm">
           Every PR is evaluated on one spec from each category. Your composite score is what
           determines your ranking — not just your best single-spec result.
@@ -118,7 +186,7 @@ export function QuickstartGuide() {
       </Section>
 
       {/* Step 1 */}
-      <Section title="Step 1 — Set up — Get the repo">
+      <Section id="setup" title="Step 1 — Set up — Get the repo">
         <p className="text-forge-muted text-sm">
           Clone the repo and install the eval stack. Docker is the easiest path — it has
           CalculiX, gmsh, and OCP pre-installed.
@@ -136,7 +204,7 @@ forge check-deps          # checks ccx, gmsh, OCP`} />
       </Section>
 
       {/* Step 2 */}
-      <Section title="Step 2 — Explore the problem pool">
+      <Section id="explore" title="Step 2 — Explore the problem pool">
         <p className="text-forge-muted text-sm">
           Browse all 45 specs (15 per category). Each spec defines a material, load, bolt pattern,
           and build volume. Train your agent on individual specs, then let CI test it across all categories.
@@ -153,7 +221,7 @@ curl ${API_BASE_URL}/sota`} />
       </Section>
 
       {/* Step 3 */}
-      <Section title="Step 3 — Write your agent">
+      <Section id="write" title="Step 3 — Write your agent">
         <p className="text-forge-muted text-sm">
           Create a folder <code className="bg-forge-border px-1 rounded">agents/your-name/</code> with
           an <code className="bg-forge-border px-1 rounded">agent.py</code> that implements{" "}
@@ -287,7 +355,7 @@ for chunk in llm.stream([...]):
       </div>
 
       {/* Step 4 */}
-      <Section title="Step 4 — Eval locally">
+      <Section id="eval" title="Step 4 — Eval locally">
         <p className="text-forge-muted text-sm">
           Test your agent before submitting. The local eval runs the same FEA pipeline as CI.
           Try specs from all three categories to check your agent generalizes.
@@ -310,7 +378,7 @@ forge status agents/your-name/agent.py`} />
       </Section>
 
       {/* Step 5 */}
-      <Section title="Step 5 — Submit">
+      <Section id="submit" title="Step 5 — Submit">
         <p className="text-forge-muted text-sm">
           Fork the repo, push your agent, and open a PR. CI runs a quick check (1 easy spec per category) and posts
           pass/fail within ~5 minutes. Full scoring runs across all 45 active specs automatically — that result
@@ -331,7 +399,7 @@ git push mine your-name/my-design
       </Section>
 
       {/* API section */}
-      <Section title="API reference">
+      <Section id="api" title="API reference">
         <p className="text-forge-muted text-sm">
           All data is available via REST. No auth required. Useful for agentic miners that want
           to programmatically fetch specs and check standings.
@@ -373,7 +441,7 @@ git push mine your-name/my-design
       </Section>
 
       {/* Reward section */}
-      <Section title="How rewards work">
+      <Section id="rewards" title="How rewards work">
         <p className="text-forge-muted text-sm leading-relaxed">
           Forge is registered on Gittensor subnet 74. Miners earn Bittensor (TAO) emissions by
           holding top scores across all three optimization categories. Well-rounded agents that
@@ -400,7 +468,7 @@ git push mine your-name/my-design
       </Section>
 
       {/* Anti-gaming */}
-      <Section title="Anti-gaming guarantees">
+      <Section id="anti-gaming" title="Anti-gaming guarantees">
         <p className="text-forge-muted text-sm leading-relaxed">
           The eval is sandboxed, deterministic, and gaming-resistant by design:
         </p>
@@ -458,6 +526,7 @@ git push mine your-name/my-design
           Anti-gaming design
         </a>
       </div>
+      </div>{/* end main content */}
     </div>
   );
 }

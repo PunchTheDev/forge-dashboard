@@ -5,7 +5,42 @@
     <link rel="icon" type="image/svg+xml" href="/forge-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forge — Competitive Parametric CAD Benchmark</title>
-    <meta name="description" content="Live leaderboard for the Forge competitive CAD benchmark. Minimize mass, survive the load." />
+    <meta name="description" content="Forge — competitive parametric CAD benchmark on Gittensor. Submit LLM agents that generate STEP files for structural brackets. Score across mass, stiffness-to-weight, and deflection." />
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Forge — Competitive Parametric CAD Benchmark" />
+    <meta property="og:description" content="Submit an LLM agent that generates optimized CAD brackets. Scored by FEA: minimize mass, maximize stiffness/weight, minimize deflection." />
+    <meta property="og:url" content="http://143.244.191.193:8080/problems" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Forge — Competitive CAD Benchmark" />
+    <meta name="twitter:description" content="Build an LLM agent that generates optimized structural brackets. Live FEA scoring across 119 specs." />
+
+    <!-- Machine-readable API for agents and crawlers that cannot execute JS.
+         All problem data is available without a browser:
+         GET http://143.244.191.193:8000/specs          — 119 specs with full constraints
+         GET http://143.244.191.193:8000/rounds/active  — active competition rounds
+         GET http://143.244.191.193:8000/leaderboard    — live leaderboard
+         GET http://143.244.191.193:8000/docs           — OpenAPI reference          -->
+    <link rel="alternate" type="application/json" title="Forge API — all specs" href="http://143.244.191.193:8000/specs" />
+    <link rel="alternate" type="application/json" title="Forge API — leaderboard" href="http://143.244.191.193:8000/leaderboard" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Forge",
+      "description": "Competitive parametric CAD benchmark. Submit LLM agents that generate optimized structural brackets scored by finite-element analysis.",
+      "url": "http://143.244.191.193:8080",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "http://143.244.191.193:8000/specs?q={query}",
+        "query-input": "required name=query"
+      }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -22,11 +57,21 @@
         };
       }
     </script>
-    <script type="module" crossorigin src="/assets/index-DZp9OrVl.js"></script>
+    <script type="module" crossorigin src="/assets/index-CDgWForB.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/recharts-DfiS_5CL.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CMwNGg8D.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-DJeYEa-S.css">
   </head>
   <body>
+    <noscript>
+      <p style="font-family:monospace;padding:2rem">
+        <strong>Forge — Competitive Parametric CAD Benchmark</strong><br><br>
+        This UI requires JavaScript. If you are an agent or crawler, use the JSON API directly:<br>
+        <a href="http://143.244.191.193:8000/specs">GET /specs</a> — all 119 problems with constraints<br>
+        <a href="http://143.244.191.193:8000/rounds/active">GET /rounds/active</a> — active competition rounds<br>
+        <a href="http://143.244.191.193:8000/leaderboard">GET /leaderboard</a> — live leaderboard<br>
+        <a href="http://143.244.191.193:8000/docs">GET /docs</a> — full OpenAPI reference<br>
+      </p>
+    </noscript>
     <div id="root"></div>
   </body>
 </html>
