@@ -140,10 +140,11 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             width={lpX - bvLeft}
             height={armHalfH * 2}
             fill={color}
-            fillOpacity={0.15}
+            fillOpacity={0.35}
             stroke={color}
             strokeWidth={1.5}
-            strokeOpacity={0.7}
+            strokeOpacity={0.9}
+            rx={1}
           />
 
           {/* Plate (vertical bar at x=0) */}
@@ -218,6 +219,17 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             fontFamily="monospace"
           >
             {bvz.toFixed(0)}mm
+          </text>
+          {/* Material label */}
+          <text
+            x={bvLeft + 4}
+            y={armCenterZ - armHalfH - 3}
+            fill={color}
+            fontSize={7}
+            fontFamily="monospace"
+            opacity={0.8}
+          >
+            {spec.material.replace(/_/g, " ")}
           </text>
         </svg>
       </div>

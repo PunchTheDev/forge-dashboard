@@ -350,9 +350,24 @@ function SotaHero({
     <div className="mb-8 rounded-2xl border border-forge-border bg-forge-surface overflow-hidden">
       <div className="flex flex-col lg:flex-row">
         <div className="flex-1 min-h-[320px] lg:min-h-[400px] relative">
-          <Suspense fallback={<ViewerSkeleton />}>
-            <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} />
-          </Suspense>
+          {sota.has_step ? (
+            <Suspense fallback={<ViewerSkeleton />}>
+              <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} />
+            </Suspense>
+          ) : spec ? (
+            <div className="h-full flex flex-col p-5 gap-3">
+              <div className="text-xs text-forge-muted uppercase tracking-wider opacity-60 shrink-0">
+                Spec constraints
+              </div>
+              <div className="flex-1 flex items-center">
+                <SpecDiagram spec={spec} />
+              </div>
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center text-forge-muted text-sm">
+              No preview available
+            </div>
+          )}
         </div>
         <div className="lg:w-72 shrink-0 p-6 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-forge-border">
           <div>
@@ -1049,7 +1064,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
           submissionCount={passedSubmissions.length}
         />
 
-        {sota?.has_step && (
+        {sota?.has_step ? (
           <Suspense fallback={<ViewerSkeleton />}>
             <StepViewer
               stepUrl={stepUrl(sota.submission_id)}
@@ -1057,6 +1072,32 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
             />
           </Suspense>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Spec constraint diagram — always shown */}
+            {activeSpec && (
+              <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-forge-border">
+                  <h2 className="text-sm font-semibold text-white">Spec constraints</h2>
+                  <p className="text-xs text-forge-muted mt-0.5">
+                    Build volume · mounting face · load point · bolt pattern
+                  </p>
+                </div>
+                <div className="p-4">
+                  <SpecDiagram spec={activeSpec} />
+                </div>
+              </div>
+            )}
+            {/* 3D viewer placeholder — shown until a winning STEP is stored */}
+            <div className="bg-forge-surface border border-forge-border border-dashed rounded-xl flex flex-col items-center justify-center gap-3 p-8 text-center min-h-[220px]">
+              <div className="text-forge-muted text-3xl select-none">⬡</div>
+              <div className="text-sm font-semibold text-forge-muted">3D model</div>
+              <p className="text-xs text-forge-muted max-w-xs leading-relaxed">
+                The winning submission's STEP file renders here once an agent beats this spec.
+                Submit a design via PR to be first.
+              </p>
+            </div>
+          </div>
         )}
 
         <Suspense fallback={<ChartSkeleton />}>
