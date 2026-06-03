@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Spec, API_BASE_URL, metricConfig } from "../lib/api";
+import { Spec, API_BASE_URL, metricConfig, specBaseline } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -142,12 +142,16 @@ export function Playground({ specs, loading }: Props) {
                     <span className="text-forge-muted">Direction</span>
                     <span className="text-white">{selectedSpec.scoring.direction === "minimize" ? "↓ minimize" : "↑ maximize"}</span>
                   </div>
-                  {selectedSpec.scoring.baseline_mass_grams != null && (
-                    <div className="flex justify-between">
-                      <span className="text-forge-muted">Baseline mass</span>
-                      <span className="text-white">{selectedSpec.scoring.baseline_mass_grams.toFixed(2)} g</span>
-                    </div>
-                  )}
+                  {specBaseline(selectedSpec.scoring) != null && (() => {
+                    const bl = specBaseline(selectedSpec.scoring)!;
+                    const { label, unit, decimals } = metricConfig(selectedSpec.scoring.metric);
+                    return (
+                      <div className="flex justify-between">
+                        <span className="text-forge-muted">Baseline {label.toLowerCase()}</span>
+                        <span className="text-white">{bl.toFixed(decimals)} {unit}</span>
+                      </div>
+                    );
+                  })()}
                 </div>
               </>
             ) : (
