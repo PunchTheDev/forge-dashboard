@@ -1049,7 +1049,15 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         />
 
         <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
-          <div className="text-sm font-semibold text-white mb-1">Beat the SOTA</div>
+          <div className="flex items-center justify-between mb-1">
+            <div className="text-sm font-semibold text-white">Beat the SOTA</div>
+            <Link
+              to={`/playground?spec=${activeSpec.id}`}
+              className="text-xs text-forge-accent hover:underline"
+            >
+              Explore in playground →
+            </Link>
+          </div>
           {sota ? (
             <p className="text-forge-muted text-xs mb-3">
               Current leader:{" "}
