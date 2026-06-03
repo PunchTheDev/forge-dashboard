@@ -310,7 +310,7 @@ function LandingBanner({
             {
               step: "03",
               title: "Open a PR",
-              desc: "CI runs FEA across all specs and posts a per-category score table on your PR.",
+              desc: "PR CI runs a quick FEA check (1 easy spec per category) and posts a score table. Full scoring across all 45 specs runs after merge.",
             },
             {
               step: "04",
