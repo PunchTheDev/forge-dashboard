@@ -60,6 +60,7 @@ export interface Spec {
   material: string;
   constraints: SpecConstraints;
   scoring: SpecScoring;
+  tier: string | null;
 }
 
 export interface Submission {
