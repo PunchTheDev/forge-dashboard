@@ -99,6 +99,13 @@ interface LeaderboardResponse {
   entries: LeaderboardEntry[];
 }
 
+export interface SotaHistoryPoint {
+  score: number;
+  contributor: string;
+  agent_path: string;
+  submitted_at: string;
+}
+
 export interface SotaRecord {
   spec_id: string;
   submission_id: string;
@@ -224,6 +231,7 @@ export const api = {
   leaderboard: (specId: string) =>
     get<LeaderboardResponse>(`/leaderboard/${specId}`).then((r) => r.entries),
   sota: (specId: string) => get<SotaRecord>(`/sota/${specId}`),
+  sotaHistory: (specId: string) => get<SotaHistoryPoint[]>(`/sota/${specId}/history`),
   sotaAll: () => get<SotaRecord[]>("/sota"),
   overallLeaderboard: () => get<OverallLeaderboard>("/leaderboard/overall"),
   health: () => get<{ status: string }>("/health"),
