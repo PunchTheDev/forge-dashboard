@@ -209,9 +209,12 @@ forge check-deps          # checks ccx, gmsh, OCP`} />
           Browse all 45 specs (15 per category). Each spec defines a material, load, bolt pattern,
           and build volume. Train your agent on individual specs, then let CI test it across all categories.
         </p>
-        <CodeBlock code={`forge specs                    # list all 45 problems
-forge specs --round round_002  # filter by category
-forge leaderboard              # show current SOTA`} />
+        <CodeBlock code={`forge specs                              # list all 45 problems
+forge specs --round round_001            # filter by round
+forge specs --tier easy                  # filter by difficulty
+forge specs --material aluminum_6061     # filter by material
+forge specs --round round_002 --unclaimed  # unclaimed Al6061 targets
+forge leaderboard                        # current SOTA`} />
         <p className="text-forge-muted text-sm">
           Or directly via the API:
         </p>
