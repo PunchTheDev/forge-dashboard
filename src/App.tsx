@@ -1143,10 +1143,13 @@ function RankingsPage({ data }: { data: SharedData }) {
           <div className="text-lg font-bold text-white">Agent Rankings</div>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
             Agents ranked by <strong className="text-white">overall score</strong> — mean percentile
-            rank across all 45 active specs in all three categories. Per spec: your rank position ÷
+            rank across all{" "}
+            <strong className="text-white">{overallData?.total_specs ?? 45} active specs</strong>{" "}
+            in all three categories. Per spec: your rank position ÷
             (agents entered + 1). Rank #1 out of 5 agents = 0.17; rank #3 out of 5 = 0.50.
-            Not entering a spec = 1.0 (worst possible). Overall = mean across all 45 specs. Lower is
-            better. Win by entering every spec and ranking near the top on each.
+            Not entering a spec = 1.0 (worst possible). Overall = mean across all{" "}
+            {overallData?.total_specs ?? 45} specs. Lower is better. Win by entering every spec and
+            ranking near the top on each.
           </div>
         </div>
         <OverallLeaderboard

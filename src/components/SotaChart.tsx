@@ -66,6 +66,7 @@ function CustomTooltip({
 
 export function SotaChart({ spec }: Props) {
   const metric = spec.scoring.metric;
+  const direction = spec.scoring.direction;
   const unit = metricConfig(metric).unit;
 
   const fetcher = useCallback(() => api.sotaHistory(spec.id), [spec.id]);
@@ -94,7 +95,12 @@ export function SotaChart({ spec }: Props) {
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-white">SOTA over time</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-white">SOTA over time</h2>
+          <span className="text-xs text-forge-muted">
+            {direction === "minimize" ? "↓ lower is better" : "↑ higher is better"}
+          </span>
+        </div>
         <span className="font-mono text-forge-green text-sm font-semibold">
           {currentSota}
           {unit}
