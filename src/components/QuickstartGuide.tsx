@@ -65,14 +65,14 @@ const CATEGORIES = [
   },
   {
     id: "round_003",
-    label: "Absolute Stiffness",
+    label: "Deflection",
     metric: "deflection_mm",
     unit: "mm",
     direction: "minimize" as const,
     color: "text-forge-red",
     bg: "bg-forge-red/10",
     border: "border-forge-red/30",
-    desc: "Least deflection under load. Rigidity over lightness — thick cross-sections win.",
+    desc: "Least tip deflection under load. Rigidity over lightness — thick cross-sections win.",
   },
 ];
 
@@ -86,7 +86,7 @@ export function QuickstartGuide() {
           Forge is a Gittensor subnet 74 benchmark where AI agents compete to design optimal
           3D-printable structural parts. Your agent is evaluated <strong className="text-white">across
           all three optimization categories simultaneously</strong> — mass, stiffness-to-weight, and
-          absolute stiffness. The best <em>well-rounded</em> agent earns Bittensor emissions.
+          deflection. The best <em>well-rounded</em> agent earns Bittensor emissions.
           Specialists who only optimize one axis will lose to generalists.
         </p>
       </div>
@@ -112,8 +112,8 @@ export function QuickstartGuide() {
         </div>
         <p className="text-forge-muted text-xs leading-relaxed">
           Each category has <strong className="text-white">15 problems</strong> at three difficulty
-          tiers (easy / medium / hard). CI randomly samples one easy spec per category for each PR —
-          so you can&apos;t overfit to a single problem.
+          tiers (easy / medium / hard). PR CI runs 1 easy spec per category for a quick pass/fail check (~5 min).
+          Full scoring runs across <strong className="text-white">all 45 specs</strong> — no sampling variance in the final rank.
         </p>
       </Section>
 
@@ -312,9 +312,9 @@ forge status agents/your-name/agent.py`} />
       {/* Step 5 */}
       <Section title="Step 5 — Submit">
         <p className="text-forge-muted text-sm">
-          Fork the repo, push your agent, and open a PR. CI selects one easy spec from each of
-          the three categories and scores your agent on all of them. Results post as a comment
-          within ~5 minutes.
+          Fork the repo, push your agent, and open a PR. CI runs a quick check (1 easy spec per category) and posts
+          pass/fail within ~5 minutes. Full scoring runs across all 45 active specs automatically — that result
+          determines your rank on the leaderboard.
         </p>
         <CodeBlock code={`# Fork on GitHub, then:
 git remote add mine git@github.com:YOUR_USERNAME/forge.git
@@ -407,7 +407,7 @@ git push mine your-name/my-design
         <ul className="text-forge-muted text-sm space-y-1.5">
           {[
             "Determinism check — first spec runs twice, scores must match exactly",
-            "Pool sampling — CI picks a different random spec each PR, preventing overfitting to one problem",
+            "Full coverage — final scoring runs all 45 specs, no sampling variance",
             "Duplicate detection — same commit hash is never scored twice",
             "Similarity check — agents must not copy existing agents' code",
             "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
