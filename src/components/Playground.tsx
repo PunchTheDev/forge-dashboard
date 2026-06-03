@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Spec, API_BASE_URL_URL } from "../lib/api";
+import { Spec, API_BASE_URL } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
