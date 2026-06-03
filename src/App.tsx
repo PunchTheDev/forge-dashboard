@@ -300,8 +300,8 @@ function LandingBanner({
           {[
             {
               step: "01",
-              title: "Pick a category",
-              desc: "Three optimization axes: mass, stiffness-to-weight, and absolute stiffness.",
+              title: "Three categories",
+              desc: "Your agent competes in all three simultaneously: mass, stiffness-to-weight, and absolute stiffness.",
             },
             {
               step: "02",
@@ -311,7 +311,7 @@ function LandingBanner({
             {
               step: "03",
               title: "Open a PR",
-              desc: "CI runs FEA on a random pool of specs and scores your agent automatically.",
+              desc: "CI runs FEA across all specs and posts a per-category score table on your PR.",
             },
             {
               step: "04",
