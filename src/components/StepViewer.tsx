@@ -110,12 +110,16 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
 
       const group = new THREE.Group();
       for (const mesh of result.meshes) {
+        const pos = mesh.attributes?.position?.array;
+        if (!pos?.length) continue; // skip degenerate meshes
         const geo = new THREE.BufferGeometry();
-        geo.setAttribute("position", new THREE.Float32BufferAttribute(mesh.attributes.position.array, 3));
-        geo.setAttribute("normal", new THREE.Float32BufferAttribute(mesh.attributes.normal.array, 3));
-        geo.setIndex(mesh.attributes.index.array);
+        geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+        const nor = mesh.attributes?.normal?.array;
+        if (nor?.length) geo.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+        const idx = mesh.attributes?.index?.array;
+        if (idx?.length) geo.setIndex(idx);
         const mat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(mesh.color.r, mesh.color.g, mesh.color.b),
+          color: new THREE.Color(mesh.color?.r ?? 0.6, mesh.color?.g ?? 0.6, mesh.color?.b ?? 0.6),
           metalness: 0.4,
           roughness: 0.6,
         });
