@@ -61,6 +61,7 @@ export interface Spec {
   constraints: SpecConstraints;
   scoring: SpecScoring;
   tier: string | null;
+  round_id: string | null;
 }
 
 export interface Submission {
