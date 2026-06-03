@@ -14,6 +14,10 @@ const MATERIAL_COLOR: Record<string, string> = {
   steel_mild: "#78716c",
 };
 
+function fmt(v: number, dec = 1) {
+  return v.toFixed(dec);
+}
+
 /** Compact 2-panel SVG diagram: side view (XZ) + front view (YZ bolt pattern). */
 export function SpecDiagram({ spec, compact = false }: Props) {
   const c = spec.constraints;
@@ -175,7 +179,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
 
           {/* Load point */}
           <circle cx={lpX} cy={lpZ} r={4} fill={color} opacity={0.9} />
-          {/* Load arrow (downward) */}
+          {/* Load arrow (downward) with force label */}
           <line
             x1={lpX}
             y1={lpZ + 4}
@@ -185,6 +189,16 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             strokeWidth={2}
             markerEnd="url(#arrow)"
           />
+          <text
+            x={lpX + 5}
+            y={lpZ + 16}
+            fill={color}
+            fontSize={7}
+            fontFamily="monospace"
+            opacity={0.85}
+          >
+            {fmt(c.load_newtons, 0)}N
+          </text>
           <defs>
             <marker
               id="arrow"
@@ -328,6 +342,36 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           </text>
         </svg>
       </div>}
+
+      {/* Constraint stats — shown when not compact */}
+      {!compact && (
+        <div className="w-full mt-2 grid grid-cols-3 gap-x-4 gap-y-1 text-xs font-mono text-forge-muted border-t border-forge-border/30 pt-2">
+          <span title="Applied load force">
+            <span className="text-forge-text/50">load </span>
+            <span style={{ color }}>{fmt(c.load_newtons, 0)} N ({fmt(c.load_newtons / 9.81, 1)} kg)</span>
+          </span>
+          <span title="Safety factor applied to allowable stress">
+            <span className="text-forge-text/50">SF </span>
+            <span className="text-white">{c.safety_factor}×</span>
+          </span>
+          <span title="Build volume bounding box">
+            <span className="text-forge-text/50">vol </span>
+            <span className="text-white">{fmt(c.build_volume_mm[0], 0)}×{fmt(c.build_volume_mm[1], 0)}×{fmt(c.build_volume_mm[2], 0)} mm</span>
+          </span>
+          <span title="Minimum wall thickness allowed">
+            <span className="text-forge-text/50">wall≥ </span>
+            <span className="text-white">{c.min_wall_thickness_mm} mm</span>
+          </span>
+          <span title="Maximum overhang angle (for FDM printability)">
+            <span className="text-forge-text/50">overhang≤ </span>
+            <span className="text-white">{c.max_overhang_deg}°</span>
+          </span>
+          <span title="Scoring metric and direction">
+            <span className="text-forge-text/50">score </span>
+            <span style={{ color }}>{spec.scoring?.metric?.replace(/_/g, " ")} {spec.scoring?.direction === "maximize" ? "↑" : "↓"}</span>
+          </span>
+        </div>
+      )}
     </div>
   );
 }
