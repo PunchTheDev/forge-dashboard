@@ -11,10 +11,21 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <!-- occt-import-js: WASM OpenCASCADE STEP importer for the 3D viewer -->
     <script async src="https://cdn.jsdelivr.net/npm/occt-import-js@0.0.22/dist/occt-import-js.js"></script>
-    <script type="module" crossorigin src="/assets/index-XetP0_1I.js"></script>
+    <!-- crypto.randomUUID polyfill: required when served over plain HTTP (not a secure context) -->
+    <script>
+      if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+        crypto.randomUUID = function () {
+          return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, function (c) {
+            var n = parseInt(c, 10);
+            return (n ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> n / 4).toString(16);
+          });
+        };
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-CajCyQY_.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/recharts-DfiS_5CL.js">
     <link rel="modulepreload" crossorigin href="/assets/three-nM_HsMGG.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-SMxvA7_8.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-D64k1g0h.css">
   </head>
   <body>
     <div id="root"></div>
