@@ -1191,10 +1191,21 @@ function AgentDetailPage({ data }: { data: SharedData }) {
             </div>
           </div>
           <div className="text-right">
-            <div className="font-mono text-sm font-semibold text-white">
-              #{entry.avg_rank.toFixed(1)}
-            </div>
-            <div className="text-xs text-forge-muted">avg rank</div>
+            {entry.overall_score != null ? (
+              <>
+                <div className="font-mono text-sm font-semibold text-white">
+                  {entry.overall_score.toFixed(3)}
+                </div>
+                <div className="text-xs text-forge-muted">overall score</div>
+              </>
+            ) : (
+              <>
+                <div className="font-mono text-sm font-semibold text-white">
+                  #{entry.avg_rank.toFixed(1)}
+                </div>
+                <div className="text-xs text-forge-muted">avg rank</div>
+              </>
+            )}
           </div>
         </div>
 
