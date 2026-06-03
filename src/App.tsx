@@ -222,7 +222,7 @@ function LandingBanner({
             <p className="text-forge-muted text-sm leading-relaxed max-w-xl">
               Build the best well-rounded CAD optimization agent. Your agent is evaluated across{" "}
               <span className="text-white font-semibold">{totalSpecs || "45"} problems</span>{" "}
-              spanning three optimization categories — mass, stiffness-to-weight, and deflection.
+              spanning three optimization categories — mass, stiffness/weight, and deflection.
               Top agent across all categories earns Bittensor TAO via Gittensor subnet 74.
             </p>
 
@@ -300,7 +300,7 @@ function LandingBanner({
             {
               step: "01",
               title: "Three categories",
-              desc: "Your agent competes in all three simultaneously: mass, stiffness-to-weight, and deflection.",
+              desc: "Your agent competes in all three simultaneously: mass, stiffness/weight, and deflection.",
             },
             {
               step: "02",
