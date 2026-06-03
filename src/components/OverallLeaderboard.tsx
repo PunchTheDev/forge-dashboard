@@ -5,6 +5,7 @@ interface Props {
   data: OverallLeaderboardData | null;
   loading: boolean;
   rounds?: Round[];
+  onSelectAgent?: (contributor: string) => void;
 }
 
 const CATEGORY_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -150,12 +151,13 @@ function SpecBreakdown({ entry, specToRound }: {
   );
 }
 
-function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries }: {
+function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries, onSelect }: {
   entry: OverallEntry;
   specToRound: Record<string, string>;
   expanded: boolean;
   onToggle: () => void;
   totalEntries: number;
+  onSelect?: (contributor: string) => void;
 }) {
   return (
     <div
@@ -170,7 +172,17 @@ function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries }: {
             <RankBadge rank={entry.rank} />
           </div>
           <div>
-            <div className="text-sm font-semibold text-white">{entry.contributor}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold text-white">{entry.contributor}</div>
+              {onSelect && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onSelect(entry.contributor); }}
+                  className="text-xs text-forge-accent hover:underline"
+                >
+                  Details →
+                </button>
+              )}
+            </div>
             <div className="text-xs text-forge-muted mt-0.5">
               {entry.specs_entered} spec{entry.specs_entered !== 1 ? "s" : ""}
               {" · "}
@@ -207,7 +219,7 @@ function EntryRow({ entry, specToRound, expanded, onToggle, totalEntries }: {
   );
 }
 
-export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
+export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }: Props) {
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
 
   const specToRound = useMemo(() => {
@@ -246,6 +258,7 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
           expanded={expandedAgent === entry.contributor}
           onToggle={() => setExpandedAgent(expandedAgent === entry.contributor ? null : entry.contributor)}
           totalEntries={data.entries.length}
+          onSelect={onSelectAgent}
         />
       ))}
     </div>
