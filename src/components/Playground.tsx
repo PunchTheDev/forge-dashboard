@@ -5,7 +5,7 @@ import { SpecDiagram } from "./SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
-const SAMPLE_OUTPUT = `forge eval agents/my-agent/agent.py --spec r01_001_easy
+const SAMPLE_OUTPUT = `forge eval agents/my-agent/agent.py --spec r01_001_easy --docker
 
 [forge] Loading spec r01_001_easy...
 [forge] Running agent: agents/my-agent/agent.py
@@ -53,8 +53,8 @@ export function Playground({ specs, loading }: Props) {
   const selectedSpec = specs.find((s) => s.id === selectedSpecId) ?? null;
 
   const evalCommand = selectedSpecId
-    ? `forge eval agents/my-agent/agent.py --spec ${selectedSpecId}`
-    : "forge eval agents/my-agent/agent.py --spec <spec_id>";
+    ? `forge eval agents/my-agent/agent.py --spec ${selectedSpecId} --docker`
+    : "forge eval agents/my-agent/agent.py --spec <spec_id> --docker";
 
   return (
     <div className="max-w-4xl mx-auto">
