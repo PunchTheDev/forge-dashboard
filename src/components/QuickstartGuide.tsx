@@ -1,4 +1,4 @@
-import { API_BASE_URL_URL } from "../lib/api";
+import { API_BASE_URL } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
