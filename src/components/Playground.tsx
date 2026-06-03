@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Spec } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
@@ -27,8 +28,17 @@ interface Props {
 }
 
 export function Playground({ specs, loading }: Props) {
-  const [selectedSpecId, setSelectedSpecId] = useState<string>("");
+  const [searchParams] = useSearchParams();
+  const [selectedSpecId, setSelectedSpecId] = useState<string>(searchParams.get("spec") ?? "");
   const [search, setSearch] = useState("");
+
+  // Sync with URL param changes (e.g. deep-link from spec detail page)
+  useEffect(() => {
+    const paramSpec = searchParams.get("spec");
+    if (paramSpec && specs.some((s) => s.id === paramSpec)) {
+      setSelectedSpecId(paramSpec);
+    }
+  }, [searchParams, specs]);
 
   const filteredSpecs = useMemo(() => {
     const q = search.toLowerCase().trim();
