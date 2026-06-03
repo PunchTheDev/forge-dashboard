@@ -240,6 +240,7 @@ export const api = {
   sotaHistory: (specId: string) => get<SotaHistoryPoint[]>(`/sota/${specId}/history`),
   sotaAll: () => get<SotaRecord[]>("/sota"),
   overallLeaderboard: () => get<OverallLeaderboard>("/leaderboard/overall"),
+  contributorStanding: (name: string) => get<OverallEntry>(`/leaderboard/overall/${encodeURIComponent(name)}`),
   health: () => get<{ status: string }>("/health"),
   evalPreview: (agentCode: string, specId: string) =>
     post<EvalPreviewResult>("/eval/preview", { agent_code: agentCode, spec_id: specId }),

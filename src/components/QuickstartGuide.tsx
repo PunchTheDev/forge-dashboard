@@ -425,6 +425,7 @@ git push mine your-name/my-design
                 ["GET /sota/{spec_id}/history", "Progressive SOTA record over time"],
                 ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim SOTA"],
                 ["GET /leaderboard/overall", "Cross-spec contributor rankings (overall_score)"],
+                ["GET /leaderboard/overall/{contributor}", "Single contributor's standing (case-insensitive substring)"],
                 ["GET /leaderboard/{spec_id}", "Per-spec ranked leaderboard"],
                 ["GET /submissions", "Submissions (?spec_id=, ?contributor=, ?limit=, ?passed_only=)"],
                 ["POST /submissions", "Submit a scored result (CI posts here)"],
