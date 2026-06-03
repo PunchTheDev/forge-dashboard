@@ -88,6 +88,15 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
   const loadKg = (c.load_newtons / 9.81).toFixed(0);
   const loadMm = c.load_point_mm[0].toFixed(0);
 
+  // Parse failure stage + reason from notes (format: "... | fail [stage]: reason")
+  const failMatch = submission.notes?.match(/\| fail \[(\w+)\]: (.+)$/);
+  const failStage = failMatch?.[1] ?? null;
+  const failReason = failMatch?.[2] ?? null;
+
+  const agentFailed = !submission.passed && failStage === "agent";
+  const evalFailed = !submission.passed && (failStage === "geometry" || failStage === "fea" || failStage === null);
+  const similarityFailed = !submission.passed && failStage === "similarity";
+
   const stages = [
     {
       label: "Problem",
@@ -96,15 +105,21 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
     },
     {
       label: "Agent",
-      passed: true,
-      detail: `${agentName}\nby ${submission.contributor}${submission.pr_number ? ` · PR #${submission.pr_number}` : ""}`,
+      passed: !agentFailed,
+      detail: agentFailed && failReason
+        ? failReason
+        : `${agentName}\nby ${submission.contributor}${submission.pr_number ? ` · PR #${submission.pr_number}` : ""}`,
     },
     {
       label: "FEA",
-      passed: submission.passed,
+      passed: submission.passed || similarityFailed,
       detail: submission.passed
         ? `${submission.fea_stress_mpa.toFixed(1)} / ${submission.fea_allowable_mpa.toFixed(1)} MPa\n${stressUsed}% used · ${stressHeadroom}% headroom`
-        : "Geometry or stress check failed",
+        : evalFailed && failReason
+          ? failReason
+          : agentFailed
+            ? "Did not run"
+            : "Check failed",
     },
     {
       label: "Score",
@@ -113,7 +128,9 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
         ? baselinePct != null
           ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs baseline`
           : `${displayScore.toFixed(decimals)} ${scoreUnit}`
-        : "No score (failed)",
+        : similarityFailed && failReason
+          ? failReason
+          : "No score (failed)",
     },
   ];
 

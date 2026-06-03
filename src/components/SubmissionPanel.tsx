@@ -6,7 +6,7 @@ interface Props {
   onSelect?: (s: Submission) => void;
 }
 
-function StatusBadge({ passed, notes }: { passed: boolean; notes: string | null }) {
+function StatusBadge({ passed }: { passed: boolean }) {
   if (passed)
     return (
       <span className="text-xs bg-forge-green/20 text-forge-green px-2 py-0.5 rounded-full">
@@ -14,10 +14,7 @@ function StatusBadge({ passed, notes }: { passed: boolean; notes: string | null 
       </span>
     );
   return (
-    <span
-      title={notes ?? "failed"}
-      className="text-xs bg-forge-red/20 text-forge-red px-2 py-0.5 rounded-full"
-    >
+    <span className="text-xs bg-forge-red/20 text-forge-red px-2 py-0.5 rounded-full">
       failed
     </span>
   );
@@ -51,9 +48,9 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
             onClick={() => onSelect?.(s)}
             className={`px-4 py-2.5 flex items-center gap-3${onSelect ? " cursor-pointer hover:bg-forge-border/20 transition-colors" : ""}`}
           >
-            <StatusBadge passed={s.passed} notes={s.notes} />
+            <StatusBadge passed={s.passed} />
             <span className="text-white text-sm font-medium shrink-0">{s.contributor}</span>
-            {s.passed && (() => {
+            {s.passed ? (() => {
               const v = s.score ?? s.mass_grams;
               const { unit, decimals } = metricConfig(s.score_metric);
               return (
@@ -61,6 +58,14 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
                   {v.toFixed(decimals)} {unit}
                 </span>
               );
+            })() : (() => {
+              const failMatch = s.notes?.match(/\| fail \[(\w+)\]: (.+)$/);
+              const failReason = failMatch?.[2];
+              return failReason ? (
+                <span className="text-forge-muted text-xs truncate max-w-[160px]" title={failReason}>
+                  {failReason}
+                </span>
+              ) : null;
             })()}
             <span className="font-mono text-forge-muted text-xs shrink-0 hidden sm:block">
               {s.commit_hash.slice(0, 7)}
