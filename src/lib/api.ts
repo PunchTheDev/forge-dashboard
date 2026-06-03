@@ -197,6 +197,21 @@ export interface Round {
   notes: string | null;
 }
 
+export interface TierStats {
+  total: number;
+  claimed: number;
+  unclaimed: number;
+}
+
+export interface RoundStats {
+  round_id: string;
+  specs_total: number;
+  specs_claimed: number;
+  specs_unclaimed: number;
+  contributor_count: number;
+  tiers: Record<string, TierStats>;
+}
+
 export interface EvalPreviewResult {
   passed: boolean;
   score: number | null;
@@ -245,4 +260,6 @@ export const api = {
   evalPreview: (agentCode: string, specId: string) =>
     post<EvalPreviewResult>("/eval/preview", { agent_code: agentCode, spec_id: specId }),
   activeRounds: () => get<Round[]>("/rounds/active"),
+  roundStats: (roundId: string) => get<RoundStats>(`/rounds/${roundId}/stats`),
+  sotaByRound: (roundId: string) => get<SotaRecord[]>(`/sota?round_id=${roundId}`),
 };

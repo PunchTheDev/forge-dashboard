@@ -218,9 +218,17 @@ forge leaderboard                        # current SOTA`} />
         <p className="text-forge-muted text-sm">
           Or directly via the API:
         </p>
-        <CodeBlock code={`curl ${API_BASE_URL}/specs
+        <CodeBlock code={`# Get active rounds
 curl ${API_BASE_URL}/rounds/active
-curl ${API_BASE_URL}/sota`} />
+
+# Get competition stats for round 1 (claimed/unclaimed/contributors)
+curl ${API_BASE_URL}/rounds/round_001/stats
+
+# Get all current leaders for round 1 in one call
+curl '${API_BASE_URL}/sota?round_id=round_001'
+
+# Get specs filtered to one round/tier/material
+curl '${API_BASE_URL}/specs?round_id=round_001&tier=easy'`} />
       </Section>
 
       {/* Step 3 */}
@@ -417,10 +425,11 @@ git push mine your-name/my-design
             </thead>
             <tbody className="divide-y divide-forge-border/30">
               {[
+                ["GET /rounds/active", "Active competition rounds"],
+                ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed specs, contributors"],
                 ["GET /specs", "List all specs (?tier=easy|medium|hard, ?round_id=round_001, ?material=pla)"],
                 ["GET /specs/{id}", "Single spec (constraints, material, scoring, tier, round_id)"],
-                ["GET /rounds/active", "Active competition rounds"],
-                ["GET /sota", "Current SOTA for all specs"],
+                ["GET /sota", "Current SOTA for all specs (filter: ?round_id=round_001)"],
                 ["GET /sota/{spec_id}", "SOTA for one spec"],
                 ["GET /sota/{spec_id}/history", "Progressive SOTA record over time"],
                 ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim SOTA"],
