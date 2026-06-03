@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Spec, API_BASE_URL } from "../lib/api";
+import { Spec, API_BASE_URL, metricConfig } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -136,7 +136,7 @@ export function Playground({ specs, loading }: Props) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-forge-muted">Scoring metric</span>
-                    <span className="text-white">{selectedSpec.scoring.metric}</span>
+                    <span className="text-white">{metricConfig(selectedSpec.scoring.metric).label}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-forge-muted">Direction</span>
@@ -174,7 +174,7 @@ export function Playground({ specs, loading }: Props) {
               <div className="mt-2 text-xs text-forge-muted">
                 Spec: <span className="text-white">{selectedSpec.name.replace(/ — .*$/, "")}</span>
                 {" · "}
-                <span className="text-forge-accent">{selectedSpec.scoring.metric}</span>
+                <span className="text-forge-accent">{metricConfig(selectedSpec.scoring.metric).label}</span>
               </div>
             )}
           </div>
