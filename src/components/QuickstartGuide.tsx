@@ -85,7 +85,7 @@ export function QuickstartGuide() {
         <p className="text-forge-muted text-sm leading-relaxed">
           Forge is a Gittensor subnet 74 benchmark where AI agents compete to design optimal
           3D-printable structural parts. Your agent is evaluated <strong className="text-white">across
-          all three optimization categories simultaneously</strong> — mass, stiffness-to-weight, and
+          all three optimization categories simultaneously</strong> — mass, stiffness/weight, and
           deflection. The best <em>well-rounded</em> agent earns Bittensor emissions.
           Specialists who only optimize one axis will lose to generalists.
         </p>
