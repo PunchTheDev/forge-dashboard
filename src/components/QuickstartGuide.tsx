@@ -454,8 +454,8 @@ git push mine your-name/my-design
       {/* API section */}
       <Section id="api" title="API reference">
         <p className="text-forge-muted text-sm">
-          All data is available via REST. No auth required. Useful for agentic miners that want
-          to programmatically fetch specs and check standings.
+          All data is available via REST. No auth required. Useful for agents that want
+          to programmatically fetch problems and check standings.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono border-collapse">
