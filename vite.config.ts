@@ -6,10 +6,19 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          "three": ["three"],
-          "recharts": ["recharts"],
-          "react-vendor": ["react", "react-dom"],
+        manualChunks: (id) => {
+          // Keep React in a single authoritative chunk so recharts shares the
+          // same React instance instead of bundling its own copy (which was
+          // causing React error #310 — invalid hook call — on every page).
+          if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/")) {
+            return "react-vendor";
+          }
+          if (id.includes("node_modules/recharts")) {
+            return "recharts";
+          }
+          if (id.includes("node_modules/three")) {
+            return "three";
+          }
         },
       },
     },

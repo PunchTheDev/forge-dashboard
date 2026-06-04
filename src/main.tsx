@@ -1,5 +1,6 @@
 import { StrictMode, Component, ReactNode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 
@@ -7,10 +8,24 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: ReactNode }) {
+class ErrorBoundary extends Component<
+  { children: ReactNode; resetKey: string },
+  ErrorBoundaryState
+> {
+  constructor(props: { children: ReactNode; resetKey: string }) {
     super(props);
     this.state = { error: null };
+  }
+
+  static getDerivedStateFromProps(
+    props: { resetKey: string },
+    state: ErrorBoundaryState & { prevResetKey?: string },
+  ) {
+    // When the route changes, clear any stale error so the new page renders cleanly.
+    if (state.prevResetKey !== props.resetKey && state.error !== null) {
+      return { error: null, prevResetKey: props.resetKey };
+    }
+    return { prevResetKey: props.resetKey };
   }
 
   static getDerivedStateFromError(error: Error) {
@@ -41,14 +56,23 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
   }
 }
 
-import { BrowserRouter } from "react-router-dom";
+// Wrapper inside BrowserRouter so we can read the current path and pass it as
+// a resetKey — the ErrorBoundary clears its error state on every navigation.
+function RouteAwareErrorBoundary({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  return (
+    <ErrorBoundary resetKey={location.pathname}>
+      {children}
+    </ErrorBoundary>
+  );
+}
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ErrorBoundary>
-      <BrowserRouter>
+    <BrowserRouter>
+      <RouteAwareErrorBoundary>
         <App />
-      </BrowserRouter>
-    </ErrorBoundary>
+      </RouteAwareErrorBoundary>
+    </BrowserRouter>
   </StrictMode>,
 );
