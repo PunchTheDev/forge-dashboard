@@ -136,6 +136,8 @@ const CATEGORIES = [
 ];
 
 export function QuickstartGuide() {
+  const [mobileTocOpen, setMobileTocOpen] = useState(false);
+
   return (
     <div className="max-w-5xl mx-auto flex gap-8">
       {/* Sidebar TOC — hidden on small screens */}
@@ -147,6 +149,23 @@ export function QuickstartGuide() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col gap-8 min-w-0">
+
+      {/* Mobile TOC — visible only on small screens */}
+      <div className="lg:hidden">
+        <button
+          onClick={() => setMobileTocOpen((v) => !v)}
+          className="flex items-center gap-2 text-xs text-forge-muted hover:text-white transition-colors border border-forge-border rounded-lg px-3 py-2 w-full text-left"
+        >
+          <span className="flex-1 font-semibold">Contents</span>
+          <span>{mobileTocOpen ? "▲" : "▼"}</span>
+        </button>
+        {mobileTocOpen && (
+          <div className="mt-2 border border-forge-border rounded-xl overflow-hidden">
+            <TableOfContents />
+          </div>
+        )}
+      </div>
+
       {/* Intro */}
       <div>
         <h1 className="text-xl font-bold text-white mb-2">Compete in Forge</h1>
@@ -157,6 +176,16 @@ export function QuickstartGuide() {
           deflection. The best <em>well-rounded</em> agent earns Bittensor emissions.
           Specialists who only optimize one axis will lose to generalists.
         </p>
+      </div>
+
+      {/* Terminology callout */}
+      <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-3 flex flex-col gap-1.5">
+        <p className="text-xs font-semibold text-forge-muted uppercase tracking-wider">Terminology</p>
+        <div className="flex flex-col gap-1 text-xs text-forge-muted leading-relaxed">
+          <div><strong className="text-white">Problem</strong> — a single optimization challenge (e.g. "PLA bracket, 15 kg @ 78 mm"). What you're competing on.</div>
+          <div><strong className="text-white">Spec</strong> — the machine-readable JSON definition of a problem: material, load, build volume, scoring metric. CLI commands use <code className="text-forge-accent font-mono">--spec</code> to refer to this by ID.</div>
+          <div><strong className="text-white">Round</strong> — a set of 15 problems sharing the same optimization category (mass / stiffness/weight / deflection). Three rounds run simultaneously.</div>
+        </div>
       </div>
 
       {/* Category overview */}
@@ -180,8 +209,8 @@ export function QuickstartGuide() {
         </div>
         <p className="text-forge-muted text-xs leading-relaxed">
           Each category has <strong className="text-white">15 problems</strong> at three difficulty
-          tiers (easy / medium / hard). PR CI runs 1 easy spec per category for a quick pass/fail check (~5 min).
-          Full scoring runs across <strong className="text-white">all 45 specs</strong> — no sampling variance in the final rank.
+          tiers (easy / medium / hard). PR CI runs 1 easy problem per category for a quick pass/fail check (~5 min).
+          Full scoring runs across <strong className="text-white">all 45 problems</strong> — no sampling variance in the final rank.
         </p>
       </Section>
 
@@ -206,8 +235,8 @@ forge check-deps          # checks Docker / native toolchain`} />
       {/* Step 2 */}
       <Section id="explore" title="Step 2 — Explore the problem pool">
         <p className="text-forge-muted text-sm">
-          Browse all 45 specs (15 per category). Each spec defines a material, load, bolt pattern,
-          and build volume. Train your agent on individual specs, then let CI test it across all categories.
+          Browse all 45 problems (15 per category). Each problem's spec defines the material, load, bolt pattern,
+          and build volume. Train your agent on individual problems, then let CI test it across all categories.
         </p>
         <CodeBlock code={`forge specs                              # list all 45 problems
 forge specs --round round_001            # filter by round

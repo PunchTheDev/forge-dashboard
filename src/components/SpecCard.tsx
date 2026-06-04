@@ -15,15 +15,15 @@ function isPubSpec(spec: Spec): boolean {
 
 interface Props {
   spec: Spec;
-  sotaMass?: number;
+  sotaScore?: number;
   isSelected: boolean;
   onClick: () => void;
 }
 
-export function SpecCard({ spec, sotaMass, isSelected, onClick }: Props) {
+export function SpecCard({ spec, sotaScore, isSelected, onClick }: Props) {
   const boltCount = spec.constraints.bolt_pattern_mm.length;
   const maxStress = allowableStress(spec);
-  const isNew = sotaMass === undefined;
+  const isNew = sotaScore === undefined;
   const pub = isPubSpec(spec);
 
   return (
@@ -54,10 +54,10 @@ export function SpecCard({ spec, sotaMass, isSelected, onClick }: Props) {
           </div>
         </div>
         <div className="shrink-0 text-right">
-          {sotaMass !== undefined ? (
+          {sotaScore !== undefined ? (
             <>
               <div className="font-mono text-forge-green font-bold text-sm">
-                {fmtScore(sotaMass, spec.scoring.metric)}
+                {fmtScore(sotaScore, spec.scoring.metric)}
               </div>
               <div className="text-forge-muted text-xs">SOTA</div>
             </>
