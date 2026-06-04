@@ -126,7 +126,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
       passed: submission.passed,
       detail: submission.passed
         ? baselinePct != null
-          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs baseline`
+          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs. reference`
           : `${displayScore.toFixed(decimals)} ${scoreUnit}`
         : similarityFailed && failReason
           ? failReason
@@ -179,7 +179,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
               </div>
               {baselinePct != null && baseline != null && (
                 <div className="text-xs text-forge-muted mt-0.5">
-                  {isMaximize ? "+" : "−"}{baselinePct}% vs {baseline.toFixed(decimals)} {scoreUnit} baseline
+                  {isMaximize ? "+" : "−"}{baselinePct}% vs. maintainer's baseline ({baseline.toFixed(decimals)} {scoreUnit})
                 </div>
               )}
             </div>
@@ -239,7 +239,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
         </div>
         <div className="shrink-0 hidden lg:block">
           <div className="text-xs text-forge-muted mb-2 font-semibold uppercase tracking-wider">
-            Spec constraints
+            Problem constraints
           </div>
           <SpecDiagram spec={spec} />
         </div>

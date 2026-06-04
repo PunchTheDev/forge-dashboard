@@ -149,10 +149,10 @@ export function SotaChart({ spec }: Props) {
         </div>
         {baseline != null && (
           <div className="mt-3 text-xs text-forge-muted border-t border-forge-border/30 pt-2">
-            vs. seed: {baseline.toFixed(decimals)}{unit}
+            vs. maintainer's baseline: {baseline.toFixed(decimals)}{unit}
             {" · "}
             <span className={beatsSeed ? "text-forge-green" : "text-amber-400"}>
-              {beatsSeed ? "beats seed" : "seed still leads — fork the code and improve it"}
+              {beatsSeed ? "beats reference" : "reference still leads — fork and improve it"}
             </span>
           </div>
         )}
