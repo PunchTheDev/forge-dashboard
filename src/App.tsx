@@ -60,7 +60,7 @@ const CATEGORY_META: Record<
     hex: "#10b981",
   },
   round_002: {
-    icon: "⟳",
+    icon: "⊕",
     color: "text-forge-accent",
     bgColor: "bg-forge-accent/10",
     borderColor: "border-forge-accent/40",
@@ -167,7 +167,7 @@ function Header() {
           <span className="text-forge-border">|</span>
           <NavLink to="/problems" label="Problems" />
           <NavLink to="/rankings" label="Rankings" />
-          <NavLink to="/playground" label="Playground" />
+          <NavLink to="/playground" label="Explorer" />
           <NavLink to="/guide" label="Guide" />
         </div>
         <nav className="flex items-center gap-4 text-xs text-forge-muted">
