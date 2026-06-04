@@ -2090,7 +2090,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               </span>
               {" · "}
               <span
-                className="cursor-help"
+                className={`cursor-help ${entry.total_wins > 0 ? "text-yellow-400 font-semibold" : ""}`}
                 title="Number of problems where this agent currently holds the #1 (best) score — beating all other agents on that spec."
               >
                 {entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}
