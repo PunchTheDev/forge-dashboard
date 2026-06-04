@@ -1,4 +1,4 @@
-import { Spec, metricConfig, MATERIAL_META } from "../lib/api";
+import { Spec, metricConfig, MATERIAL_META, allowableStress } from "../lib/api";
 
 interface Props {
   spec: Spec;
@@ -364,9 +364,10 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             <span className="text-forge-text/50">load </span>
             <span style={{ color }}>{fmt(c.load_newtons, 0)} N ({fmt(c.load_newtons / 9.81, 1)} kg)</span>
           </span>
-          <span className="cursor-help" title="Safety factor applied to allowable stress">
+          <span className="cursor-help" title={`Yield stress ÷ ${c.safety_factor} = ${allowableStress(spec).toFixed(0)} MPa max allowable stress. Your design's peak von Mises stress must stay below this. Higher SF = stricter.`}>
             <span className="text-forge-text/50">SF </span>
             <span className="text-white">{c.safety_factor}×</span>
+            <span className="text-forge-text/50"> (≤{allowableStress(spec).toFixed(0)} MPa max stress)</span>
           </span>
           <span className="cursor-help" title="Build volume bounding box">
             <span className="text-forge-text/50">vol </span>

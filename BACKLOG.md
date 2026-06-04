@@ -68,7 +68,7 @@ If any seat would be confused, the component fails.
 ### Spec detail (`/problems/:roundId/:specId`)
 
 - Spec header + plain-English summary — ● ● ● — sentence above diagram ties material+load+arm+MPa together; chips on H1 row carry tooltips. (step 344, `735dbec`)
-- Spec spec-card (material / load / wall / overhang / score) — ◐ ◐ ○ — units (N vs kg) repeated; "SF 1.5×" cryptic.
+- Spec spec-card (material / load / wall / overhang / score) — ◐ ● ● — SF row resolved: `SF 1.5×` → `SF 1.5× (≤27 MPa max stress)` with 129-char tooltip spelling the division (`Yield stress ÷ 1.5 = 27 MPa max allowable stress…`). Same pattern as Explorer Constraints row (step 357 PR #279, saved memory `feedback_inline_concrete_consequence.md`). Beautiful still ◐ — SF row is now visually wider than its 5 sibling rows in the 3-col grid. (step 359, `SpecDiagram.tsx` L367–371)
 - `SpecDiagram` (front view + side view miniature) — ○ ○ ○ — too small; load arrow direction not labeled.
 - 4 KPI tiles (best mass / vs reference / stress margin / passing entries) — ● ● ● — clean.
 - "Maintainer reference still leads" banner — ● ● ● — banner now front-loads the category direction sentence ("Lower mass wins this category" / "Higher stiffness wins this category" / "Lower deflection wins this category") before the gap %, and uses metric-specific gap verbs ("is 5.2% heavier than the reference at 263.20 g" / "still falls X% short of the reference at Y N/(mm·g)" / "deflects X% more than the reference at Y mm"). Bar-to-beat is inline with the percentage so a first-timer reads direction → gap → concrete target in one pass. (`HeroStats.tsx` L281–319, step 352)
