@@ -182,6 +182,12 @@ export function sotaCodeUrl(sota: SotaRecord): string {
   return `https://github.com/PunchTheDev/forge/blob/${sota.commit_hash}/${sota.agent}`;
 }
 
+/** GitHub URL for any submission's agent code, commit-pinned. Works for every leaderboard entry,
+ *  not just #1 — the flywheel needs rank 2/3/N to be one-click-forkable too. */
+export function submissionCodeUrl(agent_path: string, commit_hash: string): string {
+  return `https://github.com/PunchTheDev/forge/blob/${commit_hash}/${agent_path}`;
+}
+
 /** Material display name and key properties shown in tooltips. */
 export const MATERIAL_META: Record<string, { label: string; density: string; note: string }> = {
   pla:           { label: "PLA",          density: "1.24 g/cm³", note: "FDM plastic — low cost, moderate strength" },
