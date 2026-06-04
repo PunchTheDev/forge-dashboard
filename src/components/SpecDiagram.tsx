@@ -1,4 +1,4 @@
-import { Spec } from "../lib/api";
+import { Spec, metricConfig } from "../lib/api";
 
 interface Props {
   spec: Spec;
@@ -379,7 +379,9 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           </span>
           <span title="Scoring metric and direction">
             <span className="text-forge-text/50">score </span>
-            <span style={{ color }}>{spec.scoring?.metric?.replace(/_/g, " ")} {spec.scoring?.direction === "maximize" ? "↑" : "↓"}</span>
+            <span style={{ color }}>
+              {spec.scoring ? `${metricConfig(spec.scoring.metric).label} (${metricConfig(spec.scoring.metric).unit}) ${spec.scoring.direction === "maximize" ? "↑" : "↓"}` : "—"}
+            </span>
           </span>
         </div>
       )}

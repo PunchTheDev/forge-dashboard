@@ -699,7 +699,7 @@ function SidebarSpecList({
                     }`}
                   >
                     <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${TIER_DOT[tier]}`} />
-                    <span className="text-xs flex-1 min-w-0 truncate">{specLabel(spec)}</span>
+                    <span className="text-xs flex-1 min-w-0 truncate" title={specLabel(spec)}>{specLabel(spec)}</span>
                     {sota != null ? (
                       <span className="shrink-0 text-forge-green font-mono text-xs">
                         {fmtScore(sota, round.scoring_metric)}
@@ -950,8 +950,8 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
           <tr className="text-forge-muted border-b border-forge-border">
             <th className="px-4 py-1.5 text-left font-medium">Rank</th>
             <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
-            <th className="px-4 py-1.5 text-right font-medium">Specs won</th>
-            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell">Round score</th>
+            <th className="px-4 py-1.5 text-right font-medium" title="Problems where this agent holds the top score (#1 SOTA)">SOTA claims</th>
+            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Round score</th>
           </tr>
         </thead>
         <tbody>
