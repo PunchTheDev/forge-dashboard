@@ -957,8 +957,9 @@ function ProblemsLanding({ data }: { data: SharedData }) {
 
 // ─── Round standings mini-panel ────────────────────────────────────────────────
 
-function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
+function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: string }) {
   const topN = lb.entries.slice(0, 5);
+  const viewAllUrl = roundId ? `/rankings?tab=${roundId}` : "/rankings";
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-forge-border">
@@ -967,7 +968,7 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
         </span>
         <div className="flex items-center gap-2">
           {lb.entries.length > 5 && (
-            <Link to="/rankings" className="text-xs text-forge-accent hover:underline">
+            <Link to={viewAllUrl} className="text-xs text-forge-accent hover:underline">
               View all →
             </Link>
           )}
@@ -1038,6 +1039,14 @@ function CategoryPage({ data }: { data: SharedData }) {
   }, [roundLabel]);
 
   if (!round) {
+    // Still loading — allRounds hasn't populated yet
+    if (allRounds.length === 0 && !specs) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-6 text-forge-muted text-sm">
+          Loading…
+        </div>
+      );
+    }
     // Legacy URL pattern: /problems/:specId (pre-round routing).
     // If roundId matches a spec that belongs to a known round, redirect there.
     const ownerRound = allRounds.find((r) => r.specs.some((sp) => sp.id === roundId));
@@ -1124,7 +1133,7 @@ function CategoryPage({ data }: { data: SharedData }) {
       {/* Round standings — show panel when entries exist, empty-state when none */}
       {roundLb && roundLb.entries.length > 0 ? (
         <div className="mb-5">
-          <RoundStandingsPanel lb={roundLb} />
+          <RoundStandingsPanel lb={roundLb} roundId={round?.id} />
         </div>
       ) : roundLb ? (
         <div className="mb-5 bg-forge-surface border border-forge-border rounded-xl p-4 text-center">
@@ -1155,7 +1164,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   const { roundId, specId } = useParams<{ roundId: string; specId: string }>();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const journeyRef = useRef<HTMLDivElement>(null);
-  const { specs, allRounds, sotaBySpec } = data;
+  const { specs, specsLoading, allRounds, sotaBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
   const activeSpec = specs?.find((s) => s.id === specId) ?? null;
@@ -1198,6 +1207,13 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   }, [selectedSubmission]);
 
   if (!activeSpec) {
+    if (specsLoading) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-6 text-forge-muted text-sm">
+          Loading problem…
+        </div>
+      );
+    }
     return (
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="text-forge-muted text-sm mb-2">Problem not found — check the ID or browse all problems.</div>
@@ -1565,7 +1581,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             {roundLbLoading && !roundLb ? (
               <div className="text-forge-muted text-sm py-6 text-center">Loading round rankings…</div>
             ) : roundLb ? (
-              <RoundStandingsPanel lb={roundLb} />
+              <RoundStandingsPanel lb={roundLb} roundId={activeRoundTab ?? undefined} />
             ) : (
               <div className="text-forge-muted text-sm py-6 text-center">No data for this round yet.</div>
             )}
