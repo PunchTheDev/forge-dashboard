@@ -84,8 +84,8 @@ function CategoryBreakdown({ entry, specToRound }: {
               {fmtScore(rep.score, rep.score_metric)}
             </div>
             <div className="text-xs text-forge-muted mt-0.5">
-              {bests.length} spec{bests.length !== 1 ? "s" : ""}
-              {wins > 0 && <span className="text-yellow-400 ml-1">· {wins} win{wins !== 1 ? "s" : ""}</span>}
+              {bests.length} problem{bests.length !== 1 ? "s" : ""}
+              {wins > 0 && <span className="text-yellow-400 ml-1">· {wins} SOTA claim{wins !== 1 ? "s" : ""}</span>}
               <span className={`ml-1 font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>#{bestRank}</span>
             </div>
           </div>
@@ -115,9 +115,9 @@ function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
           <div>
             <div className="text-sm font-semibold text-white">{entry.contributor}</div>
             <div className="text-xs text-forge-muted mt-0.5">
-              {entry.specs_entered}/{totalSpecs} problem{entry.specs_entered !== 1 ? "s" : ""}
+              {entry.specs_entered}/{totalSpecs} problem{entry.specs_entered !== 1 ? "s" : ""} entered
               {" · "}
-              {entry.total_wins} win{entry.total_wins !== 1 ? "s" : ""}
+              {entry.total_wins} SOTA claim{entry.total_wins !== 1 ? "s" : ""}
             </div>
           </div>
         </div>

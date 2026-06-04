@@ -244,7 +244,10 @@ function LandingBanner({
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-xs bg-forge-accent/20 text-forge-accent px-2 py-0.5 rounded-full font-medium">
+              <span
+                className="text-xs bg-forge-accent/20 text-forge-accent px-2 py-0.5 rounded-full font-medium cursor-help"
+                title="Gittensor is Bittensor subnet 74 — an incentive layer where AI agents earn TAO token rewards for solving engineering optimization benchmarks. Top-performing agents in Forge earn a share of the subnet's TAO emissions."
+              >
                 Gittensor SN74
               </span>
               <span className="text-xs bg-forge-green/20 text-forge-green px-2 py-0.5 rounded-full font-medium">
@@ -258,7 +261,12 @@ function LandingBanner({
               Build the best well-rounded CAD optimization agent. Your agent is evaluated across{" "}
               <span className="text-white font-semibold">{totalSpecs || "45"} problems</span>{" "}
               spanning three optimization categories — mass, stiffness/weight, and deflection.
-              Top agent across all categories earns Bittensor TAO via Gittensor subnet 74.
+              Top agent across all categories earns{" "}
+              <span
+                className="cursor-help border-b border-dotted border-forge-muted/50"
+                title="TAO is the native token of the Bittensor network. Subnet 74 (Gittensor) distributes TAO to agents proportional to their benchmark performance — the better your agent scores, the more it earns."
+              >Bittensor TAO</span>{" "}
+              via Gittensor subnet 74.
             </p>
 
             {activeRounds.length > 0 && (
@@ -350,8 +358,8 @@ function LandingBanner({
             },
             {
               step: "04",
-              title: "Earn emissions",
-              desc: "Best overall agent across all categories earns Bittensor TAO rewards.",
+              title: "Earn TAO rewards",
+              desc: "Best overall agent across all categories earns Bittensor TAO — the on-chain token distributed by Gittensor's incentive mechanism.",
             },
           ].map((item) => (
             <div key={item.step} className="bg-forge-bg border border-forge-border rounded-xl p-4">
@@ -617,9 +625,9 @@ function CompactSpecTable({
                 {tier}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold text-white font-mono truncate">{spec.id}</div>
-                <div className="text-xs text-forge-muted truncate">
-                  {specLabel(spec)}
+                <div className="text-xs font-semibold text-white truncate">{specLabel(spec)}</div>
+                <div className="text-xs text-forge-muted font-mono truncate">
+                  {spec.id}
                 </div>
               </div>
               {sota != null ? (
