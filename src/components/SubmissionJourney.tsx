@@ -108,7 +108,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
     {
       label: "Problem",
       passed: true,
-      detail: `${material} · ${loadKg}kg @ ${loadMm}mm\nSF ${c.safety_factor}× · ${c.bolt_pattern_mm.length} bolts`,
+      detail: `${material} · ${loadKg}kg @ ${loadMm}mm\nSafety factor ${c.safety_factor}× · ${c.bolt_pattern_mm.length} bolts`,
     },
     {
       label: "Agent",
