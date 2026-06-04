@@ -1535,6 +1535,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         <Leaderboard
           spec={activeSpec}
           submissions={submissions ?? []}
+          loading={subsLoading && !submissions}
           onSelectEntry={(s) => setSelectedSubmission(s)}
           selected={selectedSubmission}
         />

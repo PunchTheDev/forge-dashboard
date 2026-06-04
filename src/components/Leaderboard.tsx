@@ -12,6 +12,7 @@ function formatScore(value: number, metric: string): string {
 interface Props {
   spec: Spec;
   submissions: Submission[];
+  loading?: boolean;
   onSelectEntry: (s: Submission) => void;
   selected: Submission | null;
 }
@@ -50,7 +51,7 @@ function StressBar({ value, max }: { value: number; max: number }) {
   );
 }
 
-export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Props) {
+export function Leaderboard({ spec, submissions, loading, onSelectEntry, selected }: Props) {
   const metric = spec.scoring.metric;
   const direction = spec.scoring.direction;
   const { label: metricLabel, unit: metricUnit, description: metricDescription } = metricConfig(metric);
@@ -91,7 +92,18 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
         </div>
       </div>
 
-      {ranked.length === 0 && (
+      {ranked.length === 0 && loading && (
+        <div className="px-4 py-4 space-y-2 animate-pulse">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3 py-1">
+              <div className="h-3 w-6 bg-forge-border/50 rounded" />
+              <div className="h-3 w-28 bg-forge-border/50 rounded" />
+              <div className="ml-auto h-3 w-16 bg-forge-border/50 rounded" />
+            </div>
+          ))}
+        </div>
+      )}
+      {ranked.length === 0 && !loading && (
         <div className="px-4 py-8 text-center text-forge-muted text-sm">
           No passing submissions yet —{" "}
           <Link to="/guide" className="text-forge-accent hover:underline">
