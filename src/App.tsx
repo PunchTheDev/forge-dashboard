@@ -24,6 +24,7 @@ import {
   specBaseline,
   specLabel,
   sotaCodeUrl,
+  submissionCodeUrl,
 } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
@@ -2066,6 +2067,21 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                       </Link>
                     ) : (
                       <span className="text-white/80">{problemLabel}</span>
+                    )}
+                    {b.agent_path && b.commit_hash && (
+                      <>
+                        {" "}
+                        <a
+                          href={submissionCodeUrl(b.agent_path, b.commit_hash)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[10px] text-forge-muted hover:text-forge-accent font-mono whitespace-nowrap"
+                          title={`View ${b.agent_path} at commit ${b.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                        >
+                          ↗ code
+                        </a>
+                      </>
                     )}
                   </td>
                   <td className="py-1.5">

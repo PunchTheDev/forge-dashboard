@@ -138,6 +138,8 @@ export interface OverallSpecBest {
   normalized_score: number;
   submission_id: string;
   submitted_at: string;
+  agent_path: string;
+  commit_hash: string;
 }
 
 export interface OverallEntry {
