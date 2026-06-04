@@ -375,7 +375,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
             </div>
             <div className="mt-3 text-xs text-forge-muted">
               Full guide:{" "}
-              <a href="/guide" className="text-forge-accent hover:underline">Forge Guide →</a>
+              <Link to="/guide" className="text-forge-accent hover:underline">Forge Guide →</Link>
               {" · "}
               Results are written to <code className="text-forge-accent">.forge/results/</code>
             </div>
