@@ -262,7 +262,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
       {/* Front view — bolt pattern (hidden in compact mode) */}
       {!compact && <div className="shrink-0">
         <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
-          Mounting face (bolt holes)
+          Front view — bolt pattern
         </div>
         <svg
           viewBox={`0 0 ${FW} ${FH}`}
