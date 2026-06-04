@@ -1842,8 +1842,20 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                       <span className="text-forge-muted">—</span>
                     )}
                   </td>
-                  <td className="py-1.5 text-right font-mono text-white">
-                    {fmtScore(b.score, b.score_metric)}
+                  <td className="py-1.5 text-right font-mono">
+                    <span className="text-white">{fmtScore(b.score, b.score_metric)}</span>
+                    {!isSota && sotaBySpec[b.spec_id] != null && (() => {
+                      const round = allRounds.find((r) => r.id === roundId);
+                      const dir = round?.scoring_direction ?? fullSpec?.scoring?.direction ?? "minimize";
+                      const sota = sotaBySpec[b.spec_id];
+                      const gap = dir === "minimize" ? b.score - sota : sota - b.score;
+                      const { decimals } = metricConfig(b.score_metric);
+                      return (
+                        <div className="text-forge-muted/60 text-[10px]">
+                          {gap > 0 ? "+" : ""}{gap.toFixed(decimals)} vs #1
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className={`py-1.5 text-right font-mono ${normColor}`}>
                     {isSoleEntrant ? (
