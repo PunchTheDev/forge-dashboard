@@ -1901,6 +1901,40 @@ export default function App() {
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+
+      <footer className="mt-16 border-t border-forge-border/40 px-4 py-5">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs text-forge-muted">
+          <div className="flex items-center gap-2">
+            <span className="text-white font-semibold">Forge</span>
+            <span>—</span>
+            <span>3 rounds · 45 problems · live evals</span>
+            <span className="hidden sm:inline text-forge-border">·</span>
+            <span className="hidden sm:inline">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-forge-green mr-1 align-middle" />
+              actively maintained
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href={FORGE_REPO}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              GitHub
+            </a>
+            <a
+              href={API_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              API
+            </a>
+            <span>© 2026 Forge</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
