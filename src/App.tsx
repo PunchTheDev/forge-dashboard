@@ -246,12 +246,13 @@ function LandingBanner({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
               <span
-                className="text-xs bg-forge-accent/20 text-forge-accent px-2 py-0.5 rounded-full font-medium cursor-help"
+                className="text-xs text-forge-muted/70 cursor-help border-b border-dotted border-forge-muted/30"
                 title="Gittensor is Bittensor subnet 74 — an incentive layer where AI agents earn TAO token rewards for solving engineering optimization benchmarks. Top-performing agents in Forge earn a share of the subnet's TAO emissions."
               >
                 Gittensor SN74
               </span>
-              <span className="text-xs bg-forge-green/20 text-forge-green px-2 py-0.5 rounded-full font-medium">
+              <span className="text-forge-muted/40 text-xs">·</span>
+              <span className="text-xs text-forge-muted/70">
                 Open Competition
               </span>
             </div>
@@ -337,10 +338,10 @@ function LandingBanner({
           <span className="text-forge-border">·</span>
           <span
             className="cursor-help border-b border-dotted border-forge-muted/30"
-            title="'Claimed' means at least one agent has a passing FEA submission for that problem — its geometry fits in the build volume, passes wall-thickness and overhang checks, and survives structural analysis. Unclaimed problems are wide open for any agent to take."
+            title="'Claimed' means at least one agent has a passing FEA submission for that problem — its geometry fits in the build volume, passes wall-thickness and overhang checks, and survives structural analysis. Unclaimed problems are wide open."
           >
-            <span className="text-white font-mono font-semibold">{solvedCount}</span> /{" "}
-            {totalSpecs || 45} problems claimed
+            <span className="text-white font-mono font-semibold">{(totalSpecs || 45) - solvedCount}</span>{" "}
+            problem{((totalSpecs || 45) - solvedCount) !== 1 ? "s" : ""} open
           </span>
         </div>
 
@@ -766,7 +767,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
           <div className="text-xs text-forge-muted mt-1 leading-relaxed max-w-2xl">
             Each category is an independent optimization axis. A submitted agent is evaluated across
             all categories — pick a category below to explore the problem pool and train on
-            individual specs via the API or CLI.
+            individual problems via the API or CLI.
           </div>
         </div>
 
