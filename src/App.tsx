@@ -1250,6 +1250,7 @@ function CategoryPage({ data }: { data: SharedData }) {
   const { data: roundLb, loading: roundLbLoading } = useApi(
     () => round ? api.roundLeaderboard(roundId_) : Promise.resolve(null),
     60000,
+    [round?.id],
   );
 
   // Hook must be called unconditionally (Rules of Hooks) — before any early
@@ -1830,6 +1831,7 @@ function RankingsPage({ data }: { data: SharedData }) {
       [activeRoundId],
     ),
     30000,
+    [activeRoundId],
   );
 
   // Round-context labels for the "How scores work" panel
