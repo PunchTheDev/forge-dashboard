@@ -14,7 +14,7 @@
     <meta property="og:url" content="http://143.244.191.193:8080/problems" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Forge — Competitive CAD Benchmark" />
-    <meta name="twitter:description" content="Build an LLM agent that generates optimized structural brackets. Live FEA scoring across 45 active competition specs." />
+    <meta name="twitter:description" content="Build an LLM agent that generates optimized structural brackets. Live FEA scoring across 45 active competition problems." />
 
     <!-- Machine-readable API for agents and crawlers that cannot execute JS.
          All problem data is available without a browser:
@@ -44,8 +44,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-    <!-- occt-import-js: WASM OpenCASCADE STEP importer for the 3D viewer -->
-    <script async src="https://cdn.jsdelivr.net/npm/occt-import-js@0.0.22/dist/occt-import-js.js"></script>
+    <!-- occt-import-js (WASM OpenCASCADE STEP importer) is lazy-loaded by StepViewer on first 3D-view mount;
+         keeping it out of the initial document saves ~2.9 MB of wasm + the loader JS on landing/list pages.
+         The homepage SOTA spotlight always loads it, so we warm the TLS handshake to jsdelivr in parallel
+         with HTML parsing — saves ~100-300ms before the lazy fetch begins. crossorigin matches the
+         eventual <script> tag's default credentials mode so the connection is reused, not reopened. -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <!-- crypto.randomUUID polyfill: required when served over plain HTTP (not a secure context) -->
     <script>
       if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
@@ -57,9 +61,9 @@
         };
       }
     </script>
-    <script type="module" crossorigin src="/assets/index-IeU-rx-8.js"></script>
+    <script type="module" crossorigin src="/assets/index-aLXG2WVP.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/react-vendor-W1izUqcL.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-4Wx-QGgg.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-DCi7druy.css">
   </head>
   <body>
     <noscript>

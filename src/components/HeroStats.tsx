@@ -1,5 +1,6 @@
-import { Round, SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, sotaCodeUrl, MATERIAL_META } from "../lib/api";
+import { Round, SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, MATERIAL_META } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
+import { SotaCodeViewer } from "./SotaCodeViewer";
 
 interface Props {
   spec: Spec;
@@ -253,44 +254,37 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         </div>
       )}
 
-      {/* SOTA code link — the flywheel: open-source the winner so the next agent can fork and beat it */}
+      {/* SOTA agent source — the flywheel: read it, fork it, beat it by a decaying margin.
+       *  We pull the file inline (not link-out) so the loop stays on this page. */}
       {sota && (
-        <div className="mt-4 bg-forge-surface border border-forge-border rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-white mb-0.5">
-              {seedLeads ? "Top competitor — open-source code" : "Winning agent — open-source code"}
-            </div>
-            <div className="text-xs text-forge-muted">
-              {seedLeads ? (
-                <>
-                  This is the highest-ranked competitor submission so far — fork it as your starting point, then push past the{" "}
-                  <span className="text-white font-mono">{baselineStr}</span> reference to claim #1.
-                </>
-              ) : (
-                <>
-                  The current best score was set by this agent. Fork it,{" "}
-                  {marginNote
-                    ? <span>beat it by <span className="text-white font-mono">{marginNote}</span>,</span>
-                    : "beat it,"}{" "}
-                  and claim #1.
-                </>
-              )}
-            </div>
+        <>
+          <div className="mt-4 px-1 text-xs text-forge-muted leading-relaxed">
+            {seedLeads ? (
+              <>
+                <span className="text-white font-semibold">Top competitor — open-source code.</span>{" "}
+                Highest-ranked competitor submission so far. Read it below, fork it, then push past
+                the <span className="text-white font-mono">{baselineStr}</span> reference to claim #1.
+              </>
+            ) : (
+              <>
+                <span className="text-white font-semibold">Winning agent — open-source code.</span>{" "}
+                The current best score was set by this agent. Read it below, fork it,{" "}
+                {marginNote ? (
+                  <>
+                    beat it by <span className="text-white font-mono">{marginNote}</span>,
+                  </>
+                ) : (
+                  "beat it,"
+                )}{" "}
+                and claim #1.
+              </>
+            )}
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <code className="text-xs text-forge-muted bg-forge-bg px-2 py-1 rounded font-mono truncate max-w-[200px]">
-              {sota.agent}
-            </code>
-            <a
-              href={sotaCodeUrl(sota)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs bg-forge-accent/10 border border-forge-accent/30 text-forge-accent px-3 py-1.5 rounded-lg hover:bg-forge-accent/20 transition-colors font-mono whitespace-nowrap"
-            >
-              View code →
-            </a>
-          </div>
-        </div>
+          <SotaCodeViewer
+            sota={sota}
+            label={seedLeads ? "Top competitor agent" : "Current #1 agent"}
+          />
+        </>
       )}
     </div>
   );
