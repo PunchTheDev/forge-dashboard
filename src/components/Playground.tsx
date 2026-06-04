@@ -98,7 +98,7 @@ function QuickStartBlock({ evalCommand, apiBase }: { evalCommand: string; apiBas
 
   return (
     <>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-1">
         <div className="text-sm font-semibold text-white">Quick Start</div>
         <button
           onClick={() => {
@@ -112,6 +112,16 @@ function QuickStartBlock({ evalCommand, apiBase }: { evalCommand: string; apiBas
           {copied ? "copied ✓" : "copy all"}
         </button>
       </div>
+      <p className="text-[11px] text-forge-muted leading-relaxed mb-2">
+        Four commands from a clean machine to a scored eval result.{" "}
+        <span
+          className="cursor-help underline decoration-dotted decoration-forge-border text-forge-muted/90"
+          title="Docker is required — step 3 builds an isolated sandbox container that runs your agent and the structural simulation. Install Docker Desktop (Mac/Windows) or docker-engine (Linux) before running step 3."
+        >
+          Requires Docker
+        </span>
+        . Pick a problem on the left first so step 3 fills in <code className="text-forge-accent">--spec</code> automatically.
+      </p>
       <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
         <div><span className="text-forge-muted"># 1. clone the repo</span></div>
         <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone https://github.com/PunchTheDev/forge && cd forge && pip install -e .</span></div>

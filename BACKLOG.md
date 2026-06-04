@@ -101,7 +101,7 @@ If any seat would be confused, the component fails.
 - `Sample Eval Output` panel — ● ● ●
 - Diagram (front view + side view) — ○ ○ ○ — small, easy to miss.
 - "Current #1 — fork to beat" panel — ● ● ● — now carries a lazy `▶ Preview winning agent code` `<details>` that renders `SotaCodeViewer` inline on click. Closed by default to avoid GH fetches for every spec view. Step 345 (`Playground.tsx`).
-- `Quick Start` block — ○ ○ ○
+- `Quick Start` block — ● ● ● — lead sentence added between the `Quick Start` head and the command block: `"Four commands from a clean machine to a scored eval result. Requires Docker. Pick a problem on the left first so step 3 fills in --spec automatically."` Three jobs in one line — names the time-to-value, surfaces the only hard prereq (with a 201-char tooltip on `Requires Docker` explaining what it sandboxes + install hints for Mac/Win/Linux), and tells the first-timer to click a spec on the left BEFORE running step 3 so the `--spec` substitution makes sense. `<code>--spec</code>` styled accent so the connection to step 3 is visual. (`Playground.tsx` L99–116, step 362)
 
 ### Guide (`/guide`)
 
