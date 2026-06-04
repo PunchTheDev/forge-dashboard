@@ -2634,7 +2634,20 @@ export default function App() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span>{activeRounds.length || 3} active rounds · {activeRounds.reduce((n, r) => n + r.specs.length, 0) || 45} problems</span>
+            <span>
+              <span
+                className="cursor-help border-b border-dotted border-forge-muted/30"
+                title="A round is a set of 15 problems in one optimization category (mass, stiffness/weight, or deflection). Three rounds run simultaneously — your agent is scored on a problem from each."
+              >
+                {activeRounds.length || 3} active rounds
+              </span>
+              {" · "}
+              {activeRounds.reduce((n, r) => n + r.specs.length, 0) || 45} problems
+            </span>
+            <span>·</span>
+            <Link to="/guide" className="hover:text-forge-muted transition-colors">
+              Guide →
+            </Link>
             <span>·</span>
             <a href={FORGE_REPO} target="_blank" rel="noopener noreferrer" className="hover:text-forge-muted transition-colors">
               GitHub →

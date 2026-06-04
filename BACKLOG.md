@@ -56,7 +56,7 @@ If any seat would be confused, the component fails.
 - `Spotlight` (SOTA hero with 3D viewer + spec sidecar) — ● ● ● — 3D loads cleanly; sidecar metric card + prose. `FEA (CalculiX)` in the sidecar prose is now a routed `<Link to="/guide#fea">` with dotted-underline + 233-char hover tooltip ("FEA = structural simulation that meshes the part into thousands of elements and solves for stress + displacement under load. CalculiX is the open-source solver Forge runs."). Tooltip gives the definition in-place; click jumps to the canonical `#fea` explainer in `QuickstartGuide` (verified `feaSectionInView: true` after navigation). Step 353 (`App.tsx` L546–559).
 - Category grid (`CategoryCard`) — ● ● ● — three cards (Mass / Stiffness / Deflection) each with problem count + claim status.
 - ~~`OverallLeaderboard` preview~~ — N/A. `ProblemsLanding` only reads `overallData.entries.length` for the `LandingBanner` agent count; no leaderboard preview is rendered on `/problems`. The actual `<OverallLeaderboard>` mount is on `/rankings` (App.tsx:1940), already reviewed under Rankings.
-- Footer — ○ ○ ○ — not reviewed.
+- Footer — ● ● ● — global footer (`App.tsx` L2622–2647). Right cluster now reads `{N active rounds (cursor-help, 180-char tooltip naming the round-per-category mapping)} · M problems · Guide → · GitHub →`. The `Guide` link gives any visitor stuck at the bottom of any page a one-click route to the canonical explainer instead of bouncing out to GitHub for context. Tooltip on `active rounds` ("A round is a set of 15 problems in one optimization category…") closes the jargon gap for first-timers. (step 363)
 
 ### Category page (`/problems/:roundId`)
 
