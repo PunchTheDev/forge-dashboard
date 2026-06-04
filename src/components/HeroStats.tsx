@@ -90,7 +90,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
       : null;
   // positive raw = SOTA beats reference in the optimization direction
   const baselineDelta = baselineRawPct != null ? Math.abs(baselineRawPct).toFixed(1) : null;
-  const metricLabel = `Best ${label.toLowerCase()}`;
+  const metricLabel = `${isMaximize ? "↑" : "↓"} Best ${label.toLowerCase()}`;
 
   // Compute marginal gain threshold based on SOTA age
   const sotaAgeDays = sota?.submitted_at
