@@ -175,7 +175,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           }
           sub={
             baseline != null
-              ? `seed: ${baseline.toFixed(decimals)} ${scoreUnit}`
+              ? `maintainer's baseline: ${baseline.toFixed(decimals)} ${scoreUnit}`
               : undefined
           }
           valueColor={
