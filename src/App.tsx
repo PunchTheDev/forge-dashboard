@@ -346,7 +346,7 @@ function LandingBanner({
             {
               step: "03",
               title: "Open a PR",
-              desc: "PR CI runs a quick FEA check (1 easy spec per category) and posts a score table. Full scoring across all 45 specs runs after merge.",
+              desc: "PR CI runs a quick FEA check (1 easy problem per category) and posts a score table. Full scoring across all 45 problems runs after merge.",
             },
             {
               step: "04",
@@ -591,7 +591,7 @@ function CompactSpecTable({
             {t}
           </button>
         ))}
-        <span className="ml-auto text-forge-muted">{visibleSpecs.length} specs</span>
+        <span className="ml-auto text-forge-muted">{visibleSpecs.length} problems</span>
       </div>
 
       {/* Two-column grid of compact spec rows */}
@@ -902,10 +902,10 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-forge-muted font-mono">
                             <span className="text-white font-semibold">{unclaimed}</span> /{" "}
-                            {r.specs.length} unclaimed
+                            {r.specs.length} open
                           </span>
                           <span className={`text-xs font-semibold ${meta.color}`}>
-                            Claim SOTA →
+                            Claim →
                           </span>
                         </div>
                       </button>
@@ -1457,6 +1457,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   const { agentId } = useParams<{ agentId: string }>();
   const { overallData, overallLoading, allRounds, specs, sotaBySpec } = data;
   const contributor = agentId ? decodeURIComponent(agentId) : "";
+  const [unenteredExpanded, setUnenteredExpanded] = useState(false);
 
   const entry = overallData?.entries.find((e) => e.contributor === contributor) ?? null;
 
@@ -1526,7 +1527,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               Rank{" "}
               <span className="text-white font-mono font-semibold">#{entry.rank}</span>
               {" · "}
-              {entry.specs_entered} spec{entry.specs_entered !== 1 ? "s" : ""}
+              {entry.specs_entered} problem{entry.specs_entered !== 1 ? "s" : ""}
               {" · "}
               {entry.total_wins} win{entry.total_wins !== 1 ? "s" : ""}
             </div>
@@ -1583,15 +1584,15 @@ function AgentDetailPage({ data }: { data: SharedData }) {
         )}
       </div>
 
-      {/* Per-spec results */}
+      {/* Per-problem results */}
       <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
         <div className="text-xs text-forge-muted mb-3 font-semibold uppercase tracking-wide">
-          Per-spec results
+          Results by problem
         </div>
         <table className="w-full text-xs">
           <thead>
             <tr className="text-forge-muted border-b border-forge-border">
-              <th className="text-left pb-1.5 font-normal">Spec</th>
+              <th className="text-left pb-1.5 font-normal">Problem</th>
               <th className="text-left pb-1.5 font-normal">Category</th>
               <th className="text-right pb-1.5 font-normal">Score</th>
               <th className="text-right pb-1.5 font-normal" title="rank / (agents + 1) — lower is better">Percentile</th>
@@ -1667,66 +1668,77 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 
         return (
           <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
-            <div className="flex items-center justify-between mb-1">
+            <button
+              onClick={() => setUnenteredExpanded((v) => !v)}
+              className="w-full flex items-center justify-between mb-1 text-left hover:opacity-80 transition-opacity"
+            >
               <div className="text-xs font-semibold text-white">
-                Unentered problems — {totalUnentered} missing
+                {totalUnentered} unentered problems
+                <span className="ml-1 text-forge-muted font-normal">— each auto-scores 1.0 (worst)</span>
               </div>
-              <div
-                className="text-xs text-forge-muted cursor-help underline decoration-dotted decoration-forge-muted/50"
-                title="Each unentered problem contributes 1.0 (worst possible percentile) to your overall score"
-              >
-                each scores 1.0
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-xs text-forge-muted cursor-help underline decoration-dotted decoration-forge-muted/50"
+                  title="Each unentered problem contributes 1.0 (worst possible percentile) to your overall score. Beat more problems to lower your score."
+                >
+                  why this matters
+                </span>
+                <span className="text-forge-muted text-xs">{unenteredExpanded ? "▲" : "▼"}</span>
               </div>
-            </div>
-            <p className="text-xs text-forge-muted mb-3 leading-relaxed">
-              These specs count as 1.0 in your overall score — the worst possible. Submitting
-              any entry, even a passing baseline, immediately improves your ranking.
-            </p>
-            <div className="flex flex-col gap-3">
-              {unenteredByRound.map(({ round, specs: rSpecs }) => {
-                const meta = CATEGORY_META_OL[round.id];
-                return (
-                  <div key={round.id}>
-                    {meta && (
-                      <div className={`text-xs font-semibold ${meta.color} mb-1.5`}>
-                        {meta.label} — {rSpecs.length} unentered
+            </button>
+            {unenteredExpanded && (
+              <>
+                <p className="text-xs text-forge-muted mb-3 leading-relaxed">
+                  These problems count as 1.0 in your overall score — the worst possible. Submitting
+                  any passing design immediately improves your ranking.
+                </p>
+                <div className="flex flex-col gap-3">
+                  {unenteredByRound.map(({ round, specs: rSpecs }) => {
+                    const meta = CATEGORY_META_OL[round.id];
+                    return (
+                      <div key={round.id}>
+                        {meta && (
+                          <div className={`text-xs font-semibold ${meta.color} mb-1.5`}>
+                            {meta.label} — {rSpecs.length} open
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                          {rSpecs.map((rs) => {
+                            const sota = sotaBySpec[rs.id];
+                            const fullSpec = (specs ?? []).find((s) => s.id === rs.id);
+                            return (
+                              <Link
+                                key={rs.id}
+                                to={`/problems/${round.id}/${rs.id}`}
+                                className="flex items-center gap-2 px-2.5 py-1.5 bg-forge-bg border border-forge-border/50 rounded-lg hover:border-forge-accent/40 transition-all text-xs"
+                              >
+                                <span
+                                  className={`shrink-0 font-mono capitalize ${TIER_COLORS[rs.tier] ?? "text-forge-muted"}`}
+                                >
+                                  {rs.tier}
+                                </span>
+                                <span className="flex-1 min-w-0 font-mono text-white/70 break-words">
+                                  {fullSpec ? specLabel(fullSpec) : rs.id}
+                                </span>
+                                {sota != null ? (
+                                  <span className="shrink-0 text-forge-muted font-mono">
+                                    SOTA: {fmtScore(sota, round.scoring_metric)}
+                                  </span>
+                                ) : (
+                                  <span className="shrink-0 text-forge-accent font-mono text-xs font-semibold">
+                                    open →
+                                  </span>
+                                )}
+                              </Link>
+                            );
+                          })}
+                        </div>
                       </div>
-                    )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                      {rSpecs.map((rs) => {
-                        const sota = sotaBySpec[rs.id];
-                        const fullSpec = (specs ?? []).find((s) => s.id === rs.id);
-                        return (
-                          <Link
-                            key={rs.id}
-                            to={`/problems/${round.id}/${rs.id}`}
-                            className="flex items-center gap-2 px-2.5 py-1.5 bg-forge-bg border border-forge-border/50 rounded-lg hover:border-forge-accent/40 transition-all text-xs"
-                          >
-                            <span
-                              className={`shrink-0 font-mono capitalize ${TIER_COLORS[rs.tier] ?? "text-forge-muted"}`}
-                            >
-                              {rs.tier}
-                            </span>
-                            <span className="flex-1 min-w-0 font-mono text-white/70 break-words">
-                              {fullSpec ? specLabel(fullSpec) : rs.id}
-                            </span>
-                            {sota != null ? (
-                              <span className="shrink-0 text-forge-muted font-mono">
-                                SOTA: {fmtScore(sota, round.scoring_metric)}
-                              </span>
-                            ) : (
-                              <span className="shrink-0 text-forge-accent font-mono text-xs font-semibold">
-                                unclaimed →
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         );
       })()}
