@@ -152,8 +152,12 @@ export function SotaChart({ spec }: Props) {
               axisLine={false}
               tickLine={false}
               domain={domain}
-              unit={unit}
-              width={65}
+              width={58}
+              tickFormatter={(v: number) => {
+                if (v >= 100) return v.toFixed(0);
+                if (v >= 1)   return v.toFixed(2);
+                return v.toFixed(4);
+              }}
             />
             <Tooltip content={<CustomTooltip unit={unit} />} />
             {baseline != null && (
