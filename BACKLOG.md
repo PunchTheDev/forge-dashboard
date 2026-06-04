@@ -106,7 +106,7 @@ If any seat would be confused, the component fails.
 ### Guide (`/guide`)
 
 - TOC / sticky nav — ○ ○ ○
-- "The three categories" section — ○ ○ ○
+- "The three categories" section — ● ● ● — each category card now carries a routed `round_001`/`round_002`/`round_003` chip (small mono, color-matched border, 122-char tooltip naming both the `--round` CLI flag and `/problems/:roundId` URL) so a first-timer connects "Mass Optimization" → CLI flag → URL in one glance. Trailing scoring paragraph added that reuses the canonical Rankings vocabulary verbatim ("0.0 = best", "1.0 = worst (or unclaimed)", "round score" / "overall score") with a routed `see Rankings →` link. Step 365 (`QuickstartGuide.tsx` L448–478).
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
