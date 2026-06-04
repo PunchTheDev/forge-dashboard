@@ -927,6 +927,21 @@ function ProblemsLanding({ data }: { data: SharedData }) {
               featured.push(s);
             }
           }
+          // Show skeletons while allSota is still loading
+          if (allSota === null) {
+            return (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-4 w-32 bg-forge-border/50 rounded animate-pulse" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-36 bg-forge-surface border border-forge-border rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            );
+          }
           // Only show round-linked SOTAs; if none exist yet, skip the gallery
           if (!featured.length) return null;
           return (
