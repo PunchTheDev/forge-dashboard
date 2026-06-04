@@ -268,19 +268,25 @@ function MarginDecayChart() {
   );
 }
 
-const TOC_ITEMS = [
-  { id: "categories", label: "Three categories" },
-  { id: "setup", label: "Step 1 — Set up" },
-  { id: "explore", label: "Step 2 — Explore" },
-  { id: "write", label: "Step 3 — Write agent" },
-  { id: "models", label: "Whitelisted models", indent: true },
-  { id: "patterns", label: "Agent patterns", indent: true },
-  { id: "fea", label: "What is FEA?", indent: true },
-  { id: "eval", label: "Step 4 — Eval locally" },
-  { id: "submit", label: "Step 5 — Submit" },
-  { id: "api", label: "API reference" },
-  { id: "rewards", label: "How rewards work" },
-  { id: "anti-gaming", label: "Anti-gaming" },
+type TocItem =
+  | { kind: "heading"; label: string; hint?: string }
+  | { kind: "link"; id: string; label: string; indent?: boolean };
+
+const TOC_ITEMS: TocItem[] = [
+  { kind: "link", id: "categories", label: "Three categories" },
+  { kind: "heading", label: "Onboarding", hint: "5 steps to your first submission" },
+  { kind: "link", id: "setup", label: "Step 1 — Set up" },
+  { kind: "link", id: "explore", label: "Step 2 — Explore" },
+  { kind: "link", id: "write", label: "Step 3 — Write agent" },
+  { kind: "link", id: "models", label: "Whitelisted models", indent: true },
+  { kind: "link", id: "patterns", label: "Agent patterns", indent: true },
+  { kind: "link", id: "fea", label: "What is FEA?", indent: true },
+  { kind: "link", id: "eval", label: "Step 4 — Eval locally" },
+  { kind: "link", id: "submit", label: "Step 5 — Submit" },
+  { kind: "heading", label: "Reference" },
+  { kind: "link", id: "api", label: "API reference" },
+  { kind: "link", id: "rewards", label: "How rewards work" },
+  { kind: "link", id: "anti-gaming", label: "Anti-gaming" },
 ];
 
 function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
@@ -298,8 +304,9 @@ function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
       },
       { rootMargin: "-20% 0% -70% 0%", threshold: 0 }
     );
-    TOC_ITEMS.forEach(({ id }) => {
-      const el = document.getElementById(id);
+    TOC_ITEMS.forEach((item) => {
+      if (item.kind !== "link") return;
+      const el = document.getElementById(item.id);
       if (el) observerRef.current?.observe(el);
     });
     return () => observerRef.current?.disconnect();
@@ -308,24 +315,42 @@ function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
   return (
     <nav className="bg-forge-surface border border-forge-border rounded-xl p-4 flex flex-col gap-1.5">
       <p className="text-xs font-semibold text-forge-muted uppercase tracking-wider mb-1">Contents</p>
-      {TOC_ITEMS.map(({ id, label, indent }) => (
-        <a
-          key={id}
-          href={`#${id}`}
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            onItemClick?.();
-          }}
-          className={`text-xs py-0.5 transition-colors ${indent ? "pl-3" : ""} ${
-            activeId === id
-              ? "text-forge-accent font-semibold"
-              : "text-forge-muted hover:text-white"
-          }`}
-        >
-          {label}
-        </a>
-      ))}
+      {TOC_ITEMS.map((item, i) => {
+        if (item.kind === "heading") {
+          return (
+            <div
+              key={`h-${i}`}
+              className="mt-2 pt-2 border-t border-forge-border/60 first:mt-0 first:pt-0 first:border-t-0"
+            >
+              <p className="text-[10px] font-semibold text-forge-muted/80 uppercase tracking-wider">
+                {item.label}
+              </p>
+              {item.hint && (
+                <p className="text-[10px] text-forge-muted/60 mt-0.5 leading-tight">{item.hint}</p>
+              )}
+            </div>
+          );
+        }
+        const { id, label, indent } = item;
+        return (
+          <a
+            key={id}
+            href={`#${id}`}
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              onItemClick?.();
+            }}
+            className={`text-xs py-0.5 transition-colors ${indent ? "pl-3" : ""} ${
+              activeId === id
+                ? "text-forge-accent font-semibold"
+                : "text-forge-muted hover:text-white"
+            }`}
+          >
+            {label}
+          </a>
+        );
+      })}
     </nav>
   );
 }

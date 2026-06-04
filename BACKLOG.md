@@ -105,7 +105,7 @@ If any seat would be confused, the component fails.
 
 ### Guide (`/guide`)
 
-- TOC / sticky nav — ○ ○ ○
+- TOC / sticky nav — ● ● ● — 12 items now visually grouped: "Contents" (page header) → "Onboarding · 5 steps to your first submission" (Step 1–5 + 3 indented sub-items) → "Reference" (API / rewards / anti-gaming). Group headings sit above a top-border separator with the existing IntersectionObserver active-section highlight unchanged. First-timer sees the journey arc (5 sequential steps vs. reference material) at a glance instead of a flat 12-row list. `QuickstartGuide.tsx` L271–290 introduces a `TocItem` discriminated union (`"heading" | "link"`) and L315–340 renders the headings inline.
 - "The three categories" section — ○ ○ ○
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
