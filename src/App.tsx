@@ -821,7 +821,20 @@ function ProblemsLanding({ data }: { data: SharedData }) {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Featured SOTA hero */}
         {(() => {
-          const heroSota = (allSota ?? []).find((s) => {
+          // While allSota is still loading, show a pulsing skeleton so the page
+          // doesn't jump when the spotlight snaps in — null = in-flight, [] = no data.
+          if (allSota === null) {
+            return (
+              <div className="mb-8">
+                <div className="mb-3">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-forge-accent">Spotlight</div>
+                  <div className="h-4 w-48 bg-forge-border/50 rounded animate-pulse mt-1" />
+                </div>
+                <div className="bg-forge-surface border border-forge-border rounded-xl h-48 animate-pulse" />
+              </div>
+            );
+          }
+          const heroSota = allSota.find((s) => {
             if (!s.has_step) return false;
             return allRounds.some((r) => r.specs.some((sp) => sp.id === s.spec_id));
           });
