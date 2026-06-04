@@ -112,7 +112,7 @@ If any seat would be confused, the component fails.
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
 - "How rewards work" — ○ ○ ○
-- "Anti-gaming guarantees" — ○ ○ ○
+- "Anti-gaming guarantees" — ● ● ● — step 368: each of 7 bullets gets cursor-help + tooltip citing canonical source (run_eval_pool, similarity script, sandbox, FORGE_MODEL_WHITELIST, fea, generator). Bullet 2 fixed from false "all 45 problems" claim to accurate "3 of 45, one random per round". Marginal-gain callout untouched (already good).
 
 ### Cross-cutting
 

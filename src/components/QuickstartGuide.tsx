@@ -837,17 +837,38 @@ git push mine your-name/my-design
 
         <ul className="text-forge-muted text-sm space-y-1.5">
           {[
-            "Determinism check — first problem runs twice, scores must match exactly",
-            "Full coverage — final scoring runs all 45 problems, no sampling variance",
-            "Duplicate detection — same commit hash is never scored twice",
-            "Similarity check — agents must not copy existing agents' code",
-            "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
-            "60s / 4GB limits — prevents brute-force search",
-            "Seeds fixed — geometry and mesh generation are deterministic across runs",
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2">
+            {
+              label: "Determinism check — first problem runs twice, scores must match exactly",
+              tip: "Stops stochastic agents that hit the right answer by luck — if rerunning the same spec yields a different score, the submission is rejected. See scripts/run_eval_pool.py L47–49.",
+            },
+            {
+              label: "Three-round sampling — each PR scores 3 of 45 problems, one random spec per round",
+              tip: "Sampling 1 spec from each of the 3 active rounds keeps CI under ~20 min and forces breadth (all 3 categories factor in). Per-PR variance is the explicit tradeoff — consistent winners must beat noise across many submissions.",
+            },
+            {
+              label: "Duplicate detection — same commit hash is never scored twice",
+              tip: "Blocks the cheap attack of re-submitting an identical commit until the random sample lands on specs you happen to be strong on.",
+            },
+            {
+              label: "Similarity check — agents must not copy existing agents' code",
+              tip: "Source-similarity scan in scripts/check_source_similarity.py rejects near-clones at PR review — you can fork the SOTA agent, but you must actually change it.",
+            },
+            {
+              label: "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
+              tip: "forge/sdk/llm.py enforces FORGE_MODEL_WHITELIST: any model not on the curated list is rejected. Prevents a money-arms-race where the richest miner buys the biggest model.",
+            },
+            {
+              label: "60s / 4GB limits — prevents brute-force search",
+              tip: "benchmark/sandbox.py caps wall-clock and RAM per run. An agent can't grid-search thousands of geometries inside the eval window — it has to be smart, not loud.",
+            },
+            {
+              label: "Seeds fixed — geometry and mesh generation are deterministic across runs",
+              tip: "specs/generator.py derives per-spec seeds from the master seed, and benchmark/fea.py seeds the FEA mesh by spec id. Same spec → identical geometry and identical FEA across machines and reruns.",
+            },
+          ].map(({ label, tip }) => (
+            <li key={label} className="flex items-start gap-2">
               <span className="text-forge-green mt-0.5">+</span>
-              <span>{item}</span>
+              <span className="cursor-help border-b border-dotted border-forge-muted/40" title={tip}>{label}</span>
             </li>
           ))}
         </ul>
