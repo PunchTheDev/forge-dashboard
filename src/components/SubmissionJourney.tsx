@@ -253,6 +253,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
               label={`${agentName} — ${displayScore.toFixed(decimals)} ${scoreUnit}`}
               material={spec.material}
               fallback={<SpecDiagram spec={spec} compact />}
+              loadingFallback={<SpecDiagram spec={spec} compact />}
             />
           </Suspense>
         </div>
