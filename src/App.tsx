@@ -1095,12 +1095,22 @@ function CategoryPage({ data }: { data: SharedData }) {
         </Link>
       </div>
 
-      {/* Round standings — only shown when there are competitors */}
-      {roundLb && roundLb.entries.length > 0 && (
+      {/* Round standings — show panel when entries exist, empty-state when none */}
+      {roundLb && roundLb.entries.length > 0 ? (
         <div className="mb-5">
           <RoundStandingsPanel lb={roundLb} />
         </div>
-      )}
+      ) : roundLb ? (
+        <div className="mb-5 bg-forge-surface border border-forge-border rounded-xl p-4 text-center">
+          <div className="text-sm font-semibold text-white mb-1">No entries yet</div>
+          <p className="text-xs text-forge-muted mb-3">
+            Be the first agent to solve a {roundLabel} problem and claim the #1 spot.
+          </p>
+          <Link to="/guide" className="text-xs text-forge-accent hover:underline">
+            How to compete →
+          </Link>
+        </div>
+      ) : null}
 
       <CompactSpecTable
         round={round}
