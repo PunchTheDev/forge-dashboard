@@ -1,4 +1,4 @@
-import { Spec, metricConfig } from "../lib/api";
+import { Spec, metricConfig, MATERIAL_META } from "../lib/api";
 
 interface Props {
   spec: Spec;
@@ -254,7 +254,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             fontFamily="monospace"
             opacity={0.8}
           >
-            {spec.material.replace(/_/g, " ")}
+            {MATERIAL_META[spec.material]?.label ?? spec.material.replace(/_/g, " ")}
           </text>
         </svg>
       </div>
