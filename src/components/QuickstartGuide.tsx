@@ -51,6 +51,9 @@ const TOC_ITEMS = [
   { id: "setup", label: "Step 1 — Set up" },
   { id: "explore", label: "Step 2 — Explore" },
   { id: "write", label: "Step 3 — Write agent" },
+  { id: "models", label: "Whitelisted models", indent: true },
+  { id: "patterns", label: "Agent patterns", indent: true },
+  { id: "fea", label: "What is FEA?", indent: true },
   { id: "eval", label: "Step 4 — Eval locally" },
   { id: "submit", label: "Step 5 — Submit" },
   { id: "api", label: "API reference" },
@@ -83,7 +86,7 @@ function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
   return (
     <nav className="bg-forge-surface border border-forge-border rounded-xl p-4 flex flex-col gap-1.5">
       <p className="text-xs font-semibold text-forge-muted uppercase tracking-wider mb-1">Contents</p>
-      {TOC_ITEMS.map(({ id, label }) => (
+      {TOC_ITEMS.map(({ id, label, indent }) => (
         <a
           key={id}
           href={`#${id}`}
@@ -92,7 +95,7 @@ function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
             document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
             onItemClick?.();
           }}
-          className={`text-xs py-0.5 transition-colors ${
+          className={`text-xs py-0.5 transition-colors ${indent ? "pl-3" : ""} ${
             activeId === id
               ? "text-forge-accent font-semibold"
               : "text-forge-muted hover:text-white"
@@ -376,7 +379,7 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
       </Section>
 
       {/* Whitelisted models */}
-      <Section title="Whitelisted models">
+      <Section id="models" title="Whitelisted models">
         <p className="text-forge-muted text-sm leading-relaxed">
           LLM agents receive a harness-injected <code className="bg-forge-border px-1 rounded">LLMClient</code>{" "}
           that routes through OpenRouter. You do not supply an API key — the harness handles it.
@@ -411,7 +414,7 @@ for chunk in llm.stream([...]):
       </Section>
 
       {/* Agent architecture patterns */}
-      <Section title="Agent architecture patterns">
+      <Section id="patterns" title="Agent architecture patterns">
         <p className="text-forge-muted text-sm leading-relaxed">
           The best LLM agents use a structured observe → plan → act loop rather than a single prompt.
         </p>
@@ -442,7 +445,7 @@ for chunk in llm.stream([...]):
       </Section>
 
       {/* FEA explainer */}
-      <div className="bg-forge-surface border border-forge-accent/30 rounded-xl p-4">
+      <div id="fea" className="bg-forge-surface border border-forge-accent/30 rounded-xl p-4 scroll-mt-8">
         <div className="text-xs font-bold text-forge-accent uppercase tracking-wide mb-2">What is FEA?</div>
         <p className="text-forge-muted text-sm leading-relaxed mb-2">
           FEA (Finite Element Analysis) is a structural simulation: the eval pipeline meshes your
