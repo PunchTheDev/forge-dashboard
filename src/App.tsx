@@ -21,6 +21,7 @@ import {
   stepUrl,
   fmtScore,
   metricConfig,
+  specBaseline,
   specLabel,
   sotaCodeUrl,
 } from "./lib/api";
@@ -438,6 +439,11 @@ function SotaHero({
   const meta = round ? CATEGORY_META[round.id] : null;
   const { label: metricLabel, unit, decimals } = metricConfig(sota.score_metric);
   const isMaximize = (round?.scoring_direction ?? spec?.scoring?.direction) === "maximize";
+  const baseline = spec ? specBaseline(spec.scoring) : null;
+  const baselinePct = baseline != null
+    ? (isMaximize ? (sota.score / baseline - 1) : (1 - sota.score / baseline)) * 100
+    : null;
+  const beatsBaseline = baselinePct != null && baselinePct > 0;
 
   return (
     <div className="mb-8 rounded-2xl border border-forge-border bg-forge-surface overflow-hidden">
@@ -489,6 +495,11 @@ function SotaHero({
                 {sota.score.toFixed(decimals)}
               </div>
               <div className="text-forge-muted text-xs mt-0.5">{unit}</div>
+              {baselinePct != null && (
+                <div className={`text-xs mt-1.5 font-mono ${beatsBaseline ? "text-forge-green" : "text-amber-400"}`}>
+                  {beatsBaseline ? "+" : "−"}{Math.abs(baselinePct).toFixed(1)}% vs. reference
+                </div>
+              )}
             </div>
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
