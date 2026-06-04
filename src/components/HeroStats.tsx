@@ -104,7 +104,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
             className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
             title={`Max allowable stress = ${spec.material.includes("aluminum") || spec.material.includes("stainless") ? "yield strength" : "tensile strength"} ÷ safety factor ${spec.constraints.safety_factor}×. Your design's peak von Mises stress must stay below this. MPa = megapascals (unit of pressure/stress).`}
           >
-            ≤{allowable.toFixed(0)} MPa
+            ≤{allowable.toFixed(0)} MPa stress limit
           </span>
         </div>
         <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-4">
@@ -135,7 +135,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <Stat
           label="vs. reference agent"
           value={baselineDelta && baselineSign ? `${baselineSign}${baselineDelta}%` : "—"}
-          sub={baseline != null ? `ref: ${baseline.toFixed(decimals)} ${scoreUnit} (our seed)` : undefined}
+          sub={baseline != null ? `maintainer seed: ${baseline.toFixed(decimals)} ${scoreUnit}` : undefined}
           valueColor={
             baselineRawPct == null
               ? undefined

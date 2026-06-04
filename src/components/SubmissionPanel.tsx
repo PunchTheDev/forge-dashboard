@@ -20,15 +20,23 @@ function StatusBadge({ passed }: { passed: boolean }) {
   );
 }
 
+const SHOW_LIMIT = 20;
+
 export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
-  const recent = [...submissions]
-    .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
-    .slice(0, 20);
+  const sorted = [...submissions]
+    .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime());
+  const recent = sorted.slice(0, SHOW_LIMIT);
+  const hasMore = sorted.length > SHOW_LIMIT;
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3 border-b border-forge-border">
+      <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
         <h2 className="text-sm font-semibold text-white">Recent submissions</h2>
+        {hasMore && (
+          <span className="text-xs text-forge-muted">
+            showing {SHOW_LIMIT} of {sorted.length}
+          </span>
+        )}
       </div>
 
       {loading && !submissions.length && (
