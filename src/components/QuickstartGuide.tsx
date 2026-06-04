@@ -46,6 +46,139 @@ function CodeBlock({ code }: { code: string }) {
   );
 }
 
+function RatchetChart() {
+  // Illustrative ratchet: each new #1 forks the previous and beats it by ≥0.5%.
+  // Scores shown are example mass values (grams) on a "minimize" spec — shorter bar wins.
+  const steps = [
+    { score: 28.4, label: "v1 — Alice", delta: null as string | null },
+    { score: 26.1, label: "v2 — Bob forks Alice", delta: "−8.1%" },
+    { score: 24.0, label: "v3 — Carol forks Bob", delta: "−8.0%" },
+    { score: 22.2, label: "v4 — Dave forks Carol", delta: "−7.5%" },
+  ];
+  const max = Math.max(...steps.map((s) => s.score));
+  const barW = 64;
+  const gap = 36;
+  const chartH = 90;
+  const topPad = 28; // room for delta + score labels above bars
+  const bottomPad = 48; // room for v#, author line, fork arrow row
+  const sidePad = 8;
+  const width = steps.length * barW + (steps.length - 1) * gap + sidePad * 2;
+  const height = chartH + topPad + bottomPad;
+  return (
+    <div className="mt-1">
+      <div className="text-[10px] uppercase tracking-wide text-forge-muted/70 mb-1">
+        The ratchet — each fork beats the last
+      </div>
+      <div className="overflow-x-auto">
+        <svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          className="block"
+          role="img"
+          aria-label="Illustrative chart: each new #1 forks the previous and beats it by at least 0.5 percent."
+        >
+          {steps.map((s, i) => {
+            const h = (s.score / max) * chartH;
+            const x = sidePad + i * (barW + gap);
+            const y = topPad + (chartH - h);
+            const baseY = topPad + chartH;
+            // Color ramps muted → accent as the ratchet progresses
+            const opacity = 0.4 + (i / (steps.length - 1)) * 0.6;
+            return (
+              <g key={i}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={barW}
+                  height={h}
+                  rx={3}
+                  className="fill-forge-accent"
+                  style={{ opacity }}
+                />
+                <text
+                  x={x + barW / 2}
+                  y={y - 6}
+                  textAnchor="middle"
+                  className="fill-white"
+                  style={{ fontSize: 11, fontWeight: 600 }}
+                >
+                  {s.score}g
+                </text>
+                {s.delta && (
+                  <text
+                    x={x + barW / 2}
+                    y={y - 18}
+                    textAnchor="middle"
+                    className="fill-forge-green"
+                    style={{ fontSize: 9 }}
+                  >
+                    {s.delta}
+                  </text>
+                )}
+                <text
+                  x={x + barW / 2}
+                  y={baseY + 14}
+                  textAnchor="middle"
+                  className="fill-forge-muted"
+                  style={{ fontSize: 9 }}
+                >
+                  {s.label.split(" — ")[0]}
+                </text>
+                <text
+                  x={x + barW / 2}
+                  y={baseY + 26}
+                  textAnchor="middle"
+                  className="fill-forge-muted/70"
+                  style={{ fontSize: 8 }}
+                >
+                  {s.label.split(" — ")[1]}
+                </text>
+                {i < steps.length - 1 && (
+                  <g>
+                    <path
+                      d={`M ${x + barW + 4} ${baseY + 38} L ${x + barW + gap - 4} ${baseY + 38}`}
+                      className="stroke-forge-accent/70"
+                      strokeWidth={1.2}
+                      markerEnd="url(#ratchet-arrow)"
+                      fill="none"
+                    />
+                    <text
+                      x={x + barW + gap / 2}
+                      y={baseY + 35}
+                      textAnchor="middle"
+                      className="fill-forge-accent/80"
+                      style={{ fontSize: 8 }}
+                    >
+                      fork
+                    </text>
+                  </g>
+                )}
+              </g>
+            );
+          })}
+          <defs>
+            <marker
+              id="ratchet-arrow"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" className="fill-forge-accent/60" />
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <div className="text-[10px] text-forge-muted/60 mt-0.5">
+        Illustrative — real margins vary per spec. Score axis is example mass (grams).
+      </div>
+    </div>
+  );
+}
+
 const TOC_ITEMS = [
   { id: "categories", label: "Three categories" },
   { id: "setup", label: "Step 1 — Set up" },
@@ -320,6 +453,7 @@ curl ${API_BASE_URL}/rounds/round_001/leaderboard`} />
             {" "}claims the spot — and the next person forks <em>your</em> code to try to beat you.
             That open-source ratchet is the whole flywheel.
           </p>
+          <RatchetChart />
           <p className="text-forge-muted text-xs leading-relaxed">
             Unclaimed problems have no #1 yet — any passing submission claims them outright, no
             margin required. Start there if you want fast wins, or fork a leader if you want the
