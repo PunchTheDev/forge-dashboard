@@ -226,6 +226,7 @@ export function SotaChart({ spec }: Props) {
               stroke="#6366f1"
               strokeDasharray="4 4"
               strokeWidth={1}
+              label={{ value: "#1", position: "right", fill: "#6366f1", fontSize: 10 }}
             />
             <Line
               type="stepAfter"
