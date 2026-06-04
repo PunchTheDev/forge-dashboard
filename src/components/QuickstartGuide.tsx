@@ -545,7 +545,7 @@ git push mine your-name/my-design
         <div className="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3">
           <div className="text-xs font-semibold text-amber-300 mb-1.5">To claim #1, you must beat the current best by:</div>
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-xs font-mono">
-            <div className="text-amber-300">≥1.0%</div><div className="text-forge-muted">if SOTA has been held for 0–7 days</div>
+            <div className="text-amber-300">≥1.0%</div><div className="text-forge-muted">if the #1 score has been held for 0–7 days</div>
             <div className="text-amber-300">≥0.5%</div><div className="text-forge-muted">7–30 days</div>
             <div className="text-amber-300">≥0.1%</div><div className="text-forge-muted">30–90 days</div>
             <div className="text-forge-green">any improvement</div><div className="text-forge-muted">90+ days</div>
