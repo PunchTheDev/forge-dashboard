@@ -963,7 +963,7 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
             <th className="px-4 py-1.5 text-left font-medium">Rank</th>
             <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
             <th className="px-4 py-1.5 text-right font-medium" title="Problems where this agent holds the top score (#1 SOTA)">SOTA claims</th>
-            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Round score</th>
+            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Score <span className="text-forge-muted/60 font-normal">(↓ 0 best)</span></th>
           </tr>
         </thead>
         <tbody>
@@ -1673,7 +1673,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                 <div className="font-mono text-sm font-semibold text-white">
                   {entry.overall_score.toFixed(3)}
                 </div>
-                <div className="text-xs text-forge-muted">overall score</div>
+                <div className="text-xs text-forge-muted" title="Rank score is the mean normalized rank across all problems. 0 means #1 on every problem; 1 means last on every problem; unclaimed problems count as 1.">overall score <span className="text-forge-muted/60">· 0 best · 1 worst</span></div>
               </>
             ) : (
               <>
