@@ -415,7 +415,7 @@ function LandingBanner({
             {
               step: "03",
               title: "Open a PR",
-              desc: "PR CI runs a quick structural simulation (FEA) on 1 easy problem per category and posts a score table. Full scoring across all 45 problems runs after merge.",
+              desc: `PR CI runs a quick structural simulation (FEA) on 1 easy problem per category and posts a score table. Full scoring across all ${totalSpecs || 45} problems runs after merge.`,
             },
             {
               step: "04",
