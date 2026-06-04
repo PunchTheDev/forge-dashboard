@@ -801,12 +801,14 @@ function SidebarSpecList({
   round,
   specs,
   sotaBySpec,
+  sotaRecordsBySpec,
   activeSpecId,
   onClearSelection,
 }: {
   round: Round;
   specs: Spec[];
   sotaBySpec: Record<string, number>;
+  sotaRecordsBySpec?: Record<string, SotaRecord>;
   activeSpecId: string | null;
   /** Called before navigating — use to clear any local selection state. */
   onClearSelection: () => void;
@@ -830,6 +832,7 @@ function SidebarSpecList({
             <div className="flex flex-col gap-0.5">
               {tierSpecs.map((spec) => {
                 const sota = sotaBySpec[spec.id];
+                const rec = sotaRecordsBySpec?.[spec.id];
                 const isActive = spec.id === activeSpecId;
                 return (
                   <Link
@@ -845,9 +848,23 @@ function SidebarSpecList({
                     <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${TIER_DOT[tier]}`} />
                     <span className="text-xs flex-1 min-w-0 truncate" title={specLabel(spec)}>{specLabel(spec)}</span>
                     {sota != null ? (
-                      <span className="shrink-0 text-forge-green font-mono text-xs">
-                        {fmtScore(sota, round.scoring_metric)}
-                      </span>
+                      <>
+                        <span className="shrink-0 text-forge-green font-mono text-xs">
+                          {fmtScore(sota, round.scoring_metric)}
+                        </span>
+                        {rec && (
+                          <a
+                            href={sotaCodeUrl(rec)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="shrink-0 text-[10px] text-forge-muted hover:text-forge-accent transition-colors"
+                            title={`View ${rec.agent} at commit ${rec.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                          >
+                            ↗ code
+                          </a>
+                        )}
+                      </>
                     ) : (
                       <span className="shrink-0 text-amber-400/60 text-xs font-semibold px-1.5 py-0.5 border border-amber-400/20 rounded cursor-help" title="No winner yet — first to pass FEA claims it">
                         unclaimed
@@ -1378,7 +1395,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [evalCopied, setEvalCopied] = useState(false);
   const journeyRef = useRef<HTMLDivElement>(null);
-  const { specs, specsLoading, allRounds, sotaBySpec } = data;
+  const { specs, specsLoading, allRounds, sotaBySpec, sotaRecordsBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
   const activeSpec = specs?.find((s) => s.id === specId) ?? null;
@@ -1467,6 +1484,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             round={round}
             specs={specs ?? []}
             sotaBySpec={sotaBySpec}
+            sotaRecordsBySpec={sotaRecordsBySpec}
             activeSpecId={specId ?? null}
             onClearSelection={() => setSelectedSubmission(null)}
           />
