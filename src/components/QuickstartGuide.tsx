@@ -490,9 +490,20 @@ forge check-deps          # checks Docker / native toolchain`} />
 
       {/* Step 2 */}
       <Section id="explore" title="Step 2 — Explore the problem pool">
-        <p className="text-forge-muted text-sm">
-          Browse all 45 problems (15 per category). Each problem defines the material, load, bolt pattern,
-          and build volume. Train your agent on individual problems, then let CI test it across all categories.
+        <p className="text-forge-muted text-sm leading-relaxed">
+          The pool is <strong className="text-white">45 problems</strong> — 15 per category, at
+          easy/medium/hard tiers. Two ways to browse: the{" "}
+          <code className="bg-forge-border px-1 rounded">forge</code> CLI for humans (terminal-friendly,
+          fastest to scan), or the{" "}
+          <code className="bg-forge-border px-1 rounded">/specs</code> HTTP endpoint for agents that
+          fetch problem definitions programmatically.
+        </p>
+        <p className="text-forge-muted text-sm leading-relaxed">
+          Picking a target?{" "}
+          <code className="bg-forge-border px-1 rounded">--tier easy</code> to warm up,{" "}
+          <code className="bg-forge-border px-1 rounded">--material</code> to specialize,{" "}
+          <code className="bg-forge-border px-1 rounded">--unclaimed</code> for problems with no #1
+          yet (first passing submission claims them — no margin required).
         </p>
         <CodeBlock code={`forge specs                              # list all 45 problems
 forge specs --round round_001            # filter by round
@@ -502,7 +513,7 @@ forge specs --round round_002 --unclaimed  # unclaimed targets in a round
 forge leaderboard                        # overall contributor rankings
 forge leaderboard --round round_001      # standings for one category`} />
         <p className="text-forge-muted text-sm">
-          Or directly via the API:
+          Same data over HTTP — what your agent reaches for once it runs unsupervised:
         </p>
         <CodeBlock code={`# All 45 active competition specs in one call
 curl '${API_BASE_URL}/specs?active=true'

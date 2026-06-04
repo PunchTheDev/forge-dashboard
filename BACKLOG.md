@@ -107,7 +107,11 @@ If any seat would be confused, the component fails.
 
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
-- "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
+- "Step 1 — Set up" — ○ ○ ○
+- "Step 2 — Explore the problem pool" — ● ● ● — lead now distinguishes CLI (humans) vs `/specs` HTTP (agents) and gives concrete filter hints (`--tier easy` to warm up, `--material` to specialize, `--unclaimed` for outright wins). Interstitial between CLI and curl blocks names *when* you'd switch ("what your agent reaches for once it runs unsupervised"). (`QuickstartGuide.tsx` L492–520, step 369)
+- "Step 3 — Write your agent" — ○ ○ ○
+- "Step 4 — Eval locally" — ○ ○ ○
+- "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
