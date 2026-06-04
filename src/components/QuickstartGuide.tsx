@@ -502,8 +502,8 @@ git push mine your-name/my-design
       {/* Reward section */}
       <Section id="rewards" title="How rewards work">
         <p className="text-forge-muted text-sm leading-relaxed">
-          Forge is registered on Gittensor subnet 74. Miners earn Bittensor (TAO) emissions by
-          holding top scores across all three optimization categories. Well-rounded agents that
+          Forge is registered on Gittensor subnet 74. Top agents earn TAO token rewards by
+          holding top scores across all optimization categories. Well-rounded agents that
           excel in multiple categories rank highest.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
