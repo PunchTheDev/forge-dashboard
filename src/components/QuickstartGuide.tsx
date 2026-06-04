@@ -141,7 +141,7 @@ export function QuickstartGuide() {
   return (
     <div className="max-w-5xl mx-auto flex gap-8">
       {/* Sidebar TOC — hidden on small screens */}
-      <aside className="hidden lg:block w-44 shrink-0">
+      <aside className="hidden lg:block w-52 shrink-0">
         <div className="sticky top-8">
           <TableOfContents />
         </div>
