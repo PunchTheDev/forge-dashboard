@@ -567,6 +567,7 @@ function CompactSpecTable({
   selectedTier: string | null;
   onTierChange: (tier: string | null) => void;
 }) {
+  const [unclaimedOnly, setUnclaimedOnly] = useState(false);
   const roundSpecIds = new Set(round.specs.map((s) => s.id));
   const tierMap = Object.fromEntries(round.specs.map((s) => [s.id, s.tier]));
 
@@ -575,6 +576,7 @@ function CompactSpecTable({
     .filter((s) => {
       if (!roundSpecIds.has(s.id)) return false;
       if (selectedTier && tierMap[s.id] !== selectedTier) return false;
+      if (unclaimedOnly && sotaBySpec[s.id] !== undefined) return false;
       return true;
     })
     .sort((a, b) => {
@@ -584,26 +586,36 @@ function CompactSpecTable({
     });
 
   const tiers = ["easy", "medium", "hard"].filter((t) => round.specs.some((s) => s.tier === t));
+  const unclaimedCount = round.specs.filter((s) => sotaBySpec[s.id] === undefined).length;
 
   return (
     <div className="flex flex-col gap-3">
       {/* Tier filter */}
-      <div className="flex items-center gap-1 text-xs">
+      <div className="flex items-center gap-1 text-xs flex-wrap">
         <button
           onClick={() => onTierChange(null)}
-          className={`px-2.5 py-1 rounded-lg transition-colors ${!selectedTier ? "bg-forge-accent text-white font-semibold" : "text-forge-muted hover:text-white"}`}
+          className={`px-2.5 py-1 rounded-lg transition-colors ${!selectedTier && !unclaimedOnly ? "bg-forge-accent text-white font-semibold" : "text-forge-muted hover:text-white"}`}
         >
           All
         </button>
         {tiers.map((t) => (
           <button
             key={t}
-            onClick={() => onTierChange(t)}
-            className={`px-2.5 py-1 rounded-lg transition-colors capitalize ${selectedTier === t ? `${TIER_COLORS[t]} font-semibold bg-forge-surface` : "text-forge-muted hover:text-white"}`}
+            onClick={() => { onTierChange(t); setUnclaimedOnly(false); }}
+            className={`px-2.5 py-1 rounded-lg transition-colors capitalize ${selectedTier === t && !unclaimedOnly ? `${TIER_COLORS[t]} font-semibold bg-forge-surface` : "text-forge-muted hover:text-white"}`}
           >
             {t}
           </button>
         ))}
+        {unclaimedCount > 0 && (
+          <button
+            onClick={() => { setUnclaimedOnly((v) => !v); onTierChange(null); }}
+            className={`px-2.5 py-1 rounded-lg transition-colors ${unclaimedOnly ? "bg-amber-400/20 text-amber-300 font-semibold" : "text-forge-muted hover:text-white"}`}
+            title="Show only problems with no winning submission yet — claim #1 on any of these"
+          >
+            Open ({unclaimedCount})
+          </button>
+        )}
         <span className="ml-auto text-forge-muted">{visibleSpecs.length} problems</span>
       </div>
 
