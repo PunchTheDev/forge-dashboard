@@ -345,7 +345,7 @@ function LandingBanner({
             title="'Claimed' means at least one agent has a passing FEA submission for that problem — its geometry fits in the build volume, passes wall-thickness and overhang checks, and survives structural analysis. Unclaimed problems are wide open."
           >
             <span className="text-white font-mono font-semibold">{(totalSpecs || 45) - solvedCount}</span>{" "}
-            problem{((totalSpecs || 45) - solvedCount) !== 1 ? "s" : ""} open
+            problem{((totalSpecs || 45) - solvedCount) !== 1 ? "s" : ""} unclaimed
           </span>
         </div>
 
@@ -867,7 +867,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
           );
         })()}
 
-        {/* Open Challenges */}
+        {/* Unclaimed problems by round */}
         {allRounds.length > 0 &&
           (() => {
             const solvedSpecIds = new Set((allSota ?? []).map((s) => s.spec_id));
@@ -883,9 +883,9 @@ function ProblemsLanding({ data }: { data: SharedData }) {
             return (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="text-sm font-semibold text-white">Open Challenges</div>
+                  <div className="text-sm font-semibold text-white">Unclaimed Problems</div>
                   <span className="text-xs text-forge-accent font-mono">
-                    {totalUnclaimed} open
+                    {totalUnclaimed} unclaimed
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -923,7 +923,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-forge-muted font-mono">
                             <span className="text-white font-semibold">{unclaimed}</span> /{" "}
-                            {r.specs.length} open
+                            {r.specs.length} unclaimed
                           </span>
                           <span
                             className={`text-xs font-semibold ${meta.color}`}
@@ -1861,7 +1861,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                       <div key={round.id}>
                         {meta && (
                           <div className={`text-xs font-semibold ${meta.color} mb-1.5`}>
-                            {meta.label} — {rSpecs.length} open
+                            {meta.label} — {rSpecs.length} unclaimed
                           </div>
                         )}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
