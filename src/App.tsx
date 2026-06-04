@@ -650,7 +650,7 @@ function CompactSpecTable({
                   {fmtScore(sota, round.scoring_metric)}
                 </span>
               ) : (
-                <span className="text-xs text-amber-400/60 font-semibold shrink-0 px-1.5 py-0.5 border border-amber-400/20 rounded" title="No winner yet — first passing submission claims #1">unclaimed</span>
+                <span className="text-xs text-amber-400/60 font-semibold shrink-0 px-1.5 py-0.5 border border-amber-400/20 rounded cursor-help" title="No winner yet — first passing submission claims #1">unclaimed</span>
               )}
             </Link>
           );
@@ -720,7 +720,7 @@ function SidebarSpecList({
                         {fmtScore(sota, round.scoring_metric)}
                       </span>
                     ) : (
-                      <span className="shrink-0 text-amber-400/60 text-xs font-semibold px-1.5 py-0.5 border border-amber-400/20 rounded" title="No winner yet — first to pass FEA claims it">
+                      <span className="shrink-0 text-amber-400/60 text-xs font-semibold px-1.5 py-0.5 border border-amber-400/20 rounded cursor-help" title="No winner yet — first to pass FEA claims it">
                         unclaimed
                       </span>
                     )}
