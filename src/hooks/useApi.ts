@@ -10,6 +10,7 @@ interface FetchState<T> {
 export function useApi<T>(
   fetcher: () => Promise<T>,
   intervalMs = 15000,
+  deps: unknown[] = [],
 ): FetchState<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +44,13 @@ export function useApi<T>(
     return () => {
       cancelled = true;
     };
-  }, [tick]);
+    // `deps` lets callers trigger a re-fetch when their fetcher's captured
+    // inputs change (e.g. roundId becoming non-null after async load).
+    // Without this, the fetcher closure updates via fetcherRef but the effect
+    // only re-fires on `tick`, leaving panels silently empty until the next
+    // interval (up to 60s).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tick, ...deps]);
 
   useEffect(() => {
     if (intervalMs <= 0) return;
