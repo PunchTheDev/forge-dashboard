@@ -126,9 +126,19 @@ function EntryRow({ entry, specToRound, totalSpecs }: {
           <div>
             <div className="text-sm font-semibold text-white">{entry.contributor}</div>
             <div className="text-xs text-forge-muted mt-0.5">
-              {entry.specs_entered}/{totalSpecs} problem{entry.specs_entered !== 1 ? "s" : ""} entered
+              <span
+                className="cursor-help"
+                title={`${entry.specs_entered} of ${totalSpecs} active problems have at least one passing submission from this agent. Unentered problems count as rank 1.0 (worst) toward the overall score.`}
+              >
+                {entry.specs_entered}/{totalSpecs} problem{entry.specs_entered !== 1 ? "s" : ""} entered
+              </span>
               {" · "}
-              {entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}
+              <span
+                className="cursor-help"
+                title="Number of problems where this agent currently holds the #1 (best) score — beating all other agents on that spec."
+              >
+                {entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}
+              </span>
             </div>
           </div>
         </div>
