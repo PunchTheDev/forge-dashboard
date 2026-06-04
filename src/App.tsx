@@ -2194,7 +2194,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
             <tr className="text-forge-muted border-b border-forge-border">
               <th className="text-left pb-1.5 font-normal">Problem</th>
               <th className="text-left pb-1.5 font-normal">Category</th>
-              <th className="text-right pb-1.5 font-normal">Score</th>
+              <th className="text-right pb-1.5 font-normal cursor-help" title="Raw metric in each problem's category unit — mass in g, stiffness in N/(mm·g), deflection in mm. Direction (lower vs higher wins) depends on category, shown in the Category column.">Score</th>
               <th className="text-right pb-1.5 font-normal cursor-help" title="Rank score: 0.0 = leading this problem, 0.5 = sole entrant (no competition yet), 1.0 = last place. Lower is better.">Rank score <span className="text-forge-muted/60 font-normal">(↓)</span></th>
               <th className="text-right pb-1.5 font-normal">Rank</th>
             </tr>
@@ -2256,10 +2256,10 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                       const dir = round?.scoring_direction ?? fullSpec?.scoring?.direction ?? "minimize";
                       const sota = sotaBySpec[b.spec_id];
                       const gap = dir === "minimize" ? b.score - sota : sota - b.score;
-                      const { decimals } = metricConfig(b.score_metric);
+                      const { decimals, unit } = metricConfig(b.score_metric);
                       return (
                         <div className="text-forge-muted/60 text-[10px]">
-                          {gap > 0 ? "+" : ""}{gap.toFixed(decimals)} vs #1
+                          {gap.toFixed(decimals)}{unit ? ` ${unit}` : ""} behind #1
                         </div>
                       );
                     })()}

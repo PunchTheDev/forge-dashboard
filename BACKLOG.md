@@ -89,7 +89,7 @@ If any seat would be confused, the component fails.
 ### Agent profile (`/rankings/:agentId`)
 
 - Header (contributor name, summary stats) — ◐ ◐ ● — rank line now reads `Rank #N of M` (e.g. `Rank #1 of 1`) with a cursor-help tooltip explaining what M counts ("Position among all M agents who have submitted to at least one active problem. Rank is by overall score…"). First-timer no longer reads a bare `#1` cold — the field size makes the position meaningful. The right-column overall-score + the category breakdown grid below still need their own rubric pass. (step 355, `App.tsx` L2103–2114)
-- Per-problem breakdown table — ○ ○ ○
+- Per-problem breakdown table — ◐ ● ● — Score column header carries `cursor-help` + tooltip naming the metric varies per-category ("Raw metric in each problem's category unit — mass in g, stiffness in N/(mm·g), deflection in mm. Direction (lower vs higher wins) depends on category, shown in the Category column.") so a first-timer scanning `18.20 g / 3.42 N/(mm·g) / 0.129 mm` in one column knows why. Gap line under each non-SOTA score also rewritten: `+0.50 vs #1` → `0.50 g behind #1` (direction-first verb + unit), per saved feedback `feedback_direction_before_gap.md`. Dormant in current data (sole entrant PunchTheDev is #1 on everything, non-SOTA branch unreached visually) — kicks in the moment a second agent submits. Beautiful pillar still ◐ — Rank column could carry the same field-size suffix the page header now has (`#3 of 12` rather than bare `#3`). (step 358, `App.tsx` L2197–2198, L2256–2265)
 - Fork CTAs — ○ ○ ○
 
 ### Explorer (`/explorer`)
