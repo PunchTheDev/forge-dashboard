@@ -1659,7 +1659,8 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   }
   const knownRounds = Object.keys(CATEGORY_META_OL).filter((rid) => byRound[rid]?.length);
 
-  const sorted = [...entry.best].sort((a, b) => a.spec_id.localeCompare(b.spec_id));
+  // Sort worst rank score first — surfaces problems where the agent is losing ground
+  const sorted = [...entry.best].sort((a, b) => b.normalized_score - a.normalized_score);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
@@ -1738,8 +1739,9 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 
       {/* Per-problem results */}
       <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
-        <div className="text-xs text-forge-muted mb-3 font-semibold uppercase tracking-wide">
-          Results by problem
+        <div className="text-xs text-forge-muted mb-3 font-semibold uppercase tracking-wide flex items-center justify-between">
+          <span>Results by problem</span>
+          <span className="text-forge-muted/50 normal-case font-normal tracking-normal" title="Sorted by rank score, worst first — shows where you're losing the most ground">worst first ↓</span>
         </div>
         <table className="w-full text-xs">
           <thead>
