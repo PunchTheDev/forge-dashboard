@@ -1549,7 +1549,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                               {rs.tier}
                             </span>
                             <span className="flex-1 min-w-0 font-mono text-white/70 truncate">
-                              {fullSpec?.name?.replace(/ — .*$/, "") ?? rs.id}
+                              {fullSpec?.name?.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "") ?? rs.id}
                             </span>
                             {sota != null ? (
                               <span className="shrink-0 text-forge-muted font-mono">
