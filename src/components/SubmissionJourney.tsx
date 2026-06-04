@@ -71,8 +71,19 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
         ? (displayScore / baseline - 1) * 100
         : (1 - displayScore / baseline) * 100
       : null;
-  const baselinePct = baselinePctRaw != null
-    ? `${baselinePctRaw >= 0 ? "+" : "−"}${Math.abs(baselinePctRaw).toFixed(1)}`
+  // Direction-anchored phrasing: a bare "+2.3% vs. reference" only reads as good news if
+  // you already know whether higher or lower wins. Lead with the metric-specific verb
+  // (heavier/lighter, stiffer/short, more/less deflection) so the sign-of-good-news is
+  // explicit before the number. Same vocabulary as HeroStats maintainer-reference banner.
+  const baselineVerb = baselinePctRaw != null
+    ? metric === "mass_grams"
+      ? baselinePctRaw >= 0 ? "lighter than" : "heavier than"
+      : isMaximize
+      ? baselinePctRaw >= 0 ? "stiffer than" : "short of"
+      : baselinePctRaw >= 0 ? "less deflection than" : "more deflection than"
+    : null;
+  const baselineDirPhrase = baselinePctRaw != null && baselineVerb != null
+    ? `${Math.abs(baselinePctRaw).toFixed(1)}% ${baselineVerb} maintainer's baseline`
     : null;
   const sotaScore = sota ? sota.score : null;
   const vsSOTA = sotaScore != null ? (isMaximize ? displayScore - sotaScore : sotaScore - displayScore) : null;
@@ -121,8 +132,8 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
       label: "Score",
       passed: submission.passed,
       detail: submission.passed
-        ? baselinePct != null
-          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${baselinePct}% vs. reference`
+        ? baselineDirPhrase != null
+          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${baselineDirPhrase.replace(" maintainer's baseline", " baseline")}`
           : `${displayScore.toFixed(decimals)} ${scoreUnit}`
         : similarityFailed && failReason
           ? failReason
@@ -173,12 +184,12 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
                 {displayScore.toFixed(decimals)}
                 <span className="text-sm text-forge-muted ml-1">{scoreUnit}</span>
               </div>
-              {baselinePct != null && baseline != null && (
+              {baselineDirPhrase != null && baseline != null && (
                 <div
                   className="text-xs text-forge-muted mt-0.5 cursor-help"
-                  title={`vs. maintainer's baseline = compared to the reference design the problem author submitted. This is context only — your goal is to beat the current #1, not the baseline. Baseline: ${baseline.toFixed(decimals)} ${scoreUnit}.`}
+                  title={`Maintainer's baseline = the reference design the problem author submitted. This is context only — your goal is to beat the current #1, not the baseline. Baseline: ${baseline.toFixed(decimals)} ${scoreUnit}.`}
                 >
-                  {baselinePct}% vs. maintainer's baseline ({baseline.toFixed(decimals)} {scoreUnit})
+                  {baselineDirPhrase} ({baseline.toFixed(decimals)} {scoreUnit})
                 </div>
               )}
             </div>
