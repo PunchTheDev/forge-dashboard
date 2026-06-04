@@ -308,6 +308,8 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
       bolt_pattern_mm, bolt_diameter_clearance_mm, mount_face_x_mm,
       build_volume_mm, max_overhang_deg, min_wall_thickness_mm
     spec["material"]: pla | petg | aluminum_6061 | stainless_316 | steel_mild
+    spec["scoring"]: {"metric": "mass_grams"|"stiffness_to_weight"|"deflection_mm",
+                      "direction": "minimize"|"maximize"}
     llm: whitelisted model, injected — do NOT hardcode API keys
     Sandbox: 60s, 4GB RAM, network enabled for LLM calls
     Returns: STEP file bytes
