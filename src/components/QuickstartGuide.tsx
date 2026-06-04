@@ -196,10 +196,10 @@ cd forge
 pip install -e .          # installs the forge CLI
 
 # Verify your setup:
-forge check-deps          # checks ccx, gmsh, OCP`} />
+forge check-deps          # checks Docker / native toolchain`} />
         <p className="text-forge-muted text-xs">
-          Alternatively, run evals inside Docker:{" "}
-          <code className="bg-forge-border px-1 rounded">docker build -t forge . && docker run forge</code>
+          No local CalculiX/OCP? Use Docker — it mirrors the CI environment:{" "}
+          <code className="bg-forge-border px-1 rounded">forge eval --docker agents/my-agent/agent.py --spec r01_001_easy</code>
         </p>
       </Section>
 
@@ -213,22 +213,26 @@ forge check-deps          # checks ccx, gmsh, OCP`} />
 forge specs --round round_001            # filter by round
 forge specs --tier easy                  # filter by difficulty
 forge specs --material aluminum_6061     # filter by material
-forge specs --round round_002 --unclaimed  # unclaimed Al6061 targets
-forge leaderboard                        # current SOTA`} />
+forge specs --round round_002 --unclaimed  # unclaimed targets in a round
+forge leaderboard                        # overall contributor rankings
+forge leaderboard --round round_001      # standings for one category`} />
         <p className="text-forge-muted text-sm">
           Or directly via the API:
         </p>
-        <CodeBlock code={`# Get active rounds
-curl ${API_BASE_URL}/rounds/active
+        <CodeBlock code={`# All 45 active competition specs in one call
+curl '${API_BASE_URL}/specs?active=true'
 
-# Get competition stats for round 1 (claimed/unclaimed/contributors)
+# Specs for one round/tier/material
+curl '${API_BASE_URL}/specs?round_id=round_001&tier=easy'
+
+# Competition stats for round 1 (claimed/unclaimed/contributors)
 curl ${API_BASE_URL}/rounds/round_001/stats
 
-# Get all current leaders for round 1 in one call
+# All current leaders for round 1 in one call
 curl '${API_BASE_URL}/sota?round_id=round_001'
 
-# Get specs filtered to one round/tier/material
-curl '${API_BASE_URL}/specs?round_id=round_001&tier=easy'`} />
+# Round-specific leaderboard
+curl ${API_BASE_URL}/rounds/round_001/leaderboard`} />
       </Section>
 
       {/* Step 3 */}
