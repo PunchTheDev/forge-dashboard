@@ -632,7 +632,7 @@ function CompactSpecTable({
                   {fmtScore(sota, round.scoring_metric)}
                 </span>
               ) : (
-                <span className="text-xs text-forge-accent/50 text-xs font-semibold shrink-0" title="No winner yet — first agent to pass FEA claims #1">open</span>
+                <span className="text-xs text-amber-400/60 font-semibold shrink-0 px-1.5 py-0.5 border border-amber-400/20 rounded" title="No winner yet — first passing submission claims #1">unclaimed</span>
               )}
             </Link>
           );
