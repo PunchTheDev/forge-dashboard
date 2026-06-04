@@ -120,6 +120,7 @@ interface SharedData {
   allRounds: Round[];
   allSota: SotaRecord[] | null;
   sotaBySpec: Record<string, number>;
+  sotaRecordsBySpec: Record<string, SotaRecord>;
   overallData: import("./lib/api").OverallLeaderboard | null;
   overallLoading: boolean;
   roundSolvedCount: number;
@@ -641,12 +642,14 @@ function CompactSpecTable({
   round,
   specs,
   sotaBySpec,
+  sotaRecordsBySpec,
   selectedTier,
   onTierChange,
 }: {
   round: Round;
   specs: Spec[];
   sotaBySpec: Record<string, number>;
+  sotaRecordsBySpec?: Record<string, SotaRecord>;
   selectedTier: string | null;
   onTierChange: (tier: string | null) => void;
 }) {
@@ -746,16 +749,34 @@ function CompactSpecTable({
                 <div className="text-[10px] font-mono text-forge-muted/50 truncate" title={`CLI: forge eval ... --spec ${spec.id}`}>{spec.id}</div>
               </div>
               {sota != null ? (
-                <span
-                  className="flex items-center gap-1.5 shrink-0 cursor-help"
-                  title={`#1 score so far — ${fmtScore(sota, round.scoring_metric)}. Beat it by the required margin to take the top spot.`}
-                >
-                  <span className="text-[10px] font-semibold text-forge-green/70 px-1.5 py-0.5 border border-forge-green/30 rounded uppercase tracking-wide">
-                    #1
+                <span className="flex items-center gap-1.5 shrink-0">
+                  <span
+                    className="flex items-center gap-1.5 cursor-help"
+                    title={`#1 score so far — ${fmtScore(sota, round.scoring_metric)}. Beat it by the required margin to take the top spot.`}
+                  >
+                    <span className="text-[10px] font-semibold text-forge-green/70 px-1.5 py-0.5 border border-forge-green/30 rounded uppercase tracking-wide">
+                      #1
+                    </span>
+                    <span className="text-xs font-mono text-forge-green">
+                      {fmtScore(sota, round.scoring_metric)}
+                    </span>
                   </span>
-                  <span className="text-xs font-mono text-forge-green">
-                    {fmtScore(sota, round.scoring_metric)}
-                  </span>
+                  {(() => {
+                    const rec = sotaRecordsBySpec?.[spec.id];
+                    if (!rec) return null;
+                    return (
+                      <a
+                        href={sotaCodeUrl(rec)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[10px] text-forge-muted hover:text-forge-accent transition-colors whitespace-nowrap"
+                        title={`View ${rec.agent} at commit ${rec.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                      >
+                        ↗ code
+                      </a>
+                    );
+                  })()}
                 </span>
               ) : (
                 <span className="text-xs text-amber-400/60 font-semibold shrink-0 px-1.5 py-0.5 border border-amber-400/20 rounded cursor-help" title="No winner yet — first passing submission claims #1">unclaimed</span>
@@ -1177,7 +1198,7 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
 function CategoryPage({ data }: { data: SharedData }) {
   const { roundId } = useParams<{ roundId: string }>();
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const { specs, specsLoading, allRounds, sotaBySpec } = data;
+  const { specs, specsLoading, allRounds, sotaBySpec, sotaRecordsBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
 
@@ -1341,6 +1362,7 @@ function CategoryPage({ data }: { data: SharedData }) {
           round={round}
           specs={specs ?? []}
           sotaBySpec={sotaBySpec}
+          sotaRecordsBySpec={sotaRecordsBySpec}
           selectedTier={selectedTier}
           onTierChange={setSelectedTier}
         />
@@ -2324,6 +2346,7 @@ export default function App() {
     allRounds: activeRounds,
     allSota: allSota ?? null,
     sotaBySpec,
+    sotaRecordsBySpec,
     overallData: overallData ?? null,
     overallLoading,
     roundSolvedCount,
