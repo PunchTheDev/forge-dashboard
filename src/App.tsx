@@ -1027,6 +1027,14 @@ function CategoryPage({ data }: { data: SharedData }) {
   }, [roundLabel]);
 
   if (!round) {
+    // Still loading — allRounds hasn't populated yet
+    if (allRounds.length === 0 && !specs) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-6 text-forge-muted text-sm">
+          Loading…
+        </div>
+      );
+    }
     // Legacy URL pattern: /problems/:specId (pre-round routing).
     // If roundId matches a spec that belongs to a known round, redirect there.
     const ownerRound = allRounds.find((r) => r.specs.some((sp) => sp.id === roundId));
