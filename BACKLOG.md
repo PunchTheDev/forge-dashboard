@@ -108,7 +108,7 @@ If any seat would be confused, the component fails.
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
-- "Whitelisted models" — ○ ○ ○
+- "Whitelisted models" — ● ● ● — `QuickstartGuide.tsx` L604–676 (step 366). Lead rewritten to explain the whitelist↔`FORGE_MODEL` relationship up front (was buried in trailing footnote). Chips regrouped by provider (uppercase header per provider with count: `ANTHROPIC · 7`, `OPENAI · 2`, `DEEPSEEK · 3`, `META · 2`, `GOOGLE · 2`, `MISTRAL · 1`, `QWEN · 1`), provider prefix stripped from chip text (`anthropic/claude-haiku-4-5` → `claude-haiku-4-5`). Footnote replaced with dotted-underline tooltip on `FORGE_MODEL_WHITELIST` (245 chars) naming the env var, where it's read (`forge.sdk.llm`), and the rejection point (before OpenRouter).
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
 - "How rewards work" — ○ ○ ○

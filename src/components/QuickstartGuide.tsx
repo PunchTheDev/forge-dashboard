@@ -605,18 +605,38 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
       <Section id="models" title="Whitelisted models">
         <p className="text-forge-muted text-sm leading-relaxed">
           LLM agents receive a harness-injected <code className="bg-forge-border px-1 rounded">LLMClient</code>{" "}
-          that routes through OpenRouter. You do not supply an API key — the harness handles it.
-          Full list in{" "}
+          that routes through OpenRouter — you never supply an API key. The whitelist below is the
+          candidate set; the harness picks <strong className="text-white">one</strong> model per eval via
+          the <code className="bg-forge-border px-1 rounded">FORGE_MODEL</code> env var. Your agent
+          cannot read or override it, so write prompts that hold up across the whole list.
+        </p>
+        <p className="text-forge-muted text-sm leading-relaxed">
+          Authoritative list lives in{" "}
           <a href={`${FORGE_REPO}/blob/main/config/model-whitelist.txt`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">
             config/model-whitelist.txt
-          </a>
-          :
+          </a>{" "}
+          — this page is a mirror, grouped by provider:
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          {WHITELISTED_MODELS.map((m) => (
-            <div key={m.id} className="flex items-center gap-2 bg-forge-bg border border-forge-border rounded px-2.5 py-1.5">
-              <span className="text-white text-xs font-mono flex-1 min-w-0 truncate">{m.id}</span>
-              <span className="text-forge-muted text-xs shrink-0">{m.provider}</span>
+        <div className="flex flex-col gap-3">
+          {Object.entries(
+            WHITELISTED_MODELS.reduce<Record<string, typeof WHITELISTED_MODELS>>((acc, m) => {
+              (acc[m.provider] ||= []).push(m);
+              return acc;
+            }, {}),
+          ).map(([provider, models]) => (
+            <div key={provider} className="flex flex-col gap-1">
+              <div className="text-[10px] uppercase tracking-wide text-forge-muted font-semibold">
+                {provider} <span className="text-forge-muted/60">· {models.length}</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                {models.map((m) => (
+                  <div key={m.id} className="bg-forge-bg border border-forge-border rounded px-2.5 py-1.5">
+                    <span className="text-white text-xs font-mono truncate block">
+                      {m.id.replace(`${provider.toLowerCase()}/`, "").replace("meta-llama/", "").replace("mistralai/", "")}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -630,9 +650,15 @@ response = llm.chat([
 # You can also stream:
 for chunk in llm.stream([...]):
     print(chunk, end="", flush=True)`} />
-        <p className="text-forge-muted text-xs">
-          The model is fixed by the harness via <code className="bg-forge-border px-1 rounded">FORGE_MODEL</code>.
-          Your agent cannot override the model — this prevents gaming through model selection.
+        <p className="text-forge-muted text-xs leading-relaxed">
+          The whitelist is enforced by{" "}
+          <span
+            className="border-b border-dotted border-forge-muted/50 cursor-help"
+            title="FORGE_MODEL_WHITELIST is a comma-separated env var read by forge.sdk.llm at chat time. If FORGE_MODEL is not in this list, the LLMClient refuses the call before it hits OpenRouter — agents cannot reach a non-listed model even by guessing its ID."
+          >
+            <code className="bg-forge-border px-1 rounded">FORGE_MODEL_WHITELIST</code>
+          </span>
+          {" "}— calls to any model outside this list are rejected before they leave your container.
         </p>
       </Section>
 
