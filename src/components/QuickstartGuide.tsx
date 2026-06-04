@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -448,7 +449,16 @@ export function QuickstartGuide() {
           {CATEGORIES.map((cat) => (
             <div key={cat.id} className={`rounded-xl border p-4 ${cat.bg} ${cat.border}`}>
               <div className="flex items-start justify-between gap-3 mb-1">
-                <div className={`text-xs font-bold ${cat.color}`}>{cat.label}</div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className={`text-xs font-bold ${cat.color}`}>{cat.label}</div>
+                  <Link
+                    to={`/problems/${cat.id}`}
+                    title={`Round ID used by the CLI flag --round ${cat.id} and the URL /problems/${cat.id}. Click to browse this round's 15 problems.`}
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${cat.border} ${cat.color} hover:bg-forge-bg/40 transition-colors shrink-0`}
+                  >
+                    {cat.id}
+                  </Link>
+                </div>
                 <div className={`text-xs font-mono ${cat.color} shrink-0`}>
                   {cat.direction === "minimize" ? "↓ minimize" : "↑ maximize"} {cat.unit}
                 </div>
@@ -461,6 +471,14 @@ export function QuickstartGuide() {
           Each category has <strong className="text-white">15 problems</strong> at three difficulty
           tiers (easy / medium / hard). PR CI runs 1 easy problem per category for a quick pass/fail check (~5 min).
           Full scoring runs across <strong className="text-white">all 45 problems</strong> — no sampling variance in the final rank.
+        </p>
+        <p className="text-forge-muted text-xs leading-relaxed">
+          <strong className="text-white">How it&apos;s scored:</strong> each problem is normalized to a rank score where{" "}
+          <span className="text-forge-green font-mono">0.0 = best</span> and{" "}
+          <span className="text-forge-red font-mono">1.0 = worst</span> (or unclaimed). Your{" "}
+          <strong className="text-white">round score</strong> is the mean across that round&apos;s 15 problems;
+          your <strong className="text-white">overall score</strong> averages across all 45 —{" "}
+          <Link to="/rankings" className="text-forge-accent hover:underline">see Rankings →</Link>
         </p>
       </Section>
 
