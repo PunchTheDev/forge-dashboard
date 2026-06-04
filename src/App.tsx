@@ -74,10 +74,11 @@ const API_DOCS_URL = `${API_BASE_URL}/docs`;
 
 const CATEGORY_META: Record<
   string,
-  { icon: string; color: string; bgColor: string; borderColor: string; hex: string }
+  { icon: string; tooltip: string; color: string; bgColor: string; borderColor: string; hex: string }
 > = {
   round_001: {
     icon: "⚖",
+    tooltip: "Mass optimization — minimize total part weight while surviving the applied load",
     color: "text-forge-green",
     bgColor: "bg-forge-green/10",
     borderColor: "border-forge-green/40",
@@ -85,6 +86,7 @@ const CATEGORY_META: Record<
   },
   round_002: {
     icon: "⊕",
+    tooltip: "Stiffness/weight ratio — maximize structural stiffness per gram of material used",
     color: "text-forge-accent",
     bgColor: "bg-forge-accent/10",
     borderColor: "border-forge-accent/40",
@@ -92,6 +94,7 @@ const CATEGORY_META: Record<
   },
   round_003: {
     icon: "↕",
+    tooltip: "Deflection minimization — minimize load-point displacement under the applied force",
     color: "text-forge-red",
     bgColor: "bg-forge-red/10",
     borderColor: "border-forge-red/40",
@@ -267,12 +270,12 @@ function LandingBanner({
                       to={`/problems/${r.id}`}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:opacity-80 ${meta.bgColor} ${meta.borderColor}`}
                     >
-                      <span className={`text-sm ${meta.color}`}>{meta.icon}</span>
+                      <span className={`text-sm ${meta.color}`} title={meta.tooltip}>{meta.icon}</span>
                       <span className="text-xs font-medium text-white">
                         {r.name.replace(/Round \d+ — /, "")}
                       </span>
                       <span className="text-xs text-forge-muted font-mono">
-                        {r.specs.length} specs
+                        {r.specs.length} problems
                       </span>
                     </Link>
                   );
@@ -316,9 +319,9 @@ function LandingBanner({
             {agentCount !== 1 ? "s" : ""} competing
           </span>
           <span className="text-forge-border">·</span>
-          <span title="'Solved' = at least one agent has a passing FEA submission for that spec">
+          <span title="'Claimed' = at least one agent has a passing FEA submission for that problem">
             <span className="text-white font-mono font-semibold">{solvedCount}</span> /{" "}
-            {totalSpecs || 45} specs claimed
+            {totalSpecs || 45} problems claimed
           </span>
         </div>
 
@@ -494,7 +497,7 @@ function CategoryCard({
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
-          <div className="text-2xl mb-2">{meta.icon}</div>
+          <div className="text-2xl mb-2" title={meta.tooltip}>{meta.icon}</div>
           <div className="text-white font-bold text-sm">{round.name.replace(/Round \d+ — /, "")}</div>
           <div className="text-forge-muted text-xs mt-0.5 leading-relaxed max-w-xs">
             {round.description}
@@ -618,7 +621,7 @@ function CompactSpecTable({
                   {fmtScore(sota, round.scoring_metric)}
                 </span>
               ) : (
-                <span className="text-xs text-forge-muted shrink-0">unclaimed</span>
+                <span className="text-xs text-forge-accent/50 text-xs font-semibold shrink-0" title="No SOTA claimed yet — first passing submission wins">open</span>
               )}
             </button>
           );
@@ -855,7 +858,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                 <div className="flex items-center gap-2 mb-3">
                   <div className="text-sm font-semibold text-white">Open Challenges</div>
                   <span className="text-xs text-forge-accent font-mono">
-                    {totalUnclaimed} specs unclaimed
+                    {totalUnclaimed} open
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -922,7 +925,7 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
           Round standings
         </span>
         <span className="text-xs text-forge-muted">
-          {lb.entries.length} competitor{lb.entries.length !== 1 ? "s" : ""} · {lb.total_specs} specs
+          {lb.entries.length} competitor{lb.entries.length !== 1 ? "s" : ""} · {lb.total_specs} problems
         </span>
       </div>
       <table className="w-full text-xs">
@@ -1029,7 +1032,7 @@ function CategoryPage({ data }: { data: SharedData }) {
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-xl ${meta.color}`}>{meta.icon}</span>
+            <span className={`text-xl ${meta.color}`} title={meta.tooltip}>{meta.icon}</span>
             <div>
               <div className="text-xs text-forge-muted font-mono uppercase tracking-wider mb-0.5">
                 {round.name.match(/Round \d+/)?.[0] ?? round.id}
@@ -1288,7 +1291,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1 text-xs text-forge-muted">
-            <span>Spec JSON:</span>
+            <span>Problem definition (JSON):</span>
             <a
               href={`${API_BASE_URL}/specs/${activeSpec.id}`}
               target="_blank"
@@ -1474,7 +1477,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 
         {/* Category breakdown */}
         {knownRounds.length > 0 && (
-          <div className="grid grid-cols-3 gap-2 mt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
             {knownRounds.map((rid) => {
               const meta = CATEGORY_META_OL[rid];
               const bests = byRound[rid];
@@ -1483,12 +1486,12 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               const rep = bests.find((b) => b.rank === 1) ?? bests[0];
               return (
                 <div key={rid} className={`rounded-lg border px-3 py-2 ${meta.bg} ${meta.border}`}>
-                  <div className={`text-xs font-semibold ${meta.color} mb-1`}>{meta.label}</div>
+                  <div className={`text-xs font-semibold ${meta.color} mb-1 truncate`}>{meta.label}</div>
                   <div className="text-xs text-white font-mono">
                     {fmtScore(rep.score, rep.score_metric)}
                   </div>
                   <div className="text-xs text-forge-muted mt-0.5">
-                    {bests.length} spec{bests.length !== 1 ? "s" : ""}
+                    {bests.length} problem{bests.length !== 1 ? "s" : ""}
                     {wins > 0 && (
                       <span className="text-yellow-400">
                         {" · "}{wins} win{wins !== 1 ? "s" : ""}
@@ -1573,7 +1576,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
         </table>
       </div>
 
-      {/* Unentered specs — show what's dragging the overall score up */}
+      {/* Unentered problems — show what's dragging the overall score up */}
       {(() => {
         const enteredIds = new Set(entry.best.map((b) => b.spec_id));
         const unenteredByRound = allRounds
@@ -1591,11 +1594,11 @@ function AgentDetailPage({ data }: { data: SharedData }) {
           <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
             <div className="flex items-center justify-between mb-1">
               <div className="text-xs font-semibold text-white">
-                Unentered specs — {totalUnentered} missing
+                Unentered problems — {totalUnentered} missing
               </div>
               <div
-                className="text-xs text-forge-muted"
-                title="Each unentered spec contributes 1.0 (worst possible percentile) to your overall score"
+                className="text-xs text-forge-muted cursor-help underline decoration-dotted decoration-forge-muted/50"
+                title="Each unentered problem contributes 1.0 (worst possible percentile) to your overall score"
               >
                 each scores 1.0
               </div>

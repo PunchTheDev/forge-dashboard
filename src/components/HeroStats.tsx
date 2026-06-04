@@ -94,7 +94,10 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
             {loadKg} kg load
           </span>
-          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
+          <span
+            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+            title={`Safety factor ${spec.constraints.safety_factor}× — yield stress ÷ SF = max allowable stress. Higher = stricter design requirement.`}
+          >
             SF {spec.constraints.safety_factor}×
           </span>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
