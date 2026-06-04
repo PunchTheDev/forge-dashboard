@@ -508,6 +508,7 @@ git push mine your-name/my-design
               {[
                 ["GET /rounds/active", "Active competition rounds"],
                 ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed problems, contributors"],
+                ["GET /rounds/{id}/leaderboard", "Per-round contributor rankings (same as /rankings?tab={id})"],
                 ["GET /specs", "List all problems with filters: active, unclaimed, tier, round, material"],
                 ["GET /specs/{id}", "Single problem definition (constraints, material, scoring, tier, round_id)"],
                 ["GET /sota", "Current #1 score for all problems (filter: ?round_id=round_001)"],
