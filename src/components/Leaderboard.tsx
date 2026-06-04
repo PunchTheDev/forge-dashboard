@@ -110,13 +110,10 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                   : ((baseline - score) / baseline) * 100
                 : null;
               // positive rawPct = entry beats the reference in the optimization direction
-              const improvePct = rawPct != null ? Math.abs(rawPct).toFixed(1) : null;
-              const improveSign =
-                rawPct == null
-                  ? null
-                  : rawPct >= 0
-                    ? (direction === "maximize" ? "+" : "−") // better than reference
-                    : (direction === "maximize" ? "−" : "+"); // worse than reference
+              const beatRef = rawPct != null && rawPct >= 0;
+              const refDisplay = rawPct != null
+                ? `${beatRef ? "+" : "−"}${Math.abs(rawPct).toFixed(1)}%`
+                : null;
               return (
                 <tr
                   key={s.id}
@@ -154,9 +151,9 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                   </td>
                   {baseline != null && (
                   <td className="px-4 py-2.5 text-right hidden sm:table-cell">
-                    {improvePct && improveSign && (
-                      <span className={`font-mono text-xs ${improveSign === "+" && direction !== "maximize" ? "text-forge-red" : "text-forge-green"}`}>
-                        {improveSign}{improvePct}%
+                    {refDisplay && (
+                      <span className={`font-mono text-xs ${beatRef ? "text-forge-green" : "text-amber-400"}`}>
+                        {refDisplay}
                       </span>
                     )}
                   </td>
