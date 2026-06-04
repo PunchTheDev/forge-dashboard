@@ -1623,6 +1623,8 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               const meta = roundId ? CATEGORY_META_OL[roundId] : null;
               const isSota = b.rank === 1;
               const pct = b.normalized_score * 100;
+              // normalized_score = rank / (agents + 1). If sole entrant: 1 / (1+1) = 0.5
+              const isSoleEntrant = b.rank === 1 && Math.abs(b.normalized_score - 0.5) < 0.001;
               const normColor =
                 pct <= 80
                   ? "text-forge-green"
@@ -1656,7 +1658,13 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     {fmtScore(b.score, b.score_metric)}
                   </td>
                   <td className={`py-1.5 text-right font-mono ${normColor}`}>
-                    {pct.toFixed(1)}%
+                    {isSoleEntrant ? (
+                      <span title="Only agent on this problem — auto-scored at 50th percentile (rank ÷ (agents + 1))">
+                        Sole entrant
+                      </span>
+                    ) : (
+                      `${pct.toFixed(1)}%`
+                    )}
                   </td>
                   <td className="py-1.5 text-right">
                     {isSota ? (

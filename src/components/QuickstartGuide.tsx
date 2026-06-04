@@ -395,7 +395,7 @@ for chunk in llm.stream([...]):
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
           {[
-            { term: "Von Mises stress", def: "Combined stress scalar — FEA pass/fail gate" },
+            { term: "Von Mises stress", def: "A single number (MPa) summarizing all stress directions at a point — used as the FEA pass/fail gate" },
             { term: "Deflection (mm)", def: "Tip displacement under load — category 3 metric" },
             { term: "Stiffness/weight", def: "Load ÷ deflection ÷ mass — category 2 metric" },
           ].map((item) => (

@@ -162,9 +162,9 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <Stat
           label="Passing entries"
           value={String(submissionCount)}
-          sub="designs that survived FEA"
+          sub="passed structural simulation"
           accent
-          title="A passing entry fits in the build volume, has bolt hole clearance, meets wall thickness and overhang constraints, and survives FEA (peak stress ≤ yield / safety factor)."
+          title="A passing entry fits in the build volume, has bolt hole clearance, meets wall thickness and overhang constraints, and survives FEA — finite element analysis — where the peak von Mises stress must stay below yield strength ÷ safety factor."
         />
       </div>
 
