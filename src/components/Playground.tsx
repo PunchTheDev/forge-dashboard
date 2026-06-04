@@ -229,8 +229,8 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                           {fmtScore(sota, s.scoring?.metric ?? "mass_grams")}
                         </span>
                       ) : (
-                        <span className="text-[10px] text-forge-accent/60 font-semibold shrink-0" title="No submissions yet">
-                          open
+                        <span className="text-[10px] text-amber-400/60 font-semibold shrink-0 px-1 border border-amber-400/20 rounded" title="No submissions yet">
+                          unclaimed
                         </span>
                       )}
                     </button>
