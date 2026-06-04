@@ -702,8 +702,8 @@ function SidebarSpecList({
                         {fmtScore(sota, round.scoring_metric)}
                       </span>
                     ) : (
-                      <span className="shrink-0 text-forge-accent/50 text-xs font-semibold" title="No winner yet — first to pass FEA claims it">
-                        open
+                      <span className="shrink-0 text-amber-400/60 text-xs font-semibold px-1.5 py-0.5 border border-amber-400/20 rounded" title="No winner yet — first to pass FEA claims it">
+                        unclaimed
                       </span>
                     )}
                   </Link>
