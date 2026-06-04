@@ -116,14 +116,34 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           </clipPath>
           <g clipPath={`url(#wall-clip-${spec.id})`}>{hatchLines}</g>
           <rect x={0} y={0} width={sLpad - 2} height={SH} fill="#1f2937" opacity={0.7} />
-          <line
-            x1={sLpad - 2}
-            y1={sVpad - 4}
-            x2={sLpad - 2}
-            y2={SH - sVpad + 4}
-            stroke="#6b7280"
-            strokeWidth={2}
-          />
+          <g style={{ cursor: "help" }}>
+            <title>
+              Fixed wall. The bracket bolts flush to this face and must hold the load
+              cantilevered out at the far end of the arm — nothing supports the tip.
+            </title>
+            <line
+              x1={sLpad - 2}
+              y1={sVpad - 4}
+              x2={sLpad - 2}
+              y2={SH - sVpad + 4}
+              stroke="#6b7280"
+              strokeWidth={2}
+            />
+            {/* WALL label — rotated, in the hatched region so the fixed face reads instantly */}
+            <text
+              x={sLpad / 2 - 1}
+              y={SH / 2}
+              textAnchor="middle"
+              fill="#9ca3af"
+              fontSize={7}
+              fontFamily="monospace"
+              letterSpacing={1}
+              opacity={0.85}
+              transform={`rotate(-90 ${sLpad / 2 - 1} ${SH / 2})`}
+            >
+              WALL
+            </text>
+          </g>
 
           {/* Build volume box */}
           <rect
@@ -188,18 +208,23 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             />
           ))}
 
-          {/* Load point */}
-          <circle cx={lpX} cy={lpZ} r={4} fill={color} opacity={0.9} />
-          {/* Load arrow (downward) with force label */}
-          <line
-            x1={lpX}
-            y1={lpZ + 4}
-            x2={lpX}
-            y2={lpZ + 18}
-            stroke={color}
-            strokeWidth={2}
-            markerEnd={`url(#arrow-${spec.id})`}
-          />
+          {/* Load point + arrow, wrapped in a help tooltip */}
+          <g style={{ cursor: "help" }}>
+            <title>
+              {`The ${fmt(c.load_newtons, 0)} N (${fmt(c.load_newtons / 9.81, 1)} kg) load pulls straight down here, at the tip of the arm. Your part has to carry it without yielding — that's what the safety factor of ${c.safety_factor}× guards against.`}
+            </title>
+            <circle cx={lpX} cy={lpZ} r={4} fill={color} opacity={0.9} />
+            {/* Load arrow (downward) with force label */}
+            <line
+              x1={lpX}
+              y1={lpZ + 4}
+              x2={lpX}
+              y2={lpZ + 18}
+              stroke={color}
+              strokeWidth={2}
+              markerEnd={`url(#arrow-${spec.id})`}
+            />
+          </g>
           <text
             x={lpX + 5}
             y={lpZ + 16}
@@ -208,7 +233,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             fontFamily="monospace"
             opacity={0.85}
           >
-            {fmt(c.load_newtons, 0)}N
+            <tspan fontWeight="bold">load</tspan> {fmt(c.load_newtons, 0)}N
           </text>
           <defs>
             <marker
@@ -261,7 +286,10 @@ export function SpecDiagram({ spec, compact = false }: Props) {
 
       {/* Front view — bolt pattern (hidden in compact mode) */}
       {!compact && <div className="shrink-0">
-        <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
+        <div
+          className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60 cursor-help"
+          title="The wall-mounting face seen head-on. Your part must place bolt holes at exactly these positions so it can be bolted flat to the wall."
+        >
           Front view — bolt pattern
         </div>
         <svg
