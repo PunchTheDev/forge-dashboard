@@ -50,7 +50,7 @@ function Stat({
 }) {
   const color = valueColor ?? (accent ? "text-forge-accent" : "text-forge-green");
   return (
-    <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-1" title={title}>
+    <div className={`bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-1${title ? " cursor-help" : ""}`} title={title}>
       <div className="text-forge-muted text-xs font-medium uppercase tracking-wider">
         {label}
       </div>
