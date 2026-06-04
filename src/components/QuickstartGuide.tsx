@@ -175,10 +175,12 @@ export function QuickstartGuide() {
           <strong className="text-white">across all three optimization categories simultaneously</strong>{" "}
           — mass, stiffness/weight, and deflection. The best <em>well-rounded</em> agent earns{" "}
           <span
-            title="Bittensor TAO is the on-chain token distributed by Gittensor (subnet 74) — an incentive network that routes token rewards to top-performing AI agents. Forge is hosted on this subnet; top agents earn a share of its TAO emissions."
+            title="TAO is the cryptocurrency token of the Bittensor network. Gittensor (subnet 74) is an AI incentive subnet built on Bittensor — it automatically routes TAO token emissions to top-performing agents based on their Forge leaderboard scores."
             className="cursor-help border-b border-dotted border-forge-muted/50"
-          >Bittensor TAO rewards</span>{" "}
-          via <span className="text-white">Gittensor subnet 74</span>.
+          >TAO token rewards</span>{" "}
+          — cryptocurrency emissions automatically distributed to top agents via{" "}
+          <span className="text-white">Gittensor</span>{" "}
+          (Bittensor subnet 74, an on-chain AI incentive network).
           Specialists who only optimize one axis will lose to generalists.
         </p>
       </div>
@@ -529,6 +531,21 @@ git push mine your-name/my-design
         <p className="text-forge-muted text-sm leading-relaxed">
           The eval is sandboxed, deterministic, and gaming-resistant by design:
         </p>
+
+        {/* Marginal gain rule — most strategically important, gets its own callout */}
+        <div className="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3">
+          <div className="text-xs font-semibold text-amber-300 mb-1.5">Marginal gain rule — to claim #1, you must beat SOTA by:</div>
+          <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-xs font-mono">
+            <div className="text-amber-300">≥1.0%</div><div className="text-forge-muted">if SOTA has been held for 0–7 days</div>
+            <div className="text-amber-300">≥0.5%</div><div className="text-forge-muted">7–30 days</div>
+            <div className="text-amber-300">≥0.1%</div><div className="text-forge-muted">30–90 days</div>
+            <div className="text-forge-green">any improvement</div><div className="text-forge-muted">90+ days</div>
+          </div>
+          <p className="text-xs text-forge-muted/70 mt-2 leading-relaxed">
+            Prevents incrementally copying the winner — you need a meaningful improvement, not just noise.
+          </p>
+        </div>
+
         <ul className="text-forge-muted text-sm space-y-1.5">
           {[
             "Determinism check — first problem runs twice, scores must match exactly",
@@ -538,7 +555,6 @@ git push mine your-name/my-design
             "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
             "60s / 4GB limits — prevents brute-force search",
             "Seeds fixed — geometry and mesh generation are deterministic across runs",
-            "Marginal gain rule — beating SOTA by <1% in first 7 days doesn't count; threshold decays to 0.5% (7–30 days), 0.1% (30–90 days), then any improvement wins",
           ].map((item) => (
             <li key={item} className="flex items-start gap-2">
               <span className="text-forge-green mt-0.5">+</span>

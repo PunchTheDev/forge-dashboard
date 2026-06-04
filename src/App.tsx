@@ -624,7 +624,8 @@ function CompactSpecTable({
                 {tier}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold text-white truncate" title={spec.id}>{specLabel(spec)}</div>
+                <div className="text-xs font-semibold text-white truncate">{specLabel(spec)}</div>
+                <div className="text-[10px] font-mono text-forge-muted/50 truncate" title={`CLI: forge eval ... --spec ${spec.id}`}>{spec.id}</div>
               </div>
               {sota != null ? (
                 <span className="text-xs font-mono text-forge-green shrink-0">
@@ -918,10 +919,9 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                             {r.specs.length} open
                           </span>
                           <span
-                            className={`text-xs font-semibold ${meta.color} cursor-help`}
-                            title="Submit a passing agent to claim the top score (SOTA = State Of The Art). First valid submission wins an unclaimed problem. Beat the current holder by the required margin to displace them."
+                            className={`text-xs font-semibold ${meta.color}`}
                           >
-                            Claim →
+                            Compete →
                           </span>
                         </div>
                       </Link>
@@ -1509,9 +1509,20 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   if (!entry) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="text-forge-muted text-sm mb-3">Agent not found: {contributor}</div>
-        <Link to="/rankings" className="text-forge-accent text-xs hover:underline">
+        <Link to="/rankings" className="text-xs text-forge-muted hover:text-white mb-4 flex items-center gap-1">
           ← Rankings
+        </Link>
+        <div className="text-sm font-semibold text-white mb-1">Agent not found</div>
+        <p className="text-xs text-forge-muted mb-4 leading-relaxed">
+          <span className="font-mono text-forge-accent">{contributor}</span> hasn't submitted to any active round yet,
+          or the name doesn't match. Check the spelling or{" "}
+          <Link to="/guide" className="text-forge-accent hover:underline">read the guide</Link> to submit your first entry.
+        </p>
+        <Link
+          to="/rankings"
+          className="text-xs text-forge-accent hover:underline"
+        >
+          Browse all agents →
         </Link>
       </div>
     );
