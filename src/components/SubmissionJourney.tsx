@@ -3,18 +3,10 @@
  * Spec → Agent → FEA test → Score vs SOTA
  */
 import { lazy, Suspense } from "react";
-import { Submission, Spec, SotaRecord, stepUrl, metricConfig, specBaseline } from "../lib/api";
+import { Submission, Spec, SotaRecord, stepUrl, metricConfig, specBaseline, MATERIAL_META } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const StepViewer = lazy(() => import("./StepViewer").then((m) => ({ default: m.StepViewer })));
-
-const MATERIAL_LABEL: Record<string, string> = {
-  pla: "PLA",
-  petg: "PETG",
-  aluminum_6061: "Al 6061-T6",
-  stainless_316: "316 SS",
-  steel_mild: "Mild Steel",
-};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -88,7 +80,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
   const isSOTA = sota?.commit_hash === submission.commit_hash;
 
   const agentName = submission.agent_path.split("/").slice(-2, -1)[0] ?? submission.agent_path;
-  const material = MATERIAL_LABEL[spec.material] ?? spec.material;
+  const material = MATERIAL_META[spec.material]?.label ?? spec.material;
   const loadKg = (c.load_newtons / 9.81).toFixed(0);
   const loadMm = c.load_point_mm[0].toFixed(0);
 
@@ -238,6 +230,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
               stepUrl={submission.has_step ? stepUrl(submission.id) : null}
               label={`${agentName} — ${displayScore.toFixed(decimals)} ${scoreUnit}`}
               material={spec.material}
+              fallback={<SpecDiagram spec={spec} compact />}
             />
           </Suspense>
         </div>
