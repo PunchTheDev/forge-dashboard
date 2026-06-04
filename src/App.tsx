@@ -698,6 +698,12 @@ function CompactSpecTable({
     <div className="flex flex-col gap-3">
       {/* Tier filter */}
       <div className="flex items-center gap-1 text-xs flex-wrap">
+        <span
+          className="text-[10px] font-semibold uppercase tracking-wide text-forge-muted/70 pr-1 cursor-help"
+          title="Difficulty tiers reflect load magnitude, tolerance tightness, and build-volume freedom — not solver complexity. Easy problems are forgiving entry points; hard problems push structural limits."
+        >
+          Difficulty
+        </span>
         <button
           onClick={() => { onTierChange(null); setUnclaimedOnly(false); }}
           className={`px-2.5 py-1 rounded-lg transition-colors ${!selectedTier && !unclaimedOnly ? "bg-forge-accent text-white font-semibold" : "text-forge-muted hover:text-white"}`}
