@@ -559,14 +559,6 @@ git push mine your-name/my-design
           Fork on GitHub
         </a>
         <a
-          href={`${FORGE_REPO}/blob/main/QUICKSTART.md`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="border border-forge-border text-forge-muted px-4 py-2 rounded-lg text-sm hover:border-forge-accent/50 hover:text-white transition-colors"
-        >
-          Full Quickstart
-        </a>
-        <a
           href={`${API_BASE_URL}/docs`}
           target="_blank"
           rel="noopener noreferrer"
@@ -575,12 +567,10 @@ git push mine your-name/my-design
           API Docs
         </a>
         <a
-          href={`${FORGE_REPO}/blob/main/docs/anti-gaming.md`}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#anti-gaming"
           className="border border-forge-border text-forge-muted px-4 py-2 rounded-lg text-sm hover:border-forge-accent/50 hover:text-white transition-colors"
         >
-          Anti-gaming design
+          Anti-gaming rules ↑
         </a>
       </div>
       </div>{/* end main content */}
