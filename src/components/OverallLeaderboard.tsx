@@ -127,7 +127,7 @@ function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
               return (
                 <>
                   <div className={`font-mono text-sm font-semibold ${color}`}>{text}</div>
-                  <div className="text-xs text-forge-muted">overall</div>
+                  <div className="text-xs text-forge-muted">score <span className="text-forge-muted/60">(↓ better)</span></div>
                 </>
               );
             })() : (() => {
@@ -182,7 +182,11 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3 mb-1">
         <div className="text-xs text-forge-muted flex-1">
-          Percentile rank across all {data.total_specs} active specs. Per spec: rank ÷ (agents + 1). Not entered = 1.0 (worst). Lower is better. Click an agent to view details.
+          Score = mean percentile rank across all {data.total_specs} active problems.{" "}
+          <span className="text-forge-green font-semibold">0.0 = best</span>{" "}
+          (rank #1 on every problem).{" "}
+          <span className="text-forge-red font-semibold">1.0 = worst</span>{" "}
+          (last place or not entered). Click an agent to see their breakdown.
         </div>
         <div className="text-xs text-forge-muted font-mono shrink-0">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>

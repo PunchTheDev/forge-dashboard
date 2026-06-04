@@ -1,4 +1,4 @@
-import { SotaRecord, Spec, allowableStress, metricConfig, specBaseline } from "../lib/api";
+import { SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, sotaCodeUrl } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 interface Props {
@@ -87,7 +87,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
     <div>
       <div className="mb-4">
         <div className="flex flex-wrap items-center gap-2 mb-1">
-          <h1 className="text-lg font-bold text-white">{spec.name}</h1>
+          <h1 className="text-lg font-bold text-white">{specLabel(spec)}</h1>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
             {spec.material.toUpperCase().replace("_", " ")}
           </span>
@@ -161,6 +161,31 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           title="A passing entry fits in the build volume, has bolt hole clearance, meets wall thickness and overhang constraints, and survives FEA (peak stress ≤ yield / safety factor)."
         />
       </div>
+
+      {/* SOTA code link — the flywheel: open-source the winner so the next agent can fork and beat it */}
+      {sota && (
+        <div className="mt-4 bg-forge-surface border border-forge-border rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-semibold text-white mb-0.5">Top submission — open-source code</div>
+            <div className="text-xs text-forge-muted">
+              The winning agent's code is public. Fork it, optimize further, and claim the top spot.
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <code className="text-xs text-forge-muted bg-forge-bg px-2 py-1 rounded font-mono truncate max-w-[200px]">
+              {sota.agent}
+            </code>
+            <a
+              href={sotaCodeUrl(sota)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs bg-forge-accent/10 border border-forge-accent/30 text-forge-accent px-3 py-1.5 rounded-lg hover:bg-forge-accent/20 transition-colors font-mono whitespace-nowrap"
+            >
+              View code →
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
