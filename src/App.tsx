@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, lazy, Suspense, useEffect, Component } from "react";
+import { useState, useCallback, useMemo, lazy, Suspense, useEffect, useRef, Component } from "react";
 import type { ReactNode } from "react";
 import {
   Routes,
@@ -1142,6 +1142,7 @@ function CategoryPage({ data }: { data: SharedData }) {
 function SpecDetailPage({ data }: { data: SharedData }) {
   const { roundId, specId } = useParams<{ roundId: string; specId: string }>();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const journeyRef = useRef<HTMLDivElement>(null);
   const { specs, allRounds, sotaBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
@@ -1176,6 +1177,13 @@ function SpecDetailPage({ data }: { data: SharedData }) {
     if (specShortName) document.title = `${specShortName} — Forge`;
     return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, [specShortName]);
+
+  // Auto-scroll to SubmissionJourney when a leaderboard row is selected
+  useEffect(() => {
+    if (selectedSubmission && journeyRef.current) {
+      journeyRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selectedSubmission]);
 
   if (!activeSpec) {
     return (
@@ -1329,12 +1337,14 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         />
 
         {selectedSubmission && (
-          <SubmissionJourney
-            submission={selectedSubmission}
-            spec={activeSpec}
-            sota={sota ?? null}
-            onClose={() => setSelectedSubmission(null)}
-          />
+          <div ref={journeyRef}>
+            <SubmissionJourney
+              submission={selectedSubmission}
+              spec={activeSpec}
+              sota={sota ?? null}
+              onClose={() => setSelectedSubmission(null)}
+            />
+          </div>
         )}
 
         <SubmissionPanel
