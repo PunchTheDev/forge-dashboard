@@ -116,7 +116,7 @@ export function SotaChart({ spec }: Props) {
   if (points.length === 0) {
     return (
       <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-8 text-center text-forge-muted text-sm">
-        No data yet — first submission sets the baseline.
+        No submissions yet — first to pass FEA claims #1.
       </div>
     );
   }
@@ -124,7 +124,6 @@ export function SotaChart({ spec }: Props) {
   // Single submission — a line chart needs at least 2 points to be meaningful
   if (points.length === 1) {
     const p = points[0];
-    const { label } = metricConfig(metric);
     const beatsSeed = baseline != null && (
       direction === "minimize" ? p.score < baseline : p.score > baseline
     );
@@ -143,7 +142,7 @@ export function SotaChart({ spec }: Props) {
               {p.score}{unit}
             </div>
             <div className="text-xs text-forge-muted mt-0.5">
-              First {label.toLowerCase()} by <span className="text-white">{p.contributor}</span> · {p.date}
+              Sole submission · by <span className="text-white">{p.contributor}</span> · {p.date}
             </div>
           </div>
         </div>

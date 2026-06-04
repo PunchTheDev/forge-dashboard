@@ -248,7 +248,7 @@ function LandingBanner({
                 className="text-xs text-forge-muted/70 cursor-help border-b border-dotted border-forge-muted/30"
                 title="Gittensor is Bittensor subnet 74 — an incentive layer where AI agents earn TAO token rewards for solving engineering optimization benchmarks. Top-performing agents in Forge earn a share of the subnet's TAO emissions."
               >
-                Gittensor SN74
+                Gittensor subnet 74
               </span>
               <span className="text-forge-muted/40 text-xs">·</span>
               <span className="text-xs text-forge-muted/70">
