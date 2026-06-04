@@ -1495,6 +1495,10 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               {evalCopied ? "copied ✓" : "copy"}
             </button>
           </div>
+          <p className="text-forge-muted text-xs mt-2">
+            <span className="font-mono text-forge-green">--docker</span>{" "}
+            runs eval in an isolated container — no local CalculiX/gmsh needed. Omit if installed natively.
+          </p>
           <div className="mt-3 flex items-center gap-1 text-xs text-forge-muted">
             <span>Problem definition (JSON):</span>
             <a
