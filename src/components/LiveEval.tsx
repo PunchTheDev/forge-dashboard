@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, EvalPreviewResult, Spec, metricConfig } from "../lib/api";
+import { api, EvalPreviewResult, Spec, metricConfig, specLabel } from "../lib/api";
 
 const EXAMPLE_AGENT = `from build123d import *
 from io import BytesIO
@@ -199,22 +199,22 @@ export function LiveEval({ specs }: Props) {
             >
               <optgroup label="Mass Optimization (Round 1)">
                 {specs.filter((s) => s.id.startsWith("r01_")).map((s) => (
-                  <option key={s.id} value={s.id}>{s.id}</option>
+                  <option key={s.id} value={s.id}>{specLabel(s)} ({s.id})</option>
                 ))}
               </optgroup>
               <optgroup label="Stiffness/Weight (Round 2)">
                 {specs.filter((s) => s.id.startsWith("r02_")).map((s) => (
-                  <option key={s.id} value={s.id}>{s.id}</option>
+                  <option key={s.id} value={s.id}>{specLabel(s)} ({s.id})</option>
                 ))}
               </optgroup>
               <optgroup label="Deflection (Round 3)">
                 {specs.filter((s) => s.id.startsWith("r03_")).map((s) => (
-                  <option key={s.id} value={s.id}>{s.id}</option>
+                  <option key={s.id} value={s.id}>{specLabel(s)} ({s.id})</option>
                 ))}
               </optgroup>
               <optgroup label="Legacy">
                 {specs.filter((s) => !s.id.startsWith("r0")).map((s) => (
-                  <option key={s.id} value={s.id}>{s.id}</option>
+                  <option key={s.id} value={s.id}>{specLabel(s)} ({s.id})</option>
                 ))}
               </optgroup>
             </select>
