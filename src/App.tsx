@@ -1730,7 +1730,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               <th className="text-left pb-1.5 font-normal">Problem</th>
               <th className="text-left pb-1.5 font-normal">Category</th>
               <th className="text-right pb-1.5 font-normal">Score</th>
-              <th className="text-right pb-1.5 font-normal" title="rank / (agents + 1) — lower is better">Percentile</th>
+              <th className="text-right pb-1.5 font-normal cursor-help" title="Normalized rank = rank ÷ (agents + 1). Lower is better: ~0% = leading, 50% = sole entrant, ~100% = last. Unlike traditional percentile, lower means higher placement.">Rank score <span className="text-forge-muted/60 font-normal">(↓)</span></th>
               <th className="text-right pb-1.5 font-normal">Rank</th>
             </tr>
           </thead>
