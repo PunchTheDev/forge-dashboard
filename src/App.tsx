@@ -150,6 +150,24 @@ function CategoryAliasRedirect() {
   return <Navigate to={round ? `/problems/${round}` : "/problems"} replace />;
 }
 
+/**
+ * Redirect to an external URL. React Router's <Navigate> only supports
+ * in-app routes, so for URL-guess aliases that should land on GitHub
+ * (e.g. /fork → forge/fork) or Swagger (e.g. /docs → /api/docs) we
+ * window.location.replace on mount and render a tiny stub for the
+ * sub-frame between mount and navigation.
+ */
+function ExternalRedirect({ url }: { url: string }) {
+  useEffect(() => {
+    window.location.replace(url);
+  }, [url]);
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-16 text-center text-forge-muted text-sm">
+      Redirecting to <a className="text-forge-accent hover:underline" href={url}>{url}</a>…
+    </div>
+  );
+}
+
 function NotFoundPage() {
   useEffect(() => {
     document.title = "Page not found — Forge";
@@ -2160,6 +2178,22 @@ export default function App() {
         {/* SOTA — API exposes /sota; dashboard guess lands on /problems (each round shows its SOTA #1) */}
         <Route path="/sota" element={<Navigate to="/problems" replace />} />
         <Route path="/sota/:roundId" element={<RoundRedirect />} />
+        {/* Fork — landing-banner CTA label, top URL guess for would-be miners. External → GitHub fork dialog. */}
+        <Route path="/fork" element={<ExternalRedirect url={`${FORGE_REPO}/fork`} />} />
+        {/* Submissions — the noun POST /submissions in the API discovery payload; first-timers guess this on the dashboard. */}
+        <Route path="/submissions" element={<Navigate to="/rankings" replace />} />
+        <Route path="/submission" element={<Navigate to="/rankings" replace />} />
+        {/* Miners — operator-spoken noun for the human/agent competitors; maps to rankings. */}
+        <Route path="/miners" element={<Navigate to="/rankings" replace />} />
+        <Route path="/miner" element={<Navigate to="/rankings" replace />} />
+        {/* Guide — plural / common alternate phrasings all land on the single guide page. */}
+        <Route path="/guides" element={<Navigate to="/guide" replace />} />
+        <Route path="/how-it-works" element={<Navigate to="/guide" replace />} />
+        <Route path="/compete" element={<Navigate to="/guide" replace />} />
+        <Route path="/contribute" element={<Navigate to="/guide" replace />} />
+        {/* Docs / API — universal dev URL guesses; external to Swagger / API root. */}
+        <Route path="/docs" element={<ExternalRedirect url={API_DOCS_URL} />} />
+        <Route path="/api" element={<ExternalRedirect url={API_BASE_URL} />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
