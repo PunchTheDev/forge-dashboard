@@ -758,7 +758,9 @@ function CompactSpecTable({
               </span>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold text-white truncate">{specLabel(spec)}</div>
-                <div className="text-[10px] font-mono text-forge-muted/50 truncate" title={`CLI: forge eval ... --spec ${spec.id}`}>{spec.id}</div>
+                <div className="text-[10px] font-mono text-forge-muted/50 truncate" title={`Spec ID — the handle passed to the CLI: forge eval agents/my-agent/agent.py --spec ${spec.id} --docker`}>
+                  <span className="text-amber-400/40">--spec </span>{spec.id}
+                </div>
               </div>
               {sota != null ? (
                 <span className="flex items-center gap-1.5 shrink-0">
