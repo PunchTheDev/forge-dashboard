@@ -576,12 +576,12 @@ git push mine your-name/my-design
       {/* Links */}
       <div className="flex flex-wrap gap-3 pb-8">
         <a
-          href={FORGE_REPO}
+          href={`${FORGE_REPO}/fork`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-forge-accent text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-forge-accent/80 transition-colors"
         >
-          Fork on GitHub
+          Fork on GitHub →
         </a>
         <a
           href={`${API_BASE_URL}/docs`}
