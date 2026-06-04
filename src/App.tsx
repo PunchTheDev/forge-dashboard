@@ -929,8 +929,13 @@ function CategoryPage({ data }: { data: SharedData }) {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className={`text-xl ${meta.color}`}>{meta.icon}</span>
-            <div className="text-lg font-bold text-white">
-              {round.name.replace(/Round \d+ — /, "")}
+            <div>
+              <div className="text-xs text-forge-muted font-mono uppercase tracking-wider mb-0.5">
+                {round.name.match(/Round \d+/)?.[0] ?? round.id}
+              </div>
+              <div className="text-lg font-bold text-white">
+                {round.name.replace(/Round \d+ — /, "")}
+              </div>
             </div>
           </div>
           <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-xl">
@@ -1567,6 +1572,10 @@ export default function App() {
             </div>
           }
         />
+
+        {/* Aliases — common URL guesses */}
+        <Route path="/leaderboard" element={<Navigate to="/rankings" replace />} />
+        <Route path="/leaderboard/*" element={<Navigate to="/rankings" replace />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
