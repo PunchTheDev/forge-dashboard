@@ -1165,7 +1165,7 @@ function CategoryPage({ data }: { data: SharedData }) {
   const round = allRounds.find((r) => r.id === roundId) ?? null;
 
   const roundId_ = roundId ?? "";
-  const { data: roundLb } = useApi(
+  const { data: roundLb, loading: roundLbLoading } = useApi(
     () => round ? api.roundLeaderboard(roundId_) : Promise.resolve(null),
     60000,
   );
@@ -1276,7 +1276,21 @@ function CategoryPage({ data }: { data: SharedData }) {
       </div>
 
       {/* Round standings — show panel when entries exist, empty-state when none */}
-      {roundLb && roundLb.entries.length > 0 ? (
+      {roundLbLoading && !roundLb ? (
+        <div className="mb-5 bg-forge-surface border border-forge-border rounded-xl overflow-hidden animate-pulse">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-forge-border">
+            <div className="h-3 w-28 bg-forge-border/50 rounded" />
+            <div className="h-3 w-20 bg-forge-border/50 rounded" />
+          </div>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-4 px-4 py-2 border-b border-forge-border/30">
+              <div className="h-3 w-6 bg-forge-border/50 rounded" />
+              <div className="h-3 w-24 bg-forge-border/50 rounded" />
+              <div className="ml-auto h-3 w-12 bg-forge-border/50 rounded" />
+            </div>
+          ))}
+        </div>
+      ) : roundLb && roundLb.entries.length > 0 ? (
         <div className="mb-5">
           <RoundStandingsPanel lb={roundLb} roundId={round?.id} />
         </div>
@@ -1756,7 +1770,19 @@ function RankingsPage({ data }: { data: SharedData }) {
         {activeRoundTab ? (
           <div>
             {roundLbLoading && !roundLb ? (
-              <div className="text-forge-muted text-sm py-6 text-center">Loading round rankings…</div>
+              <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden animate-pulse">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-forge-border">
+                  <div className="h-3 w-28 bg-forge-border/50 rounded" />
+                  <div className="h-3 w-20 bg-forge-border/50 rounded" />
+                </div>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center gap-4 px-4 py-2 border-b border-forge-border/30 last:border-0">
+                    <div className="h-3 w-6 bg-forge-border/50 rounded" />
+                    <div className="h-3 w-24 bg-forge-border/50 rounded" />
+                    <div className="ml-auto h-3 w-12 bg-forge-border/50 rounded" />
+                  </div>
+                ))}
+              </div>
             ) : roundLb ? (
               <RoundStandingsPanel lb={roundLb} roundId={activeRoundTab ?? undefined} />
             ) : (
