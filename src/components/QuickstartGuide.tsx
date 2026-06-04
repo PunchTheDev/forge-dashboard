@@ -468,10 +468,10 @@ git push mine your-name/my-design
             <tbody className="divide-y divide-forge-border/30">
               {[
                 ["GET /rounds/active", "Active competition rounds"],
-                ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed specs, contributors"],
-                ["GET /specs", "List all specs (?active=true, ?unclaimed=true, ?tier=easy|medium|hard, ?round_id=round_001, ?material=pla)"],
-                ["GET /specs/{id}", "Single spec (constraints, material, scoring, tier, round_id)"],
-                ["GET /sota", "Current SOTA for all specs (filter: ?round_id=round_001)"],
+                ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed problems, contributors"],
+                ["GET /specs", "List all problems with filters: active, unclaimed, tier, round, material"],
+                ["GET /specs/{id}", "Single problem definition (constraints, material, scoring, tier, round_id)"],
+                ["GET /sota", "Current SOTA for all problems (filter: ?round_id=round_001)"],
                 ["GET /sota/{spec_id}", "SOTA for one problem"],
                 ["GET /sota/{spec_id}/history", "Progressive SOTA record over time"],
                 ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim SOTA"],
