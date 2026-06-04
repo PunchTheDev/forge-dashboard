@@ -179,6 +179,95 @@ function RatchetChart() {
   );
 }
 
+function MarginDecayChart() {
+  // Visualizes the margin-decay rule: required improvement to claim #1 shrinks
+  // as the current SOTA's age grows. Story: stale records get easier to beat.
+  const windows = [
+    { label: "0–7d", margin: 1.0, display: "≥1.0%", tone: "amber" as const },
+    { label: "7–30d", margin: 0.5, display: "≥0.5%", tone: "amber" as const },
+    { label: "30–90d", margin: 0.1, display: "≥0.1%", tone: "amber" as const },
+    { label: "90+d", margin: 0.05, display: "any", tone: "green" as const },
+  ];
+  const max = 1.0;
+  const barW = 56;
+  const gap = 18;
+  const chartH = 80;
+  const topPad = 28;
+  const bottomPad = 36;
+  const sidePad = 8;
+  const width = windows.length * barW + (windows.length - 1) * gap + sidePad * 2;
+  const height = chartH + topPad + bottomPad;
+  return (
+    <div className="mt-2">
+      <div className="text-[10px] uppercase tracking-wide text-forge-muted/70 mb-1">
+        Margin required vs. age of #1
+      </div>
+      <div className="overflow-x-auto">
+        <svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          className="block"
+          role="img"
+          aria-label="Illustrative chart: the margin you need to beat the current best shrinks as that best gets older — from 1 percent at 0 to 7 days down to any improvement after 90 days."
+        >
+          {windows.map((w, i) => {
+            const h = (w.margin / max) * chartH;
+            const x = sidePad + i * (barW + gap);
+            const y = topPad + (chartH - h);
+            const baseY = topPad + chartH;
+            const fill = w.tone === "green" ? "fill-forge-green" : "fill-amber-400";
+            const opacity = w.tone === "green" ? 0.85 : 0.35 + ((windows.length - 1 - i) / (windows.length - 1)) * 0.5;
+            return (
+              <g key={i}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={barW}
+                  height={h}
+                  rx={3}
+                  className={fill}
+                  style={{ opacity }}
+                />
+                <text
+                  x={x + barW / 2}
+                  y={y - 6}
+                  textAnchor="middle"
+                  className={w.tone === "green" ? "fill-forge-green" : "fill-amber-300"}
+                  style={{ fontSize: 11, fontWeight: 600 }}
+                >
+                  {w.display}
+                </text>
+                <text
+                  x={x + barW / 2}
+                  y={baseY + 14}
+                  textAnchor="middle"
+                  className="fill-forge-muted"
+                  style={{ fontSize: 9 }}
+                >
+                  {w.label}
+                </text>
+                <text
+                  x={x + barW / 2}
+                  y={baseY + 26}
+                  textAnchor="middle"
+                  className="fill-forge-muted/60"
+                  style={{ fontSize: 8 }}
+                >
+                  {i === 0 ? "fresh #1" : i === windows.length - 1 ? "stale #1" : ""}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div className="text-[10px] text-forge-muted/60 mt-0.5">
+        Illustrative — the longer a #1 holds, the smaller the gap a challenger needs to close.
+      </div>
+    </div>
+  );
+}
+
 const TOC_ITEMS = [
   { id: "categories", label: "Three categories" },
   { id: "setup", label: "Step 1 — Set up" },
@@ -740,6 +829,7 @@ git push mine your-name/my-design
             <div className="text-amber-300">≥0.1%</div><div className="text-forge-muted">30–90 days</div>
             <div className="text-forge-green">any improvement</div><div className="text-forge-muted">90+ days</div>
           </div>
+          <MarginDecayChart />
           <p className="text-xs text-forge-muted/70 mt-2 leading-relaxed">
             Prevents incrementally copying the winner — you need a meaningful improvement, not just noise.
           </p>
