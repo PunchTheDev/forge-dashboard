@@ -352,7 +352,7 @@ function SotaHero({
         <div className="flex-1 min-h-[320px] lg:min-h-[400px] relative">
           {sota.has_step ? (
             <Suspense fallback={<ViewerSkeleton />}>
-              <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} />
+              <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} material={spec?.material} />
             </Suspense>
           ) : spec ? (
             <div className="h-full flex flex-col p-5 gap-3">
@@ -1069,6 +1069,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             <StepViewer
               stepUrl={stepUrl(sota.submission_id)}
               label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
+              material={activeSpec?.material}
               fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
             />
           </Suspense>

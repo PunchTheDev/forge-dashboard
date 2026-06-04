@@ -3,9 +3,19 @@ import type React from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+// Material colours — visually distinct, physically inspired
+const MATERIAL_COLORS: Record<string, THREE.Color> = {
+  pla: new THREE.Color(0.92, 0.90, 0.86),       // warm off-white
+  petg: new THREE.Color(0.72, 0.83, 0.94),      // light translucent blue
+  aluminum_6061: new THREE.Color(0.76, 0.78, 0.82), // silvery aluminium
+  stainless_316: new THREE.Color(0.55, 0.57, 0.62), // cool dark steel
+};
+
 interface Props {
   stepUrl: string | null;
   label?: string;
+  /** Material key (pla, petg, aluminum_6061, stainless_316) — used for mesh tinting. */
+  material?: string;
   /** Rendered instead of the viewer when loading fails (e.g. a SpecDiagram). */
   fallback?: React.ReactNode;
 }
@@ -15,7 +25,7 @@ interface Props {
  * Renders the actual agent-generated CAD output — the STEP file produced
  * by the winning submission's CadQuery code.
  */
-export function StepViewer({ stepUrl, label, fallback }: Props) {
+export function StepViewer({ stepUrl, label, material, fallback }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -96,12 +106,19 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
       attributes: {
         position: { array: number[] };
         normal: { array: number[] };
-        index: { array: number[] };
       };
+      // index is a top-level property, NOT inside attributes
+      index?: { array: number[] };
       color: { r: number; g: number; b: number };
     };
+    type OcctReadParams = {
+      linearUnit?: string;
+      linearDeflectionType?: string;
+      linearDeflection?: number;
+      angularDeflection?: number;
+    };
     type OcctInstance = {
-      ReadStepFile: (bytes: Uint8Array, params: { linearTolerance: number; angularTolerance: number } | null) => { success: boolean; meshes: OcctMesh[] };
+      ReadStepFile: (bytes: Uint8Array, params: OcctReadParams | null) => { success: boolean; meshes: OcctMesh[] };
     };
 
     async function loadStep(url: string) {
@@ -114,10 +131,12 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
       const buf = await r.arrayBuffer();
       if (cancelled) return;
 
-      // Finer tessellation reduces gaps between adjacent faces
+      // Fine tessellation — correct occt-import-js key names (not linearTolerance/angularTolerance)
       const result = occt.ReadStepFile(new Uint8Array(buf), {
-        linearTolerance: 0.005,
-        angularTolerance: 0.3,
+        linearUnit: "millimeter",
+        linearDeflectionType: "absolute_value",
+        linearDeflection: 0.005,
+        angularDeflection: 0.3,
       });
       if (!result.success) throw new Error("failed to parse STEP");
 
@@ -133,12 +152,19 @@ export function StepViewer({ stepUrl, label, fallback }: Props) {
         } else {
           geo.computeVertexNormals();
         }
-        const idx = mesh.attributes?.index?.array;
+        // index is top-level on mesh, not inside .attributes — critical for correct triangle winding
+        const idx = mesh.index?.array;
         if (idx?.length) geo.setIndex(idx);
+        // Material-based tinting: use spec material colour if available, else fall back to STEP face colour
+        const matKey = material?.toLowerCase();
+        const baseColor = (matKey && MATERIAL_COLORS[matKey])
+          ? MATERIAL_COLORS[matKey]
+          : new THREE.Color(mesh.color?.r ?? 0.6, mesh.color?.g ?? 0.6, mesh.color?.b ?? 0.6);
+        const isMetallic = matKey === "aluminum_6061" || matKey === "stainless_316";
         const mat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(mesh.color?.r ?? 0.6, mesh.color?.g ?? 0.6, mesh.color?.b ?? 0.6),
-          metalness: 0.25,
-          roughness: 0.55,
+          color: baseColor,
+          metalness: isMetallic ? 0.7 : 0.15,
+          roughness: isMetallic ? 0.3 : 0.6,
           side: THREE.DoubleSide,
         });
         group.add(new THREE.Mesh(geo, mat));
