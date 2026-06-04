@@ -56,12 +56,20 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
   const { label, unit: scoreUnit, decimals } = metricConfig(metric);
   const baseline = specBaseline(spec.scoring);
   const sotaScore = sota?.score ?? sota?.score_grams ?? null;
-  const baselineDelta =
+  const baselineRawPct =
     sota && baseline != null && sotaScore != null
       ? isMaximize
-        ? (((sotaScore / baseline) - 1) * 100).toFixed(1)
-        : (((baseline - sotaScore) / baseline) * 100).toFixed(1)
+        ? ((sotaScore / baseline) - 1) * 100
+        : ((baseline - sotaScore) / baseline) * 100
       : null;
+  // positive raw = SOTA beats reference in the optimization direction
+  const baselineDelta = baselineRawPct != null ? Math.abs(baselineRawPct).toFixed(1) : null;
+  const baselineSign =
+    baselineRawPct == null
+      ? null
+      : baselineRawPct >= 0
+        ? (isMaximize ? "+" : "−")  // SOTA better than reference
+        : (isMaximize ? "−" : "+"); // SOTA worse than reference
   const metricLabel = `SOTA ${label.toLowerCase()}`;
 
   // Compute marginal gain threshold based on SOTA age
@@ -121,7 +129,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         />
         <Stat
           label="vs. reference agent"
-          value={baselineDelta ? `${isMaximize ? "+" : "−"}${baselineDelta}%` : "—"}
+          value={baselineDelta && baselineSign ? `${baselineSign}${baselineDelta}%` : "—"}
           sub={baseline != null ? `ref: ${baseline.toFixed(decimals)} ${scoreUnit} (our seed)` : undefined}
         />
         <Stat
