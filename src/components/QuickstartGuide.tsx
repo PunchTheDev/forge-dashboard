@@ -25,10 +25,24 @@ const WHITELISTED_MODELS = [
 ];
 
 function CodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <pre className="bg-forge-bg border border-forge-border rounded-lg p-3 text-xs text-forge-green font-mono overflow-x-auto whitespace-pre">
-      {code}
-    </pre>
+    <div className="relative group">
+      <pre className="bg-forge-bg border border-forge-border rounded-lg p-3 text-xs text-forge-green font-mono overflow-x-auto whitespace-pre">
+        {code}
+      </pre>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(code);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        }}
+        className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded border border-forge-border bg-forge-bg text-forge-muted hover:text-white hover:border-forge-accent/50 transition-colors opacity-0 group-hover:opacity-100"
+        title="Copy to clipboard"
+      >
+        {copied ? "copied ✓" : "copy"}
+      </button>
+    </div>
   );
 }
 
