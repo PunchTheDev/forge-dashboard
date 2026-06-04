@@ -1471,7 +1471,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             )}
           </div>
           <div className="mt-2 px-3 py-2 bg-forge-surface border border-forge-border rounded-lg text-xs text-forge-muted leading-relaxed">
-            <strong className="text-white">How scores work:</strong> Every unentered problem
+            <strong className="text-white">How scores work:</strong> Every unclaimed problem
             counts as <span className="text-forge-accent font-mono">1.0</span> (worst).
             A sole entrant on a problem scores{" "}
             <span className="text-forge-green font-mono">~0.5</span> (mid-range — no competition yet).
