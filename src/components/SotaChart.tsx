@@ -130,7 +130,7 @@ export function SotaChart({ spec }: Props) {
     return (
       <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-5">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-white">SOTA over time</h2>
+          <h2 className="text-sm font-semibold text-white cursor-help" title="Best score = State Of The Art (SOTA) — the highest-ranking submission on this problem.">Best score over time</h2>
           <span className="text-xs text-forge-muted">1 submission</span>
         </div>
         <div className="flex items-center gap-4">
@@ -166,7 +166,7 @@ export function SotaChart({ spec }: Props) {
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-white">SOTA over time</h2>
+          <h2 className="text-sm font-semibold text-white cursor-help" title="Best score = State Of The Art (SOTA) — the highest-ranking submission on this problem. Chart shows how the record has improved over time.">Best score over time</h2>
           <span className="text-xs text-forge-muted">
             {direction === "minimize" ? "↓ lower is better" : "↑ higher is better"}
           </span>
