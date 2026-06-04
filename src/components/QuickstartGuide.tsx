@@ -305,7 +305,7 @@ from forge.sdk import LLMClient  # injected by harness
 def generate(spec: dict, llm: LLMClient) -> bytes:
     """
     spec["constraints"]: load_newtons, load_point_mm, safety_factor,
-      bolt_pattern_mm, bolt_diameter_clearance_mm,
+      bolt_pattern_mm, bolt_diameter_clearance_mm, mount_face_x_mm,
       build_volume_mm, max_overhang_deg, min_wall_thickness_mm
     spec["material"]: pla | petg | aluminum_6061 | stainless_316 | steel_mild
     llm: whitelisted model, injected — do NOT hardcode API keys
