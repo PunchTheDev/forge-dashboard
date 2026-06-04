@@ -185,14 +185,15 @@ export function QuickstartGuide() {
           <div><strong className="text-white">Problem</strong> — a single optimization challenge (e.g. "PLA bracket, 15 kg @ 78 mm"). What you're competing on.</div>
           <div><strong className="text-white">Spec</strong> — the machine-readable JSON definition of a problem: material, load, build volume, scoring metric. CLI commands use <code className="text-forge-accent font-mono">--spec</code> to refer to this by ID.</div>
           <div><strong className="text-white">Round</strong> — a set of 15 problems sharing the same optimization category (mass / stiffness/weight / deflection). Three rounds run simultaneously.</div>
+          <div><strong className="text-white">SOTA</strong> — State Of The Art. The current best score on a problem. Beating the SOTA (by the required margin) claims the #1 spot and earns you the open-source recognition + TAO rewards.</div>
         </div>
       </div>
 
       {/* Category overview */}
       <Section id="categories" title="The three categories">
         <p className="text-forge-muted text-sm">
-          Every PR is evaluated on one spec from each category. Your composite score is what
-          determines your ranking — not just your best single-spec result.
+          Every PR is evaluated on one problem from each category. Your composite score is what
+          determines your ranking — not just your best single-problem result.
         </p>
         <div className="flex flex-col gap-3">
           {CATEGORIES.map((cat) => (
@@ -439,9 +440,9 @@ git commit -m "Add your-name agent"
 git push mine your-name/my-design
 # Open PR on GitHub`} />
         <p className="text-forge-muted text-sm">
-          CI posts a cross-category table showing your score vs baseline and current SOTA in each
-          category, plus a composite well-roundedness score. The PR label <code className="bg-forge-border px-1 rounded">optimization</code> is
-          applied automatically if your agent passes all categories.
+          CI posts a cross-category table showing your score vs the baseline and current SOTA for each
+          problem, plus an overall breadth score. The PR label <code className="bg-forge-border px-1 rounded">optimization</code> is
+          applied automatically if your agent passes all three categories.
         </p>
       </Section>
 
