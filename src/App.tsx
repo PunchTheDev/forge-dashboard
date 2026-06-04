@@ -2181,6 +2181,26 @@ function AgentDetailPage({ data }: { data: SharedData }) {
             })}
           </div>
         )}
+
+        {/* Fork CTA — page-level action for a would-be competitor sizing up this agent */}
+        <div className="mt-3 pt-3 border-t border-forge-border/60 flex items-center gap-3 text-xs text-forge-muted">
+          <span className="flex-1 leading-relaxed">
+            {entry.total_wins > 0 ? (
+              <>Challenge <span className="text-white">{entry.contributor}</span>'s setup — fork the repo, open any of their <span className="text-yellow-400 font-semibold">{entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}</span> below, and beat the score to take the top spot.</>
+            ) : (
+              <>Race <span className="text-white">{entry.contributor}</span> for the top spot — fork the repo, pick any of their {entry.specs_entered} entered problem{entry.specs_entered !== 1 ? "s" : ""} below, and submit a passing agent with a better score.</>
+            )}
+          </span>
+          <a
+            href={`${FORGE_REPO}/fork`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent px-3 py-1.5 rounded-lg hover:bg-forge-accent/20 transition-colors cursor-help"
+            title="Opens the GitHub fork dialog for PunchTheDev/forge — your fork is where you edit an agent.py, run forge eval locally, and open a PR back to this benchmark."
+          >
+            Fork repo →
+          </a>
+        </div>
       </div>
 
       {/* Per-problem results */}

@@ -89,8 +89,8 @@ If any seat would be confused, the component fails.
 ### Agent profile (`/rankings/:agentId`)
 
 - Header (contributor name, summary stats) — ◐ ◐ ● — rank line now reads `Rank #N of M` (e.g. `Rank #1 of 1`) with a cursor-help tooltip explaining what M counts ("Position among all M agents who have submitted to at least one active problem. Rank is by overall score…"). First-timer no longer reads a bare `#1` cold — the field size makes the position meaningful. The right-column overall-score + the category breakdown grid below still need their own rubric pass. (step 355, `App.tsx` L2103–2114)
-- Per-problem breakdown table — ○ ○ ○
-- Fork CTAs — ○ ○ ○
+- Per-problem breakdown table — ◐ ● ● — Score column header carries a cursor-help tooltip naming the metric+unit per category (`mass g · stiffness N/(mm·g) · deflection mm`); the gap-line under each Score now reads direction-first per saved `feedback_direction_before_gap.md` (`0.50 g behind #1` style — dormant until a competitor enters, structurally correct). Rank-column field-size suffix (`#3 of 12`) deferred. (step 358, `App.tsx` L2197, L2256–2264)
+- Fork CTAs — ● ● ● — header card now closes with a context-aware page-level CTA row separated by a 1px divider: would-be competitor reads "Challenge {contributor}'s setup — fork the repo, open any of their {N} #1 problems below, and beat the score to take the top spot." (or the entered-but-unwon variant when total_wins=0), followed by an accent-styled `Fork repo →` button targeting the GitHub fork dialog. Tooltip on the button names what fork actually does ("Opens the GitHub fork dialog for PunchTheDev/forge — your fork is where you edit an agent.py, run forge eval locally, and open a PR back to this benchmark."). The per-problem `↗ code` chips inside the table still cover the row-level fork affordance; this row covers the page-level one. (step 360, `App.tsx` L2185–2204)
 
 ### Explorer (`/explorer`)
 
