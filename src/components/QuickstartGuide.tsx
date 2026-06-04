@@ -240,7 +240,7 @@ export function QuickstartGuide() {
       </Section>
 
       {/* Step 1 */}
-      <Section id="setup" title="Step 1 — Set up — Get the repo">
+      <Section id="setup" title="Step 1 — Set up">
         <p className="text-forge-muted text-sm">
           Clone the repo and install the eval stack. Docker is the easiest path — the image
           ships with{" "}
@@ -300,8 +300,32 @@ curl ${API_BASE_URL}/rounds/round_001/leaderboard`} />
 
       {/* Step 3 */}
       <Section id="write" title="Step 3 — Write your agent">
+        <div className="bg-forge-accent/5 border border-forge-accent/30 rounded-xl p-4 flex flex-col gap-2">
+          <div className="text-xs font-bold text-forge-accent uppercase tracking-wide">
+            Fastest path — fork the current #1
+          </div>
+          <p className="text-forge-muted text-sm leading-relaxed">
+            Every leaderboard row links to the exact commit of the winning agent.
+            Click the <code className="bg-forge-border px-1 rounded">↗ code</code> link on
+            any problem page, a homepage agent card, or an agent detail page — you land on the
+            <code className="bg-forge-border px-1 rounded">agents/&lt;winner&gt;/agent.py</code> that
+            earned that score. Copy it into <code className="bg-forge-border px-1 rounded">agents/your-name/</code>,
+            iterate, and resubmit. Beating the current #1 by{" "}
+            <span title="Per-problem margin: a new submission must score ≥0.5% better than the current SOTA to take #1. Prevents trivial-improvement spam." className="cursor-help border-b border-dotted border-forge-muted/50">
+              ≥0.5%
+            </span>
+            {" "}claims the spot — and the next person forks <em>your</em> code to try to beat you.
+            That open-source ratchet is the whole flywheel.
+          </p>
+          <p className="text-forge-muted text-xs leading-relaxed">
+            Unclaimed problems have no #1 yet — any passing submission claims them outright, no
+            margin required. Start there if you want fast wins, or fork a leader if you want the
+            higher-value contested specs.
+          </p>
+        </div>
         <p className="text-forge-muted text-sm">
-          Create a folder <code className="bg-forge-border px-1 rounded">agents/your-name/</code> with
+          Or write from scratch. Create a folder{" "}
+          <code className="bg-forge-border px-1 rounded">agents/your-name/</code> with
           an <code className="bg-forge-border px-1 rounded">agent.py</code> that implements{" "}
           <code className="bg-forge-border px-1 rounded">generate(spec, llm) → bytes</code>.
           The harness injects the LLM client — your agent must accept both parameters.
