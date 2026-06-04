@@ -1,11 +1,37 @@
-import { SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, sotaCodeUrl } from "../lib/api";
+import { Round, SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, sotaCodeUrl } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 interface Props {
   spec: Spec;
   sota: SotaRecord | null;
   submissionCount: number;
+  round?: Round | null;
 }
+
+// Mirrors CATEGORY_META in App.tsx — kept minimal here so HeroStats stays self-contained
+const CATEGORY_PILL: Record<string, { label: string; color: string; bg: string; border: string; goal: string }> = {
+  round_001: {
+    label: "Mass / Weight",
+    color: "text-forge-green",
+    bg: "bg-forge-green/10",
+    border: "border-forge-green/40",
+    goal: "Lightest part that survives the load wins.",
+  },
+  round_002: {
+    label: "Stiffness / Weight",
+    color: "text-forge-accent",
+    bg: "bg-forge-accent/10",
+    border: "border-forge-accent/40",
+    goal: "Highest stiffness-per-gram wins.",
+  },
+  round_003: {
+    label: "Deflection",
+    color: "text-forge-red",
+    bg: "bg-forge-red/10",
+    border: "border-forge-red/40",
+    goal: "Least bending under the applied load wins.",
+  },
+};
 
 function Stat({
   label,
@@ -43,7 +69,8 @@ function sotaMarginThreshold(ageDays: number): number {
   return 0.0;
 }
 
-export function HeroStats({ spec, sota, submissionCount }: Props) {
+export function HeroStats({ spec, sota, submissionCount, round }: Props) {
+  const pill = round ? CATEGORY_PILL[round.id] : null;
   const allowable = allowableStress(spec);
   const loadKg = (spec.constraints.load_newtons / 9.81).toFixed(0);
   const stressHeadroom = sota
@@ -63,12 +90,6 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
       : null;
   // positive raw = SOTA beats reference in the optimization direction
   const baselineDelta = baselineRawPct != null ? Math.abs(baselineRawPct).toFixed(1) : null;
-  const baselineSign =
-    baselineRawPct == null
-      ? null
-      : baselineRawPct >= 0
-        ? (isMaximize ? "+" : "−")  // SOTA better than reference
-        : (isMaximize ? "−" : "+"); // SOTA worse than reference
   const metricLabel = `Best ${label.toLowerCase()}`;
 
   // Compute marginal gain threshold based on SOTA age
@@ -86,6 +107,17 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
   return (
     <div>
       <div className="mb-4">
+        {pill && (
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className={`text-[10px] font-bold uppercase tracking-widest ${pill.color} ${pill.bg} border ${pill.border} px-2 py-0.5 rounded`}
+              title={pill.goal}
+            >
+              {pill.label} round
+            </span>
+            <span className="text-xs text-forge-muted">{pill.goal}</span>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2 mb-1">
           <h1 className="text-lg font-bold text-white">{specLabel(spec)}</h1>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
@@ -134,12 +166,16 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         />
         <Stat
           label="vs. reference agent"
-          value={baselineDelta && baselineSign ? `${baselineSign}${baselineDelta}%` : "—"}
+          value={
+            baselineDelta != null && baselineRawPct != null
+              ? baselineRawPct >= 0
+                ? `${baselineDelta}% better`
+                : `${baselineDelta}% worse`
+              : "—"
+          }
           sub={
             baseline != null
-              ? baselineRawPct != null && baselineRawPct >= 0
-                ? `agents ahead · seed: ${baseline.toFixed(decimals)} ${scoreUnit}`
-                : `seed still winning · ${baseline.toFixed(decimals)} ${scoreUnit}`
+              ? `seed: ${baseline.toFixed(decimals)} ${scoreUnit}`
               : undefined
           }
           valueColor={
@@ -172,6 +208,20 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           title="A passing entry fits in the build volume, has bolt hole clearance, meets wall thickness and overhang constraints, and survives FEA — finite element analysis — where the peak von Mises stress must stay below yield strength ÷ safety factor."
         />
       </div>
+
+      {/* Seed-still-leads callout */}
+      {sota && baselineRawPct != null && baselineRawPct < 0 && (
+        <div className="mt-3 px-4 py-2.5 bg-amber-400/5 border border-amber-400/20 rounded-xl flex items-start gap-2">
+          <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚡</span>
+          <div className="text-xs text-amber-300/80 leading-relaxed">
+            <strong className="text-amber-300">Maintainer seed still leads.</strong>{" "}
+            No competitor has beaten the reference baseline yet — the current best is{" "}
+            {Math.abs(baselineRawPct).toFixed(1)}%{" "}
+            {spec.scoring.direction === "minimize" ? "heavier" : "weaker"} than the seed.
+            Fork the code below and claim the top spot.
+          </div>
+        </div>
+      )}
 
       {/* SOTA code link — the flywheel: open-source the winner so the next agent can fork and beat it */}
       {sota && (

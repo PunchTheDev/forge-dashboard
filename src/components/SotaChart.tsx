@@ -121,6 +121,45 @@ export function SotaChart({ spec }: Props) {
     );
   }
 
+  // Single submission — a line chart needs at least 2 points to be meaningful
+  if (points.length === 1) {
+    const p = points[0];
+    const { label } = metricConfig(metric);
+    const beatsSeed = baseline != null && (
+      direction === "minimize" ? p.score < baseline : p.score > baseline
+    );
+    return (
+      <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-white">SOTA over time</h2>
+          <span className="text-xs text-forge-muted">1 submission</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="h-8 w-8 rounded-full bg-forge-green/15 border border-forge-green/30 flex items-center justify-center text-forge-green text-xs font-bold">
+            #1
+          </div>
+          <div>
+            <div className="font-mono text-forge-green font-semibold">
+              {p.score}{unit}
+            </div>
+            <div className="text-xs text-forge-muted mt-0.5">
+              First {label.toLowerCase()} by <span className="text-white">{p.contributor}</span> · {p.date}
+            </div>
+          </div>
+        </div>
+        {baseline != null && (
+          <div className="mt-3 text-xs text-forge-muted border-t border-forge-border/30 pt-2">
+            vs. seed: {baseline.toFixed(decimals)}{unit}
+            {" · "}
+            <span className={beatsSeed ? "text-forge-green" : "text-amber-400"}>
+              {beatsSeed ? "beats seed" : "seed still leads — fork the code and improve it"}
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const currentSota = points[points.length - 1].score;
   const domain = smartDomain(direction, baseline);
 
