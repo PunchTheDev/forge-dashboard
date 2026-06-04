@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
@@ -63,9 +63,15 @@ interface Props {
 }
 
 export function Playground({ specs, loading }: Props) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedSpecId, setSelectedSpecId] = useState<string>(searchParams.get("spec") ?? "");
   const [search, setSearch] = useState("");
+
+  // Update URL when spec is selected so it's bookmarkable / shareable
+  const selectSpec = useCallback((id: string) => {
+    setSelectedSpecId(id);
+    setSearchParams((prev) => { prev.set("spec", id); return prev; }, { replace: true });
+  }, [setSearchParams]);
 
   // Sync with URL param changes (deep-link from spec detail page)
   useEffect(() => {
@@ -82,16 +88,26 @@ export function Playground({ specs, loading }: Props) {
     }
   }, [specs, selectedSpecId, searchParams]);
 
+  // Map round_id prefix → category label for filter
+  const ROUND_LABELS: Record<string, string> = {
+    r01: "mass", r02: "stiffness", r03: "deflection",
+  };
+
   const filteredSpecs = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (!q) return specs;
-    return specs.filter(
-      (s) =>
+    return specs.filter((s) => {
+      const prefix = s.id.slice(0, 3);
+      const category = ROUND_LABELS[prefix] ?? "";
+      return (
         s.id.toLowerCase().includes(q) ||
         s.name.toLowerCase().includes(q) ||
-        s.material.toLowerCase().includes(q),
-    );
-  }, [specs, search]);
+        s.material.toLowerCase().includes(q) ||
+        category.includes(q) ||
+        (s.tier ?? "").includes(q)
+      );
+    });
+  }, [specs, search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedSpec = specs.find((s) => s.id === selectedSpecId) ?? null;
 
@@ -123,7 +139,7 @@ export function Playground({ specs, loading }: Props) {
             {/* Search */}
             <input
               type="text"
-              placeholder="Filter by ID, material, or name…"
+              placeholder="Filter by ID, material, category (mass, stiffness, deflection), or tier…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-forge-bg border border-forge-border rounded-lg px-3 py-2 text-xs text-white placeholder-forge-muted focus:outline-none focus:border-forge-accent/50 mb-3"
@@ -141,7 +157,7 @@ export function Playground({ specs, loading }: Props) {
                   return (
                     <button
                       key={s.id}
-                      onClick={() => setSelectedSpecId(s.id)}
+                      onClick={() => selectSpec(s.id)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${
                         isSelected
                           ? "bg-forge-accent/15 border border-forge-accent/40 text-white"

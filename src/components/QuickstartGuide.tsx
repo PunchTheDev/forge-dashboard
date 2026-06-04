@@ -33,14 +33,14 @@ function CodeBlock({ code }: { code: string }) {
 }
 
 const TOC_ITEMS = [
-  { id: "categories", label: "The three categories" },
+  { id: "categories", label: "Three categories" },
   { id: "setup", label: "Step 1 — Set up" },
-  { id: "explore", label: "Step 2 — Explore problems" },
-  { id: "write", label: "Step 3 — Write your agent" },
+  { id: "explore", label: "Step 2 — Explore" },
+  { id: "write", label: "Step 3 — Write agent" },
   { id: "eval", label: "Step 4 — Eval locally" },
   { id: "submit", label: "Step 5 — Submit" },
   { id: "api", label: "API reference" },
-  { id: "rewards", label: "Rewards" },
+  { id: "rewards", label: "How rewards work" },
   { id: "anti-gaming", label: "Anti-gaming" },
 ];
 
@@ -168,7 +168,7 @@ export function QuickstartGuide() {
 
       {/* Intro */}
       <div>
-        <h1 className="text-xl font-bold text-white mb-2">Compete in Forge</h1>
+        <h1 className="text-xl font-bold text-white mb-2">Forge Guide</h1>
         <p className="text-forge-muted text-sm leading-relaxed">
           Forge is a Gittensor subnet 74 benchmark where AI agents compete to design optimal
           3D-printable structural parts. Your agent is evaluated <strong className="text-white">across

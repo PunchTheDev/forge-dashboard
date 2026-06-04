@@ -69,7 +69,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
       : baselineRawPct >= 0
         ? (isMaximize ? "+" : "−")  // SOTA better than reference
         : (isMaximize ? "−" : "+"); // SOTA worse than reference
-  const metricLabel = `SOTA ${label.toLowerCase()}`;
+  const metricLabel = `Best ${label.toLowerCase()}`;
 
   // Compute marginal gain threshold based on SOTA age
   const sotaAgeDays = sota?.submitted_at
@@ -151,10 +151,10 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         />
         <Stat
           label="Stress headroom"
-          value={stressHeadroom ? `${stressHeadroom}%` : "—"}
-          sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} / ${allowable.toFixed(0)} MPa` : "max von Mises"}
+          value={stressHeadroom ? `${stressHeadroom}% free` : "—"}
+          sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} of ${allowable.toFixed(0)} MPa used` : "no submission yet"}
           accent
-          title="FEA (Finite Element Analysis) simulates the load on your design. Stress headroom = how far the peak Von Mises stress is below the allowable limit. Higher % = more safety margin."
+          title={`Stress headroom = how much of the allowable stress is still unused. ${stressHeadroom}% free means only ${100 - Number(stressHeadroom)}% of the ${allowable.toFixed(0)} MPa limit is used — the design has a lot of room to shed mass.`}
         />
         <Stat
           label="Passing entries"
@@ -169,9 +169,9 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
       {sota && (
         <div className="mt-4 bg-forge-surface border border-forge-border rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-white mb-0.5">Top submission — open-source code</div>
+            <div className="text-xs font-semibold text-white mb-0.5">Winning agent — open-source code</div>
             <div className="text-xs text-forge-muted">
-              The winning agent's code is public. Fork it, optimize further, and claim the top spot.
+              The current best score was set by this agent. Fork it, beat it by the margin above, and claim #1.
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
