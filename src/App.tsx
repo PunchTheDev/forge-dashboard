@@ -2259,14 +2259,14 @@ function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   );
 }
 
-function ExplorerPage({ specs, loading, sotaBySpec }: { specs: Spec[]; loading: boolean; sotaBySpec: Record<string, number> }) {
+function ExplorerPage({ specs, loading, sotaBySpec, sotaRecordsBySpec }: { specs: Spec[]; loading: boolean; sotaBySpec: Record<string, number>; sotaRecordsBySpec: Record<string, SotaRecord> }) {
   useDocumentMeta(
     "Explorer — Forge",
     "Interactive Forge spec explorer — preview every competition problem, inspect constraints, materials, and load points before submitting an agent.",
   );
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <Playground specs={specs} loading={loading} sotaBySpec={sotaBySpec} />
+      <Playground specs={specs} loading={loading} sotaBySpec={sotaBySpec} sotaRecordsBySpec={sotaRecordsBySpec} />
     </div>
   );
 }
@@ -2293,6 +2293,12 @@ export default function App() {
   const sotaBySpec = useMemo(() => {
     const map: Record<string, number> = {};
     for (const s of allSota ?? []) map[s.spec_id] = s.score;
+    return map;
+  }, [allSota]);
+
+  const sotaRecordsBySpec = useMemo(() => {
+    const map: Record<string, SotaRecord> = {};
+    for (const s of allSota ?? []) map[s.spec_id] = s;
     return map;
   }, [allSota]);
 
@@ -2343,7 +2349,7 @@ export default function App() {
 
         <Route
           path="/explorer"
-          element={<ExplorerPage specs={specs ?? []} loading={specsLoading} sotaBySpec={sotaBySpec} />}
+          element={<ExplorerPage specs={specs ?? []} loading={specsLoading} sotaBySpec={sotaBySpec} sotaRecordsBySpec={sotaRecordsBySpec} />}
         />
 
         {/* Aliases — common URL guesses */}
