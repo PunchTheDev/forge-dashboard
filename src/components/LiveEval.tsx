@@ -55,7 +55,10 @@ function ResultCard({ result }: { result: EvalPreviewResult }) {
           >
             {result.passed ? "PASSED" : "FAILED"}
           </span>
-          <span className="text-forge-muted text-xs font-mono">
+          <span
+            className="text-forge-muted text-xs font-mono cursor-help"
+            title="Pipeline stage where eval completed or failed: geometry = STEP parsing + build-volume / bolt / wall checks; fea = CalculiX meshing + stress analysis; score = metric extraction."
+          >
             stage: {result.stage}
           </span>
         </div>
@@ -109,19 +112,19 @@ function ResultCard({ result }: { result: EvalPreviewResult }) {
         <div className="grid grid-cols-2 gap-3 mb-4">
           {result.fea_element_count != null && (
             <div>
-              <div className="text-xs text-forge-muted">Elements</div>
+              <div className="text-xs text-forge-muted cursor-help" title="Number of tetrahedral finite elements in the CalculiX mesh. More elements = higher simulation accuracy but longer runtime. Typically 5k–50k.">Elements</div>
               <div className="font-mono text-sm text-white">{result.fea_element_count.toLocaleString()}</div>
             </div>
           )}
           {result.fea_displacement_mm != null && (
             <div>
-              <div className="text-xs text-forge-muted">Max displacement</div>
+              <div className="text-xs text-forge-muted cursor-help" title="Maximum deformation of any node in the mesh under the applied load (mm). For deflection-scored problems this approximates the scored tip deflection. Lower = stiffer design.">Max displacement</div>
               <div className="font-mono text-sm text-white">{result.fea_displacement_mm.toFixed(4)} mm</div>
             </div>
           )}
           {result.fea_load_node_count != null && (
             <div>
-              <div className="text-xs text-forge-muted">Load nodes</div>
+              <div className="text-xs text-forge-muted cursor-help" title="Number of mesh nodes at the load point where the applied force is distributed. A coarse mesh near the load point = fewer nodes = less precise force application.">Load nodes</div>
               <div className="font-mono text-sm text-white">{result.fea_load_node_count}</div>
             </div>
           )}
