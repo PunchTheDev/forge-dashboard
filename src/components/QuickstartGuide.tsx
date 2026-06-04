@@ -241,7 +241,7 @@ forge check-deps          # checks Docker / native toolchain`} />
       {/* Step 2 */}
       <Section id="explore" title="Step 2 — Explore the problem pool">
         <p className="text-forge-muted text-sm">
-          Browse all 45 problems (15 per category). Each problem's spec defines the material, load, bolt pattern,
+          Browse all 45 problems (15 per category). Each problem defines the material, load, bolt pattern,
           and build volume. Train your agent on individual problems, then let CI test it across all categories.
         </p>
         <CodeBlock code={`forge specs                              # list all 45 problems
@@ -411,7 +411,7 @@ for chunk in llm.stream([...]):
       <Section id="eval" title="Step 4 — Eval locally">
         <p className="text-forge-muted text-sm">
           Test your agent before submitting. The local eval runs the same FEA pipeline as CI.
-          Try specs from all three categories to check your agent generalizes.
+          Try problems from all three categories to check your agent generalizes.
         </p>
         <CodeBlock code={`# Recommended: run inside Docker (no local CalculiX/gmsh needed):
 forge eval agents/your-name/agent.py --spec r01_001_easy --docker  # mass
@@ -433,8 +433,8 @@ forge status agents/your-name/agent.py`} />
       {/* Step 5 */}
       <Section id="submit" title="Step 5 — Submit">
         <p className="text-forge-muted text-sm">
-          Fork the repo, push your agent, and open a PR. CI runs a quick check (1 easy spec per category) and posts
-          pass/fail within ~5 minutes. Full scoring runs across all 45 active specs automatically — that result
+          Fork the repo, push your agent, and open a PR. CI runs a quick check (1 easy problem per category) and posts
+          pass/fail within ~5 minutes. Full scoring runs across all 45 active problems automatically — that result
           determines your rank on the leaderboard.
         </p>
         <CodeBlock code={`# Fork on GitHub, then:
@@ -520,7 +520,7 @@ git push mine your-name/my-design
         <p className="text-forge-muted text-xs leading-relaxed">
           Your ranking is based on normalized performance across all active specs — not just the
           best single result. Holding the SOTA in multiple categories compounds your score. The
-          benchmark is deterministic: the same agent always produces the same output on the same spec.
+          benchmark is deterministic: the same agent always produces the same output for the same problem.
         </p>
       </Section>
 
@@ -531,8 +531,8 @@ git push mine your-name/my-design
         </p>
         <ul className="text-forge-muted text-sm space-y-1.5">
           {[
-            "Determinism check — first spec runs twice, scores must match exactly",
-            "Full coverage — final scoring runs all 45 specs, no sampling variance",
+            "Determinism check — first problem runs twice, scores must match exactly",
+            "Full coverage — final scoring runs all 45 problems, no sampling variance",
             "Duplicate detection — same commit hash is never scored twice",
             "Similarity check — agents must not copy existing agents' code",
             "LLM calls whitelisted — model fixed by harness, agents cannot self-select models",
