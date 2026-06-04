@@ -8,6 +8,7 @@ import {
   useNavigate,
   useParams,
   useMatch,
+  useSearchParams,
 } from "react-router-dom";
 import {
   api,
@@ -697,7 +698,7 @@ function SidebarSpecList({
                     }`}
                   >
                     <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${TIER_DOT[tier]}`} />
-                    <span className="font-mono text-xs flex-1 min-w-0 truncate">{spec.id}</span>
+                    <span className="text-xs flex-1 min-w-0 truncate">{specLabel(spec)}</span>
                     {sota != null ? (
                       <span className="shrink-0 text-forge-green font-mono text-xs">
                         {fmtScore(sota, round.scoring_metric)}
@@ -1018,7 +1019,7 @@ function CategoryPage({ data }: { data: SharedData }) {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="text-forge-muted text-sm">Category not found.</div>
         <Link to="/problems" className="text-forge-accent text-xs hover:underline mt-2 inline-block">
-          ← All categories
+          ← Problems
         </Link>
       </div>
     );
@@ -1039,7 +1040,7 @@ function CategoryPage({ data }: { data: SharedData }) {
         to="/problems"
         className="text-xs text-forge-muted hover:text-white mb-4 flex items-center gap-1 transition-colors"
       >
-        ← All categories
+        ← Problems
       </Link>
 
       {/* Category header */}
@@ -1334,8 +1335,15 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 
 function RankingsPage({ data }: { data: SharedData }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { overallData, overallLoading, allRounds } = data;
-  const [activeRoundTab, setActiveRoundTab] = useState<string | null>(null);
+
+  // Persist tab in URL (?tab=round_001) so per-category standings can be linked
+  const activeRoundTab = searchParams.get("tab") ?? null;
+  const setActiveRoundTab = (roundId: string | null) => {
+    if (roundId) setSearchParams({ tab: roundId }, { replace: true });
+    else setSearchParams({}, { replace: true });
+  };
 
   useEffect(() => {
     document.title = "Agent Rankings — Forge";
@@ -1501,7 +1509,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="text-forge-muted text-sm mb-3">Agent not found: {contributor}</div>
         <Link to="/rankings" className="text-forge-accent text-xs hover:underline">
-          ← All agents
+          ← Rankings
         </Link>
       </div>
     );
@@ -1523,21 +1531,21 @@ function AgentDetailPage({ data }: { data: SharedData }) {
         to="/rankings"
         className="text-xs text-forge-muted hover:text-white mb-5 flex items-center gap-1 transition-colors"
       >
-        ← All agents
+        ← Rankings
       </Link>
 
       {/* Agent header */}
       <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 mb-5">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="text-lg font-bold text-white">{entry.contributor}</div>
+            <h1 className="text-lg font-bold text-white">{entry.contributor}</h1>
             <div className="text-xs text-forge-muted mt-0.5">
               Rank{" "}
               <span className="text-white font-mono font-semibold">#{entry.rank}</span>
               {" · "}
-              {entry.specs_entered} problem{entry.specs_entered !== 1 ? "s" : ""}
+              {entry.specs_entered} problem{entry.specs_entered !== 1 ? "s" : ""} entered
               {" · "}
-              {entry.total_wins} win{entry.total_wins !== 1 ? "s" : ""}
+              {entry.total_wins} SOTA claim{entry.total_wins !== 1 ? "s" : ""}
             </div>
           </div>
           <div className="text-right">
@@ -1578,7 +1586,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     {bests.length} problem{bests.length !== 1 ? "s" : ""}
                     {wins > 0 && (
                       <span className="text-yellow-400">
-                        {" · "}{wins} win{wins !== 1 ? "s" : ""}
+                        {" · "}{wins} SOTA claim{wins !== 1 ? "s" : ""}
                       </span>
                     )}
                     <span className={`font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>
@@ -1619,18 +1627,20 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                   : pct <= 100
                     ? "text-forge-accent"
                     : "text-forge-red";
+              const fullSpec = specs?.find((s) => s.id === b.spec_id);
+              const problemLabel = fullSpec ? specLabel(fullSpec) : b.spec_id;
               return (
                 <tr key={b.spec_id} className="border-b border-forge-border/40 last:border-0">
-                  <td className="py-1.5 font-mono">
+                  <td className="py-1.5">
                     {roundId ? (
                       <Link
                         to={`/problems/${roundId}/${b.spec_id}`}
                         className="text-forge-accent hover:underline"
                       >
-                        {b.spec_id}
+                        {problemLabel}
                       </Link>
                     ) : (
-                      <span className="text-white/80">{b.spec_id}</span>
+                      <span className="text-white/80">{problemLabel}</span>
                     )}
                   </td>
                   <td className="py-1.5">
