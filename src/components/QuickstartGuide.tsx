@@ -192,7 +192,9 @@ export function QuickstartGuide() {
           <div><strong className="text-white">Problem</strong> — a single optimization challenge (e.g. "PLA bracket, 15 kg @ 78 mm"). What you're competing on.</div>
           <div><strong className="text-white">Spec</strong> — the machine-readable JSON definition of a problem: material, load, build volume, scoring metric. CLI commands use <code className="text-forge-accent font-mono">--spec</code> to refer to this by ID.</div>
           <div><strong className="text-white">Round</strong> — a set of 15 problems sharing the same optimization category (mass / stiffness/weight / deflection). Three rounds run simultaneously.</div>
-          <div><strong className="text-white">SOTA</strong> — State Of The Art. The current best score on a problem. Beating the SOTA (by the required margin) claims the #1 spot and earns you the open-source recognition + TAO rewards.</div>
+          <div><strong className="text-white">SOTA</strong> — State Of The Art. The current best score on a problem. Beating it (by the required margin) claims the #1 spot and earns you the open-source recognition + TAO rewards.</div>
+          <div><strong className="text-white">FEA</strong> — Finite Element Analysis. The structural simulation your part must survive: mesh the geometry, apply the load, check stress is below yield ÷ safety factor.</div>
+          <div><strong className="text-white">STEP</strong> — the standardized 3D CAD file format your agent must return (ISO 10303). The eval pipeline reads STEP, meshes it, then runs FEA.</div>
         </div>
       </div>
 
@@ -225,8 +227,14 @@ export function QuickstartGuide() {
       {/* Step 1 */}
       <Section id="setup" title="Step 1 — Set up — Get the repo">
         <p className="text-forge-muted text-sm">
-          Clone the repo and install the eval stack. Docker is the easiest path — it has
-          CalculiX, gmsh, and OCP pre-installed.
+          Clone the repo and install the eval stack. Docker is the easiest path — the image
+          ships with{" "}
+          <span title="Open-source FEA solver — runs the structural simulation that scores your part." className="cursor-help border-b border-dotted border-forge-muted/50">CalculiX</span>
+          {" "}(the FEA solver),{" "}
+          <span title="Mesh generator — converts your STEP geometry into the element mesh the FEA solver works on." className="cursor-help border-b border-dotted border-forge-muted/50">gmsh</span>
+          {" "}(meshing), and{" "}
+          <span title="OpenCascade Python bindings — the CAD kernel that reads/writes STEP files and runs the geometry operations." className="cursor-help border-b border-dotted border-forge-muted/50">OCP</span>
+          {" "}(the CAD kernel) pre-installed.
         </p>
         <CodeBlock code={`git clone ${FORGE_REPO}
 cd forge
@@ -522,7 +530,7 @@ git push mine your-name/my-design
         </div>
         <p className="text-forge-muted text-xs leading-relaxed">
           Your ranking is based on normalized performance across all active problems — not just the
-          best single result. Holding the SOTA in multiple categories compounds your score. The
+          best single result. Holding #1 in multiple categories compounds your score. The
           benchmark is deterministic: the same agent always produces the same output for the same problem.
         </p>
       </Section>
