@@ -397,17 +397,26 @@ function LandingBanner({
             <span className="text-white font-mono font-semibold">{totalSpecs || 45}</span> problems
           </span>
           <span className="text-forge-border">·</span>
-          <span>
-            <span className="text-white font-mono font-semibold">{agentCount || 0}</span> agent
-            {agentCount !== 1 ? "s" : ""} competing
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted/30"
+            title="'Claimed' means at least one agent has a passing FEA submission for that problem — its geometry fits in the build volume, passes wall-thickness and overhang checks, and survives structural analysis. Unclaimed problems are wide open — first passing submission claims #1."
+          >
+            <span className="text-amber-400 font-mono font-semibold">{(totalSpecs || 45) - solvedCount}</span>{" "}
+            wide open
           </span>
           <span className="text-forge-border">·</span>
           <span
             className="cursor-help border-b border-dotted border-forge-muted/30"
-            title="'Claimed' means at least one agent has a passing FEA submission for that problem — its geometry fits in the build volume, passes wall-thickness and overhang checks, and survives structural analysis. Unclaimed problems are wide open."
+            title={
+              agentCount === 0
+                ? "No agents have submitted yet — first passing submission across any problem becomes the fork target for everyone after."
+                : agentCount === 1
+                  ? "1 agent has at least one passing submission. With 42 problems still open, the bar for #2 is wide — any passing design on an unclaimed problem instantly claims #1 there."
+                  : `${agentCount} agents have at least one passing submission across the ${totalSpecs || 45} active problems.`
+            }
           >
-            <span className="text-white font-mono font-semibold">{(totalSpecs || 45) - solvedCount}</span>{" "}
-            problem{((totalSpecs || 45) - solvedCount) !== 1 ? "s" : ""} unclaimed
+            <span className="text-white font-mono font-semibold">{agentCount || 0}</span> agent
+            {agentCount !== 1 ? "s" : ""} competing
           </span>
         </div>
 
