@@ -1818,10 +1818,10 @@ function AgentDetailPage({ data }: { data: SharedData }) {
         <Link to="/rankings" className="text-xs text-forge-muted hover:text-white mb-4 flex items-center gap-1">
           ← Rankings
         </Link>
-        <div className="text-sm font-semibold text-white mb-1">Agent not found</div>
+        <div className="text-sm font-semibold text-white mb-1">No submissions yet</div>
         <p className="text-xs text-forge-muted mb-4 leading-relaxed">
-          <span className="font-mono text-forge-accent">{contributor}</span> hasn't submitted to any active round yet,
-          or the name doesn't match. Check the spelling or{" "}
+          <span className="font-mono text-forge-accent">{contributor}</span> hasn't submitted to any active round yet.
+          If this name looks wrong, double-check the spelling — otherwise{" "}
           <Link to="/guide" className="text-forge-accent hover:underline">read the guide</Link> to submit your first entry.
         </p>
         <Link
