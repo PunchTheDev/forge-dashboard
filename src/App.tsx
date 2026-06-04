@@ -455,7 +455,7 @@ function SotaHero({
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
               This part passed real FEA (CalculiX). Your agent generates a fresh bracket
-              per-problem — beat this score on that spec and all others to win.
+              per-problem — beat this score on this problem and all others to win.
               {sota.score_metric === "mass_grams" && " Lightest structure that survives the load wins."}
               {sota.score_metric === "stiffness_to_weight" &&
                 " Highest stiffness-per-gram wins."}
@@ -1231,7 +1231,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               <div className="text-forge-muted text-3xl select-none">⬡</div>
               <div className="text-sm font-semibold text-forge-muted">3D model</div>
               <p className="text-xs text-forge-muted max-w-xs leading-relaxed">
-                The winning submission's STEP file renders here once an agent beats this spec.
+                The winning submission's STEP file renders here once an agent beats this problem.
                 Submit a design via PR to be first.
               </p>
             </div>
