@@ -126,7 +126,10 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           >
             {MATERIAL_META[spec.material]?.label ?? spec.material.toUpperCase().replace(/_/g, " ")}
           </span>
-          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
+          <span
+            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+            title={`${spec.constraints.load_newtons.toFixed(0)} N (≈ ${loadKg} kg under Earth gravity) applied downward (-Z) at the arm tip — the load point. Your design must survive this without exceeding the allowable stress.`}
+          >
             {loadKg} kg load
           </span>
           <span
