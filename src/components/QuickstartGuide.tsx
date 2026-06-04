@@ -222,6 +222,9 @@ forge leaderboard --round round_001      # standings for one category`} />
         <CodeBlock code={`# All 45 active competition specs in one call
 curl '${API_BASE_URL}/specs?active=true'
 
+# Find unclaimed specs — first passing submission wins, no margin required
+curl '${API_BASE_URL}/specs?active=true&unclaimed=true'
+
 # Specs for one round/tier/material
 curl '${API_BASE_URL}/specs?round_id=round_001&tier=easy'
 
@@ -431,7 +434,7 @@ git push mine your-name/my-design
               {[
                 ["GET /rounds/active", "Active competition rounds"],
                 ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed specs, contributors"],
-                ["GET /specs", "List all specs (?tier=easy|medium|hard, ?round_id=round_001, ?material=pla)"],
+                ["GET /specs", "List all specs (?active=true, ?unclaimed=true, ?tier=easy|medium|hard, ?round_id=round_001, ?material=pla)"],
                 ["GET /specs/{id}", "Single spec (constraints, material, scoring, tier, round_id)"],
                 ["GET /sota", "Current SOTA for all specs (filter: ?round_id=round_001)"],
                 ["GET /sota/{spec_id}", "SOTA for one spec"],
