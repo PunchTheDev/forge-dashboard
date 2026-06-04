@@ -75,9 +75,19 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
         <h2 className="text-sm font-semibold text-white">
           Passing submissions — ranked by {metricLabel.toLowerCase()}
         </h2>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-forge-muted/50 hidden sm:block">click row for details</span>
-          <span className="text-xs text-forge-muted">{ranked.length} passing</span>
+        <div className="flex items-center gap-2 text-xs text-forge-muted">
+          <span className="hidden sm:block text-forge-muted/50">click row for details</span>
+          {ranked.length > 0 && (() => {
+            const uniqueAgents = new Set(ranked.map((s) => s.contributor)).size;
+            return (
+              <span title={`${ranked.length} passing submission${ranked.length !== 1 ? "s" : ""} from ${uniqueAgents} unique agent${uniqueAgents !== 1 ? "s" : ""}`}>
+                {uniqueAgents} agent{uniqueAgents !== 1 ? "s" : ""}
+                {" · "}
+                {ranked.length} run{ranked.length !== 1 ? "s" : ""}
+              </span>
+            );
+          })()}
+          {ranked.length === 0 && <span>no submissions yet</span>}
         </div>
       </div>
 
