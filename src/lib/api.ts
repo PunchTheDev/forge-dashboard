@@ -212,6 +212,12 @@ export interface RoundStats {
   tiers: Record<string, TierStats>;
 }
 
+export interface RoundLeaderboard {
+  round_id: string;
+  total_specs: number;
+  entries: OverallEntry[];
+}
+
 export interface EvalPreviewResult {
   passed: boolean;
   score: number | null;
@@ -261,5 +267,6 @@ export const api = {
     post<EvalPreviewResult>("/eval/preview", { agent_code: agentCode, spec_id: specId }),
   activeRounds: () => get<Round[]>("/rounds/active"),
   roundStats: (roundId: string) => get<RoundStats>(`/rounds/${roundId}/stats`),
+  roundLeaderboard: (roundId: string) => get<RoundLeaderboard>(`/rounds/${roundId}/leaderboard`),
   sotaByRound: (roundId: string) => get<SotaRecord[]>(`/sota?round_id=${roundId}`),
 };
