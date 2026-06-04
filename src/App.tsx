@@ -134,6 +134,22 @@ function AgentAliasRedirect() {
   return <Navigate to={`/rankings/${agentId ?? ""}`} replace />;
 }
 
+/** Map category names (mass, stiffness, deflection) → round_NNN → /problems/round_NNN */
+const CATEGORY_TO_ROUND: Record<string, string> = {
+  mass: "round_001",
+  "mass-optimization": "round_001",
+  stiffness: "round_002",
+  "stiffness-weight": "round_002",
+  "stiffness-to-weight": "round_002",
+  sw: "round_002",
+  deflection: "round_003",
+};
+function CategoryAliasRedirect() {
+  const { name } = useParams<{ name: string }>();
+  const round = CATEGORY_TO_ROUND[(name ?? "").toLowerCase()];
+  return <Navigate to={round ? `/problems/${round}` : "/problems"} replace />;
+}
+
 function NotFoundPage() {
   useEffect(() => {
     document.title = "Page not found — Forge";
@@ -2120,6 +2136,17 @@ export default function App() {
         <Route path="/rounds" element={<Navigate to="/problems" replace />} />
         <Route path="/rounds/:roundId" element={<RoundRedirect />} />
         <Route path="/round/:roundId" element={<RoundRedirect />} />
+        {/* Problem (singular) → problems */}
+        <Route path="/problem" element={<Navigate to="/problems" replace />} />
+        <Route path="/problem/:roundId" element={<RoundRedirect />} />
+        {/* Categories — home page calls each round a "category"; first-timers guess this URL */}
+        <Route path="/categories" element={<Navigate to="/problems" replace />} />
+        <Route path="/category" element={<Navigate to="/problems" replace />} />
+        <Route path="/categories/:name" element={<CategoryAliasRedirect />} />
+        <Route path="/category/:name" element={<CategoryAliasRedirect />} />
+        {/* SOTA — API exposes /sota; dashboard guess lands on /problems (each round shows its SOTA #1) */}
+        <Route path="/sota" element={<Navigate to="/problems" replace />} />
+        <Route path="/sota/:roundId" element={<RoundRedirect />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
