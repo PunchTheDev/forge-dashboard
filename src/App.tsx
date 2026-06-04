@@ -542,7 +542,15 @@ function CategoryCard({
           {tiers
             .filter((t) => tierCounts[t] > 0)
             .map((t) => (
-              <span key={t} className={`text-xs font-mono ${TIER_COLORS[t]}`}>
+              <span
+                key={t}
+                className={`text-xs font-mono ${TIER_COLORS[t]}`}
+                title={
+                  t === "easy" ? "Easy: lighter loads, more generous tolerances — good for initial testing" :
+                  t === "medium" ? "Medium: moderate load and constraints — representative of real-world bracket design" :
+                  "Hard: heavy load, tight tolerances — pushes structural limits"
+                }
+              >
                 {tierCounts[t]} {t}
               </span>
             ))}
