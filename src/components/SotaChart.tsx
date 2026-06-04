@@ -64,26 +64,32 @@ function CustomTooltip({
   );
 }
 
-// Smart y-axis domain: pad 15% around the data range, never below 0.
-// With a single data point the range collapses, so fall back to ±15% of the value.
+// Smart y-axis domain: centers on actual data. Includes the reference line in
+// the visible range only when it's within 5× of the data — otherwise the ref
+// is shown as a clipped annotation while the chart stays readable around the data.
 function smartDomain(
-  direction: string,
+  _direction: string,
   baseline: number | null,
 ): [(dataMin: number) => number, (dataMax: number) => number] {
   return [
     (dataMin: number) => {
-      const ref = baseline ?? dataMin;
-      const low = Math.min(dataMin, ref);
-      const high = Math.max(dataMin, ref);
-      const pad = (high - low) > 0 ? (high - low) * 0.15 : low * 0.15;
+      // Include reference only if within 5× of the data point
+      const includeRef = baseline != null && baseline > 0 &&
+        Math.max(dataMin, baseline) / Math.min(dataMin, baseline) <= 5;
+      const low = includeRef ? Math.min(dataMin, baseline!) : dataMin;
+      const high = includeRef ? Math.max(dataMin, baseline!) : dataMin;
+      const range = high - low;
+      const pad = range > 0 ? range * 0.15 : Math.abs(low) * 0.15 || 1;
       return Math.max(0, low - pad);
     },
     (dataMax: number) => {
-      const ref = baseline ?? dataMax;
-      const high = Math.max(dataMax, ref);
-      const low = Math.min(dataMax, ref);
-      const pad = (high - low) > 0 ? (high - low) * 0.15 : high * 0.15;
-      return direction === "maximize" ? high + pad : high + pad;
+      const includeRef = baseline != null && baseline > 0 &&
+        Math.max(dataMax, baseline) / Math.min(dataMax, baseline) <= 5;
+      const high = includeRef ? Math.max(dataMax, baseline!) : dataMax;
+      const low = includeRef ? Math.min(dataMax, baseline!) : dataMax;
+      const range = high - low;
+      const pad = range > 0 ? range * 0.15 : Math.abs(high) * 0.15 || 1;
+      return high + pad;
     },
   ];
 }
