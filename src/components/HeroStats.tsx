@@ -188,7 +188,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           title={
             baseline != null
               ? `The reference agent is the maintainer's baseline — not a competition entry. ` +
-                `${baselineRawPct != null && baselineRawPct < 0 ? "Amber = the seed is still ahead of the current SOTA." : "Green = agents are now beating the seed."} ` +
+                `${baselineRawPct != null && baselineRawPct < 0 ? "Amber = the reference is still ahead of the current SOTA." : "Green = agents are now beating the reference."} ` +
                 `Your goal is to beat the current SOTA by the required margin, not the reference.`
               : undefined
           }
@@ -214,10 +214,10 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         <div className="mt-3 px-4 py-2.5 bg-amber-400/5 border border-amber-400/20 rounded-xl flex items-start gap-2">
           <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚡</span>
           <div className="text-xs text-amber-300/80 leading-relaxed">
-            <strong className="text-amber-300">Maintainer seed still leads.</strong>{" "}
-            No competitor has beaten the reference baseline yet — the current best is{" "}
+            <strong className="text-amber-300">Maintainer reference still leads.</strong>{" "}
+            No competitor has beaten the maintainer's baseline yet — the current best is{" "}
             {Math.abs(baselineRawPct).toFixed(1)}%{" "}
-            {spec.scoring.direction === "minimize" ? "heavier" : "weaker"} than the seed.
+            {metric === "mass_grams" ? "heavier" : isMaximize ? "less stiff" : "worse (more deflection)"} than the reference.
             Fork the code below and claim the top spot.
           </div>
         </div>
