@@ -37,17 +37,25 @@ function fmtAvgRank(avg: number): { text: string; color: string } {
   return { text: `#${avg.toFixed(1)}`, color: "text-forge-red" };
 }
 
-/** Breadth bar: fills proportionally to specs entered — more specs = wider bar. */
+/** Breadth bar: fills proportionally to problems entered — more problems = wider bar. */
 function ScoreBar({ specsEntered, totalSpecs }: { specsEntered: number; totalSpecs: number }) {
   const fill = totalSpecs > 0 ? Math.min(1, specsEntered / totalSpecs) : 0;
   // Color: green ≥50%, amber 20–49%, slate <20%
   const color = fill >= 0.5 ? "#22c55e" : fill >= 0.2 ? "#f59e0b" : "#64748b";
   return (
-    <div className="w-full bg-forge-border rounded-full h-1.5 mt-1" title={`${specsEntered} of ${totalSpecs} specs entered`}>
+    <div>
       <div
-        className="h-1.5 rounded-full transition-all"
-        style={{ width: `${Math.max(fill * 100, fill > 0 ? 2 : 0)}%`, backgroundColor: color }}
-      />
+        className="w-full bg-forge-border rounded-full h-1.5"
+        title={`Coverage: ${specsEntered} of ${totalSpecs} problems entered. Unentered problems auto-score 1.0 (worst).`}
+      >
+        <div
+          className="h-1.5 rounded-full transition-all"
+          style={{ width: `${Math.max(fill * 100, fill > 0 ? 2 : 0)}%`, backgroundColor: color }}
+        />
+      </div>
+      <div className="text-xs text-forge-muted mt-0.5">
+        {specsEntered}/{totalSpecs} problems covered
+      </div>
     </div>
   );
 }
