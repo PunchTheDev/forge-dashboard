@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Round, SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, MATERIAL_META } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 import { SotaCodeViewer } from "./SotaCodeViewer";
@@ -33,6 +34,33 @@ const CATEGORY_PILL: Record<string, { label: string; color: string; bg: string; 
     goal: "Least bending under the applied load wins.",
   },
 };
+
+/**
+ * Tooltip-bearing chip used on the spec header recipe row.
+ * Signals "I have a tooltip" with a low-opacity ⓘ glyph + hover bg/text lift,
+ * so first-timers don't have to guess that these chips are interactive.
+ */
+function InfoChip({
+  title,
+  className,
+  children,
+}: {
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <span
+      className={`text-xs px-2 py-0.5 rounded cursor-help inline-flex items-center gap-1 transition-colors duration-150 ${
+        className ?? "bg-forge-border text-forge-muted hover:bg-forge-border/80 hover:text-white"
+      }`}
+      title={title}
+    >
+      {children}
+      <span aria-hidden="true" className="text-[9px] opacity-50 leading-none translate-y-[-0.5px]">ⓘ</span>
+    </span>
+  );
+}
 
 function Stat({
   label,
@@ -132,43 +160,39 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         )}
         <div className="flex flex-wrap items-center gap-2 mb-1">
           <h1 className="text-lg font-bold text-white">{specLabel(spec)}</h1>
-          <span
-            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+          <InfoChip
             title={MATERIAL_META[spec.material]?.note ?? spec.material}
           >
             {MATERIAL_META[spec.material]?.label ?? spec.material.toUpperCase().replace(/_/g, " ")}
-          </span>
-          <span
-            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+          </InfoChip>
+          <InfoChip
             title={`${spec.constraints.load_newtons.toFixed(0)} N (≈ ${loadKg} kg under Earth gravity) applied downward (-Z) at the arm tip — the load point. Your design must survive this without exceeding the allowable stress.`}
           >
             {loadKg} kg load
-          </span>
-          <span
-            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+          </InfoChip>
+          <InfoChip
             title={`Safety factor ${spec.constraints.safety_factor}× — yield stress ÷ SF = max allowable stress. Higher = stricter design requirement.`}
           >
             SF {spec.constraints.safety_factor}×
-          </span>
-          <span
-            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+          </InfoChip>
+          <InfoChip
             title={`Max allowable stress = ${spec.material.includes("aluminum") || spec.material.includes("stainless") ? "yield strength" : "tensile strength"} ÷ safety factor ${spec.constraints.safety_factor}×. Your design's peak von Mises stress must stay below this. MPa = megapascals (unit of pressure/stress).`}
           >
             ≤{allowable.toFixed(0)} MPa
-          </span>
+          </InfoChip>
           {spec.tier && (
-            <span
-              className={`text-xs px-2 py-0.5 rounded capitalize cursor-help border ${
+            <InfoChip
+              className={`capitalize border ${
                 spec.tier === "easy"
-                  ? "bg-forge-green/10 text-forge-green border-forge-green/30"
+                  ? "bg-forge-green/10 text-forge-green border-forge-green/30 hover:bg-forge-green/15"
                   : spec.tier === "medium"
-                  ? "bg-forge-accent/10 text-forge-accent border-forge-accent/30"
-                  : "bg-forge-red/10 text-forge-red border-forge-red/30"
+                  ? "bg-forge-accent/10 text-forge-accent border-forge-accent/30 hover:bg-forge-accent/15"
+                  : "bg-forge-red/10 text-forge-red border-forge-red/30 hover:bg-forge-red/15"
               }`}
               title={`Difficulty tier: ${spec.tier}. Easy problems have lighter loads and more generous tolerances; hard problems push constraints further.`}
             >
               {spec.tier}
-            </span>
+            </InfoChip>
           )}
         </div>
         <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-2">
