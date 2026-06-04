@@ -28,11 +28,12 @@ If any seat would be confused, the component fails.
 
 ## NEXT UP (priority queue)
 
-1. **Surface the SOTA agent's actual code inline** — currently we show the agent name + score + a `↗ code` link out to GitHub. The whole flywheel is "fork and beat" — the code itself should render on the spec detail page so a would-be miner reads it without leaving. Operator-specified.
+1. ~~**Surface the SOTA agent's actual code inline**~~ ✅ shipped step 343 (`fb4d06f`). `SotaCodeViewer` renders `agent.py` inline on spec detail with Python syntax highlight + line numbers + 28-line collapsed view with Expand toggle + Copy chip + GitHub-↗ as secondary affordance.
 2. **Spec detail header literacy** — "PETG · 15 kg load · 78mm arm" assumes you know what PETG is, what direction the load applies, what the arm length means. Header chips need plain-language tooltips and an inline diagram tying material/load/arm to the actual geometry.
 3. **Side / front-view diagram** — currently small and weak, only shown after spec selection. Promote it; explain the bolt pattern, the load arrow, the wall-mount plane.
 4. **Spec vs problem vs round** — pick one word per concept across all pages. Audit copy; remove the synonym drift.
 5. **Rankings → agent profile → per-problem code-fork loop** — closing the loop: from rankings, a miner should reach the best agent's code in ≤2 clicks.
+6. **Extend inline code viewer to the Spotlight panel + Explorer "Current #1" panel** — they still link-out; the new `SotaCodeViewer` component is reusable. (Spotlight ref in App.tsx ~L557; Explorer ref ~L773/L861.)
 
 ---
 
@@ -61,7 +62,7 @@ If any seat would be confused, the component fails.
 - `SpecDiagram` (front view + side view miniature) — ○ ○ ○ — too small; load arrow direction not labeled.
 - 4 KPI tiles (best mass / vs reference / stress margin / passing entries) — ● ● ● — clean.
 - "Maintainer reference still leads" banner — ● ● ◐ — banner clear; "by 5.2% heavier than the reference" phrasing slightly inverted for first-timer.
-- **"Top competitor — open-source code"** panel — ◐ ◐ ○ — surfaces the path + `view code` link but NOT the actual code. PRIORITY 1.
+- **"Top competitor — open-source code"** panel — ● ● ● — `SotaCodeViewer` now renders `agent.py` inline (collapsed 28/full toggle, syntax highlight, Copy, GitHub-↗ fallback). Shipped step 343.
 - `StepViewer` (3D viewer) — ● ● ● — drag/zoom hint visible, lazy-loaded.
 - `SotaChart` (best score over time) — ○ ○ ○
 - "Passing submissions" + "All submissions" tables — ○ ○ ○
