@@ -10,7 +10,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { useApi } from "../hooks/useApi";
-import { api, Spec, SotaHistoryPoint, metricConfig } from "../lib/api";
+import { api, Spec, SotaHistoryPoint, metricConfig, specBaseline } from "../lib/api";
 
 interface Props {
   spec: Spec;
@@ -64,10 +64,35 @@ function CustomTooltip({
   );
 }
 
+// Smart y-axis domain: pad 15% around the data range, never below 0.
+// With a single data point the range collapses, so fall back to ±15% of the value.
+function smartDomain(
+  direction: string,
+  baseline: number | null,
+): [(dataMin: number) => number, (dataMax: number) => number] {
+  return [
+    (dataMin: number) => {
+      const ref = baseline ?? dataMin;
+      const low = Math.min(dataMin, ref);
+      const high = Math.max(dataMin, ref);
+      const pad = (high - low) > 0 ? (high - low) * 0.15 : low * 0.15;
+      return Math.max(0, low - pad);
+    },
+    (dataMax: number) => {
+      const ref = baseline ?? dataMax;
+      const high = Math.max(dataMax, ref);
+      const low = Math.min(dataMax, ref);
+      const pad = (high - low) > 0 ? (high - low) * 0.15 : high * 0.15;
+      return direction === "maximize" ? high + pad : high + pad;
+    },
+  ];
+}
+
 export function SotaChart({ spec }: Props) {
   const metric = spec.scoring.metric;
   const direction = spec.scoring.direction;
-  const unit = metricConfig(metric).unit;
+  const { unit, decimals } = metricConfig(metric);
+  const baseline = specBaseline(spec.scoring);
 
   const fetcher = useCallback(() => api.sotaHistory(spec.id), [spec.id]);
   const { data: history, loading } = useApi(fetcher, 15000);
@@ -91,6 +116,7 @@ export function SotaChart({ spec }: Props) {
   }
 
   const currentSota = points[points.length - 1].score;
+  const domain = smartDomain(direction, baseline);
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
@@ -100,6 +126,11 @@ export function SotaChart({ spec }: Props) {
           <span className="text-xs text-forge-muted">
             {direction === "minimize" ? "↓ lower is better" : "↑ higher is better"}
           </span>
+          {baseline != null && (
+            <span className="text-xs text-forge-muted">
+              · ref: {baseline.toFixed(decimals)}{unit}
+            </span>
+          )}
         </div>
         <span className="font-mono text-forge-green text-sm font-semibold">
           {currentSota}
@@ -120,11 +151,20 @@ export function SotaChart({ spec }: Props) {
               tick={{ fill: "#6b7280", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              domain={[0, "auto"]}
+              domain={domain}
               unit={unit}
               width={65}
             />
             <Tooltip content={<CustomTooltip unit={unit} />} />
+            {baseline != null && (
+              <ReferenceLine
+                y={baseline}
+                stroke="#6b7280"
+                strokeDasharray="4 4"
+                strokeWidth={1}
+                label={{ value: "ref", position: "right", fill: "#6b7280", fontSize: 10 }}
+              />
+            )}
             <ReferenceLine
               y={currentSota}
               stroke="#6366f1"
