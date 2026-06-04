@@ -306,7 +306,7 @@ function LandingBanner({
           </div>
           <div className="flex flex-col gap-2 text-sm">
             <a
-              href={FORGE_REPO}
+              href={`${FORGE_REPO}/fork`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-forge-accent text-white px-4 py-2 rounded-lg font-semibold hover:bg-forge-accent/80 transition-colors text-center"
