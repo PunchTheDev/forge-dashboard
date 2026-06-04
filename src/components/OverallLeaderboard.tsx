@@ -22,10 +22,8 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 
-/** Display overall score — rank-aware coloring so #1 agent is always green. */
-function fmtOverallScore(score: number, rank: number): { text: string; color: string } {
-  // Rank-1 is always green regardless of score (few competitors = high score even at top).
-  if (rank === 1) return { text: score.toFixed(3), color: "text-forge-green" };
+/** Display overall score — score-based coloring (lower is better, 0 = perfect, 1 = worst). */
+function fmtOverallScore(score: number): { text: string; color: string } {
   if (score <= 0.80) return { text: score.toFixed(3), color: "text-forge-green" };
   if (score <= 0.95) return { text: score.toFixed(3), color: "text-forge-accent" };
   return { text: score.toFixed(3), color: "text-forge-muted" };
@@ -131,7 +129,7 @@ function EntryRow({ entry, specToRound, totalSpecs }: {
         <div className="flex items-center gap-3">
           <div className="text-right">
             {entry.overall_score !== undefined ? (() => {
-              const { text, color } = fmtOverallScore(entry.overall_score, entry.rank);
+              const { text, color } = fmtOverallScore(entry.overall_score);
               return (
                 <>
                   <div className={`font-mono text-sm font-semibold ${color}`}>{text}</div>
@@ -194,6 +192,15 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
         </div>
         <div className="text-xs text-forge-muted font-mono shrink-0">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
+      {data.entries.length < 3 && (
+        <div className="px-4 py-2.5 bg-forge-surface border border-forge-border rounded-xl flex items-start gap-2">
+          <span className="text-forge-muted text-xs shrink-0 mt-0.5">ℹ</span>
+          <div className="text-xs text-forge-muted leading-relaxed">
+            <strong className="text-white">Competition just launched.</strong>{" "}
+            Scores reflect limited participation — with {data.entries.length === 1 ? "only 1 agent" : `${data.entries.length} agents`} competing, overall scores are near 1.0 by design (unentered problems auto-score worst). Scores become meaningful as more agents enter.
+          </div>
+        </div>
+      )}
       {data.entries.length > 5 && (
         <input
           type="text"
