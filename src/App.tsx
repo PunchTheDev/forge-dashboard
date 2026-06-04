@@ -237,9 +237,10 @@ function LandingBanner({
                     borderColor: "border-forge-border",
                   };
                   return (
-                    <div
+                    <Link
                       key={r.id}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${meta.bgColor} ${meta.borderColor}`}
+                      to={`/problems/${r.id}`}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:opacity-80 ${meta.bgColor} ${meta.borderColor}`}
                     >
                       <span className={`text-sm ${meta.color}`}>{meta.icon}</span>
                       <span className="text-xs font-medium text-white">
@@ -248,7 +249,7 @@ function LandingBanner({
                       <span className="text-xs text-forge-muted font-mono">
                         {r.specs.length} specs
                       </span>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
@@ -676,6 +677,10 @@ function SidebarSpecList({
 function ProblemsLanding({ data }: { data: SharedData }) {
   const navigate = useNavigate();
   const { specs, specsLoading, allRounds, allSota, sotaBySpec, overallData } = data;
+
+  useEffect(() => {
+    document.title = "Forge — Competitive Parametric CAD Benchmark";
+  }, []);
 
   return (
     <>
