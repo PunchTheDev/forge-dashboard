@@ -27,6 +27,7 @@ import {
   submissionCodeUrl,
 } from "./lib/api";
 import { useApi } from "./hooks/useApi";
+import { useDocumentMeta } from "./hooks/useDocumentMeta";
 import { Leaderboard } from "./components/Leaderboard";
 import { SubmissionPanel } from "./components/SubmissionPanel";
 import { SubmissionJourney } from "./components/SubmissionJourney";
@@ -187,10 +188,10 @@ function ExternalRedirect({ url }: { url: string }) {
 }
 
 function NotFoundPage() {
-  useEffect(() => {
-    document.title = "Page not found — Forge";
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, []);
+  useDocumentMeta(
+    "Page not found — Forge",
+    "That URL doesn't exist on the Forge CAD benchmark. Head back to Problems, Rankings, or the Guide.",
+  );
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
       <h1 className="text-forge-muted font-mono text-5xl mb-4">404</h1>
@@ -838,9 +839,10 @@ function SidebarSpecList({
 function ProblemsLanding({ data }: { data: SharedData }) {
   const { specs, specsLoading, allRounds, allSota, sotaBySpec, overallData } = data;
 
-  useEffect(() => {
-    document.title = "Forge — Competitive CAD Benchmark";
-  }, []);
+  useDocumentMeta(
+    "Forge — Competitive CAD Benchmark",
+    "Forge — competitive parametric CAD benchmark on Gittensor. Submit LLM agents that generate STEP files for structural brackets. Score across mass, stiffness-to-weight, and deflection.",
+  );
 
   return (
     <>
@@ -1176,14 +1178,15 @@ function CategoryPage({ data }: { data: SharedData }) {
     60000,
   );
 
-  // useEffect must be called unconditionally (Rules of Hooks) — before any
-  // early returns below. When round is null the title is left unchanged.
+  // Hook must be called unconditionally (Rules of Hooks) — before any early
+  // returns below. When round is null the title is left unchanged.
   const roundLabel = round ? round.name.replace(/Round \d+ — /, "") : "";
-  useEffect(() => {
-    if (!roundLabel) return;
-    document.title = `${roundLabel} — Forge`;
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, [roundLabel]);
+  useDocumentMeta(
+    roundLabel ? `${roundLabel} — Forge` : null,
+    roundLabel
+      ? `${roundLabel} — competition round on Forge. Browse all problems in this round, view the live leaderboard, and submit an LLM agent to claim SOTA.`
+      : null,
+  );
 
   if (!round) {
     // Still loading — either allRounds or specs hasn't populated yet.
@@ -1374,10 +1377,12 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   const nextSpecId = currentIdx >= 0 && currentIdx < roundSpecs.length - 1 ? roundSpecs[currentIdx + 1].id : null;
 
   const specShortName = activeSpec ? specLabel(activeSpec) : undefined;
-  useEffect(() => {
-    if (specShortName) document.title = `${specShortName} — Forge`;
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, [specShortName]);
+  useDocumentMeta(
+    specShortName ? `${specShortName} — Forge` : null,
+    specShortName
+      ? `${specShortName} — competition problem on Forge. Live FEA leaderboard, SOTA agent code, and full spec details for fork-and-improve submissions.`
+      : null,
+  );
 
   // Auto-scroll to SubmissionJourney when a leaderboard row is selected
   useEffect(() => {
@@ -1666,13 +1671,15 @@ function RankingsPage({ data }: { data: SharedData }) {
     else setSearchParams({}, { replace: true });
   };
 
-  useEffect(() => {
-    const roundName = activeRoundTab
-      ? allRounds.find((r) => r.id === activeRoundTab)?.name.replace(/Round \d+ — /, "")
-      : null;
-    document.title = roundName ? `${roundName} Rankings — Forge` : "Agent Rankings — Forge";
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, [activeRoundTab, allRounds]);
+  const rankingsRoundName = activeRoundTab
+    ? allRounds.find((r) => r.id === activeRoundTab)?.name.replace(/Round \d+ — /, "")
+    : null;
+  useDocumentMeta(
+    rankingsRoundName ? `${rankingsRoundName} Rankings — Forge` : "Agent Rankings — Forge",
+    rankingsRoundName
+      ? `${rankingsRoundName} round rankings on Forge. Live agent leaderboard scored by FEA — fork the SOTA code to compete.`
+      : "Live agent leaderboard for the Forge CAD benchmark. Overall rankings across mass, stiffness/weight, and deflection rounds — fork the SOTA code to compete.",
+  );
 
   // Load round leaderboard when a round tab is selected
   const activeRoundId = activeRoundTab ?? "";
@@ -1875,10 +1882,12 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 
   const entry = overallData?.entries.find((e) => e.contributor === contributor) ?? null;
 
-  useEffect(() => {
-    if (contributor) document.title = `${contributor} — Forge Rankings`;
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, [contributor]);
+  useDocumentMeta(
+    contributor ? `${contributor} — Forge Rankings` : null,
+    contributor
+      ? `${contributor} — agent submissions and per-problem results on the Forge CAD benchmark. Click through to fork the submission code.`
+      : null,
+  );
 
   const specToRound = useMemo(() => {
     const map: Record<string, string> = {};
@@ -2218,14 +2227,14 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   );
 }
 
-// ─── Page wrappers: Guide + Explorer (add document.title) ─────────────────────
+// ─── Page wrappers: Guide + Explorer ──────────────────────────────────────────
 
 function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   const location = useLocation();
-  useEffect(() => {
-    document.title = "Guide — Forge";
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, []);
+  useDocumentMeta(
+    "Guide — Forge",
+    "Quickstart guide for the Forge CAD benchmark — scoring categories, anti-gaming rules, and how to submit an LLM agent that generates STEP files.",
+  );
   // Scroll to anchor when navigated to /guide#<id> (browser does this natively
   // for full page loads, but React Router SPA navigation needs an assist).
   useEffect(() => {
@@ -2251,10 +2260,10 @@ function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
 }
 
 function ExplorerPage({ specs, loading, sotaBySpec }: { specs: Spec[]; loading: boolean; sotaBySpec: Record<string, number> }) {
-  useEffect(() => {
-    document.title = "Explorer — Forge";
-    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, []);
+  useDocumentMeta(
+    "Explorer — Forge",
+    "Interactive Forge spec explorer — preview every competition problem, inspect constraints, materials, and load points before submitting an agent.",
+  );
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <Playground specs={specs} loading={loading} sotaBySpec={sotaBySpec} />
