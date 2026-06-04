@@ -15,6 +15,7 @@ import {
   Spec,
   SotaRecord,
   Round,
+  RoundLeaderboard,
   stepUrl,
   fmtScore,
   metricConfig,
@@ -876,6 +877,57 @@ function ProblemsLanding({ data }: { data: SharedData }) {
   );
 }
 
+// ─── Round standings mini-panel ────────────────────────────────────────────────
+
+function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
+  const topN = lb.entries.slice(0, 5);
+  return (
+    <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-forge-border">
+        <span className="text-xs font-semibold text-white uppercase tracking-wider">
+          Round standings
+        </span>
+        <span className="text-xs text-forge-muted">
+          {lb.entries.length} competitor{lb.entries.length !== 1 ? "s" : ""} · {lb.total_specs} specs
+        </span>
+      </div>
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="text-forge-muted border-b border-forge-border">
+            <th className="px-4 py-1.5 text-left font-medium">Rank</th>
+            <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
+            <th className="px-4 py-1.5 text-right font-medium">Specs won</th>
+            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell">Round score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {topN.map((e) => (
+            <tr key={e.contributor} className="border-b border-forge-border/30">
+              <td className="px-4 py-1.5 font-mono text-forge-muted">#{e.rank}</td>
+              <td className="px-4 py-1.5">
+                <Link
+                  to={`/rankings/${encodeURIComponent(e.contributor)}`}
+                  className="text-forge-accent hover:underline"
+                >
+                  {e.contributor}
+                </Link>
+              </td>
+              <td className="px-4 py-1.5 text-right tabular-nums">
+                <span className={e.total_wins > 0 ? "text-forge-green font-semibold" : "text-forge-muted"}>
+                  {e.total_wins} / {lb.total_specs}
+                </span>
+              </td>
+              <td className="px-4 py-1.5 text-right tabular-nums font-mono hidden sm:table-cell text-forge-muted">
+                {e.overall_score != null ? e.overall_score.toFixed(3) : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ─── Page: Category spec browser (/problems/:roundId) ─────────────────────────
 
 function CategoryPage({ data }: { data: SharedData }) {
@@ -884,6 +936,12 @@ function CategoryPage({ data }: { data: SharedData }) {
   const { specs, allRounds, sotaBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
+
+  const roundId_ = roundId ?? "";
+  const { data: roundLb } = useApi(
+    () => round ? api.roundLeaderboard(roundId_) : Promise.resolve(null),
+    60000,
+  );
 
   if (!round) {
     // Legacy URL pattern: /problems/:specId (pre-round routing).
@@ -952,6 +1010,13 @@ function CategoryPage({ data }: { data: SharedData }) {
           New here? See the guide →
         </Link>
       </div>
+
+      {/* Round standings — only shown when there are competitors */}
+      {roundLb && roundLb.entries.length > 0 && (
+        <div className="mb-5">
+          <RoundStandingsPanel lb={roundLb} />
+        </div>
+      )}
 
       <CompactSpecTable
         round={round}
