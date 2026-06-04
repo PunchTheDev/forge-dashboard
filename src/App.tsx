@@ -726,7 +726,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
           </div>
         )}
 
-        {/* SOTA Gallery */}
+        {/* SOTA Gallery — round leaders only */}
         {(() => {
           const seenRounds = new Set<string>();
           const featured: SotaRecord[] = [];
@@ -737,14 +737,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
               featured.push(s);
             }
           }
-          const featuredIds = new Set(featured.map((s) => s.spec_id));
-          for (const s of allSota ?? []) {
-            if (featured.length >= 6) break;
-            if (!featuredIds.has(s.spec_id) && s.has_step) {
-              featured.push(s);
-              featuredIds.add(s.spec_id);
-            }
-          }
+          // Only show round-linked SOTAs; if none exist yet, skip the gallery
           if (!featured.length) return null;
           return (
             <div className="mb-6">
