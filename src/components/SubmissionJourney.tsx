@@ -183,7 +183,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
               </div>
               {baselinePct != null && baseline != null && (
                 <div className="text-xs text-forge-muted mt-0.5">
-                  {isMaximize ? "+" : "−"}{baselinePct}% vs. maintainer's baseline ({baseline.toFixed(decimals)} {scoreUnit})
+                  {baselinePct}% vs. maintainer's baseline ({baseline.toFixed(decimals)} {scoreUnit})
                 </div>
               )}
             </div>
