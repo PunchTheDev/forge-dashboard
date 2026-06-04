@@ -62,7 +62,7 @@ If any seat would be confused, the component fails.
 
 - Round header (title, scoring metric, problem count) — ○ ○ ○
 - Tier groups (easy / medium / hard) — ○ ○ ○
-- `SpecCard` grid — ◐ ◐ ◐ — chips render, but a first-timer doesn't know what `r01_001_easy` means.
+- `SpecCard` grid — ● ● ● — chips render, and the dim sub-label on each row now reads as `--spec r01_001_easy` (amber-prefixed flag + tooltip "Spec ID — the handle passed to the CLI: forge eval … --spec <id> --docker"), so a first-timer sees the ID's role on first scan. (App.tsx:761)
 - Round-level SOTA chart — ○ ○ ○
 
 ### Spec detail (`/problems/:roundId/:specId`)
