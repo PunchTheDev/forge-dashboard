@@ -91,7 +91,7 @@ function CategoryBreakdown({ entry, specToRound }: {
             </div>
             <div className="text-xs text-forge-muted mt-0.5">
               {bests.length} problem{bests.length !== 1 ? "s" : ""}
-              {wins > 0 && <span className="text-yellow-400 ml-1">· {wins} SOTA claim{wins !== 1 ? "s" : ""}</span>}
+              {wins > 0 && <span className="text-yellow-400 ml-1">· {wins} #1 {wins !== 1 ? "problems" : "problem"}</span>}
               <span className={`ml-1 font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>#{bestRank}</span>
             </div>
           </div>
@@ -122,7 +122,7 @@ function EntryRow({ entry, specToRound, totalSpecs }: {
             <div className="text-xs text-forge-muted mt-0.5">
               {entry.specs_entered}/{totalSpecs} problem{entry.specs_entered !== 1 ? "s" : ""} entered
               {" · "}
-              {entry.total_wins} SOTA claim{entry.total_wins !== 1 ? "s" : ""}
+              {entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}
             </div>
           </div>
         </div>
