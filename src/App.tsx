@@ -1096,7 +1096,7 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
 function CategoryPage({ data }: { data: SharedData }) {
   const { roundId } = useParams<{ roundId: string }>();
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const { specs, allRounds, sotaBySpec } = data;
+  const { specs, specsLoading, allRounds, sotaBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
 
@@ -1224,13 +1224,21 @@ function CategoryPage({ data }: { data: SharedData }) {
         </div>
       ) : null}
 
-      <CompactSpecTable
-        round={round}
-        specs={specs ?? []}
-        sotaBySpec={sotaBySpec}
-        selectedTier={selectedTier}
-        onTierChange={setSelectedTier}
-      />
+      {specsLoading && !specs ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-12 bg-forge-surface border border-forge-border rounded-lg animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <CompactSpecTable
+          round={round}
+          specs={specs ?? []}
+          sotaBySpec={sotaBySpec}
+          selectedTier={selectedTier}
+          onTierChange={setSelectedTier}
+        />
+      )}
     </div>
   );
 }
