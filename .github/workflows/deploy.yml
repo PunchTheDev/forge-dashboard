@@ -47,7 +47,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ vars.SERVER_HOST || '143.244.191.193' }}" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Deploy dist to server
+      - name: Deploy dist + server to host
         if: steps.check.outputs.has_key == 'true'
         env:
           SERVER: ${{ vars.SERVER_USER || 'root' }}@${{ vars.SERVER_HOST || '143.244.191.193' }}
@@ -57,5 +57,9 @@ jobs:
             "mkdir -p '$DASH_DIR/dist'"
           rsync -az --delete -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             dist/ "$SERVER:$DASH_DIR/dist/"
+          rsync -az -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            server.cjs "$SERVER:$DASH_DIR/server.cjs"
+          # Replace any prior `pm2 serve` unit with the new compressed Node
+          # server. `pm2 delete` is idempotent; the new `pm2 start` boots fresh.
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "$SERVER" \
-            "pm2 restart forge-dashboard || (pm2 serve '$DASH_DIR/dist' 8080 --name forge-dashboard --spa && pm2 save)"
+            "cd '$DASH_DIR' && pm2 delete forge-dashboard 2>/dev/null; pm2 start server.cjs --name forge-dashboard --update-env && pm2 save"
