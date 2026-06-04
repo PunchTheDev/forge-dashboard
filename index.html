@@ -45,7 +45,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <!-- occt-import-js (WASM OpenCASCADE STEP importer) is lazy-loaded by StepViewer on first 3D-view mount;
-         keeping it out of the initial document saves ~2.9 MB of wasm + the loader JS on landing/list pages. -->
+         keeping it out of the initial document saves ~2.9 MB of wasm + the loader JS on landing/list pages.
+         The homepage SOTA spotlight always loads it, so we warm the TLS handshake to jsdelivr in parallel
+         with HTML parsing — saves ~100-300ms before the lazy fetch begins. crossorigin matches the
+         eventual <script> tag's default credentials mode so the connection is reused, not reopened. -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <!-- crypto.randomUUID polyfill: required when served over plain HTTP (not a secure context) -->
     <script>
       if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
