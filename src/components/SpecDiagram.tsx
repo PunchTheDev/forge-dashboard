@@ -187,7 +187,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             y2={lpZ + 18}
             stroke={color}
             strokeWidth={2}
-            markerEnd="url(#arrow)"
+            markerEnd={`url(#arrow-${spec.id})`}
           />
           <text
             x={lpX + 5}
@@ -201,7 +201,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           </text>
           <defs>
             <marker
-              id="arrow"
+              id={`arrow-${spec.id}`}
               markerWidth="6"
               markerHeight="6"
               refX="3"

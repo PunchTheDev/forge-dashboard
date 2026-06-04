@@ -168,6 +168,24 @@ export function allowableStress(spec: Spec): number {
   return (YIELD_STRESS[spec.material] ?? 50) / spec.constraints.safety_factor;
 }
 
+/** Human-readable spec label — strips the "Cantilever Bracket — " prefix and "[tier]" suffix. */
+export function specLabel(spec: Spec): string {
+  return spec.name.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "");
+}
+
+/** GitHub blob URL for the SOTA agent code (commit-pinned, browse the winning implementation). */
+export function sotaCodeUrl(sota: SotaRecord): string {
+  return `https://github.com/PunchTheDev/forge/blob/${sota.commit_hash}/${sota.agent}`;
+}
+
+/** Material display name and key properties shown in tooltips. */
+export const MATERIAL_META: Record<string, { label: string; density: string; note: string }> = {
+  pla:           { label: "PLA",          density: "1.24 g/cm³", note: "FDM plastic — low cost, moderate strength" },
+  petg:          { label: "PETG",         density: "1.27 g/cm³", note: "FDM plastic — tougher than PLA, food-safe" },
+  aluminum_6061: { label: "Al 6061-T6",   density: "2.70 g/cm³", note: "Machined aluminum — lightweight, high strength" },
+  stainless_316: { label: "SS 316",       density: "7.99 g/cm³", note: "Stainless steel — heaviest, corrosion-resistant" },
+};
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
