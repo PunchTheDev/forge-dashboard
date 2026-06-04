@@ -1590,7 +1590,11 @@ function RankingsPage({ data }: { data: SharedData }) {
             ) : roundLb ? (
               <RoundStandingsPanel lb={roundLb} roundId={activeRoundTab ?? undefined} />
             ) : (
-              <div className="text-forge-muted text-sm py-6 text-center">No data for this round yet.</div>
+              <div className="text-forge-muted text-sm py-6 text-center">
+                No entries yet.{" "}
+                <Link to="/guide" className="text-forge-accent hover:underline">Read the guide</Link>{" "}
+                and be the first to compete in this category.
+              </div>
             )}
           </div>
         ) : (
