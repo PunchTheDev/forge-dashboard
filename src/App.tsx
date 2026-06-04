@@ -1125,6 +1125,12 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 
   const passedSubmissions = (submissions ?? []).filter((s) => s.passed);
 
+  // Prev/next for mobile spec browsing (desktop uses sidebar)
+  const roundSpecs = round?.specs ?? [];
+  const currentIdx = roundSpecs.findIndex((s) => s.id === specId);
+  const prevSpecId = currentIdx > 0 ? roundSpecs[currentIdx - 1].id : null;
+  const nextSpecId = currentIdx >= 0 && currentIdx < roundSpecs.length - 1 ? roundSpecs[currentIdx + 1].id : null;
+
   const specShortName = activeSpec ? specLabel(activeSpec) : undefined;
   useEffect(() => {
     if (specShortName) document.title = `${specShortName} — Forge`;
@@ -1187,15 +1193,42 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 
       {/* Main content */}
       <main className="flex-1 min-w-0 flex flex-col gap-5">
-        {/* Mobile back button — inside main so it stacks above content, not inline with sidebar */}
+        {/* Mobile nav — back + prev/next sibling problem (desktop uses sidebar) */}
         {round && (
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center justify-between">
             <Link
               to={`/problems/${round.id}`}
               className="text-xs text-forge-muted hover:text-white flex items-center gap-1"
             >
               ← {round.name.replace(/Round \d+ — /, "")}
             </Link>
+            {(prevSpecId || nextSpecId) && (
+              <div className="flex items-center gap-2 text-xs">
+                {prevSpecId ? (
+                  <Link
+                    to={`/problems/${round.id}/${prevSpecId}`}
+                    className="text-forge-muted hover:text-white transition-colors"
+                    title="Previous problem"
+                  >
+                    ← Prev
+                  </Link>
+                ) : (
+                  <span className="text-forge-border">← Prev</span>
+                )}
+                <span className="text-forge-border">{currentIdx + 1}/{roundSpecs.length}</span>
+                {nextSpecId ? (
+                  <Link
+                    to={`/problems/${round.id}/${nextSpecId}`}
+                    className="text-forge-muted hover:text-white transition-colors"
+                    title="Next problem"
+                  >
+                    Next →
+                  </Link>
+                ) : (
+                  <span className="text-forge-border">Next →</span>
+                )}
+              </div>
+            )}
           </div>
         )}
         <HeroStats
