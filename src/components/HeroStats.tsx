@@ -138,6 +138,20 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           >
             ≤{allowable.toFixed(0)} MPa
           </span>
+          {spec.tier && (
+            <span
+              className={`text-xs px-2 py-0.5 rounded capitalize cursor-help border ${
+                spec.tier === "easy"
+                  ? "bg-forge-green/10 text-forge-green border-forge-green/30"
+                  : spec.tier === "medium"
+                  ? "bg-forge-accent/10 text-forge-accent border-forge-accent/30"
+                  : "bg-forge-red/10 text-forge-red border-forge-red/30"
+              }`}
+              title={`Difficulty tier: ${spec.tier}. Easy problems have lighter loads and more generous tolerances; hard problems push constraints further.`}
+            >
+              {spec.tier}
+            </span>
+          )}
         </div>
         <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-4">
           {spec.description}
