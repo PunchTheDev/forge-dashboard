@@ -953,9 +953,16 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
         <span className="text-xs font-semibold text-white uppercase tracking-wider">
           Round standings
         </span>
-        <span className="text-xs text-forge-muted">
-          {lb.entries.length} competitor{lb.entries.length !== 1 ? "s" : ""} · {lb.total_specs} problems
-        </span>
+        <div className="flex items-center gap-2">
+          {lb.entries.length > 5 && (
+            <Link to="/rankings" className="text-xs text-forge-accent hover:underline">
+              View all →
+            </Link>
+          )}
+          <span className="text-xs text-forge-muted">
+            {lb.entries.length} competitor{lb.entries.length !== 1 ? "s" : ""} · {lb.total_specs} problems
+          </span>
+        </div>
       </div>
       <table className="w-full text-xs">
         <thead>
