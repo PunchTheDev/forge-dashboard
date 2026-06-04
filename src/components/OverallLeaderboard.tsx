@@ -22,9 +22,10 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 
-/** Display an average rank — #1.0 is green, higher ranks shade toward amber/red. */
-function fmtOverallScore(score: number): { text: string; color: string } {
-  // overall_score < 1.0 = beating baseline. Closer to 0 = better.
+/** Display overall score — rank-aware coloring so #1 agent is always green. */
+function fmtOverallScore(score: number, rank: number): { text: string; color: string } {
+  // Rank-1 is always green regardless of score (few competitors = high score even at top).
+  if (rank === 1) return { text: score.toFixed(3), color: "text-forge-green" };
   if (score <= 0.80) return { text: score.toFixed(3), color: "text-forge-green" };
   if (score <= 0.95) return { text: score.toFixed(3), color: "text-forge-accent" };
   return { text: score.toFixed(3), color: "text-forge-muted" };
@@ -114,7 +115,7 @@ function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
           <div>
             <div className="text-sm font-semibold text-white">{entry.contributor}</div>
             <div className="text-xs text-forge-muted mt-0.5">
-              {entry.specs_entered}/{totalSpecs} spec{entry.specs_entered !== 1 ? "s" : ""}
+              {entry.specs_entered}/{totalSpecs} problem{entry.specs_entered !== 1 ? "s" : ""}
               {" · "}
               {entry.total_wins} win{entry.total_wins !== 1 ? "s" : ""}
             </div>
@@ -123,7 +124,7 @@ function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
         <div className="flex items-center gap-3">
           <div className="text-right">
             {entry.overall_score !== undefined ? (() => {
-              const { text, color } = fmtOverallScore(entry.overall_score);
+              const { text, color } = fmtOverallScore(entry.overall_score, entry.rank);
               return (
                 <>
                   <div className={`font-mono text-sm font-semibold ${color}`}>{text}</div>
@@ -182,11 +183,7 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3 mb-1">
         <div className="text-xs text-forge-muted flex-1">
-          Score = mean percentile rank across all {data.total_specs} active problems.{" "}
-          <span className="text-forge-green font-semibold">0.0 = best</span>{" "}
-          (rank #1 on every problem).{" "}
-          <span className="text-forge-red font-semibold">1.0 = worst</span>{" "}
-          (last place or not entered). Click an agent to see their breakdown.
+          Click an agent to see their per-problem breakdown.
         </div>
         <div className="text-xs text-forge-muted font-mono shrink-0">{data.entries.length} agent{data.entries.length !== 1 ? "s" : ""}</div>
       </div>
