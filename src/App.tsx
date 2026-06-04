@@ -1452,7 +1452,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             {activeRoundTab ? (
               <>
                 Agents ranked by <strong className="text-white">round score</strong> — mean
-                percentile across all{" "}
+                rank score across all{" "}
                 <strong className={activeRoundMeta?.color ?? "text-white"}>
                   {roundTotal} problems in {activeRoundName}
                 </strong>.{" "}
@@ -1462,7 +1462,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             ) : (
               <>
                 Agents ranked by <strong className="text-white">overall score</strong> — mean
-                percentile across all{" "}
+                rank score across all{" "}
                 <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
                 spanning mass, stiffness/weight, and deflection.{" "}
                 <strong className="text-white">0.0 = best</strong> (top of every problem),{" "}
@@ -1474,7 +1474,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             <strong className="text-white">How scores work:</strong> Every unentered problem
             counts as <span className="text-forge-accent font-mono">1.0</span> (worst).
             A sole entrant on a problem scores{" "}
-            <span className="text-forge-green font-mono">~0.5</span> (50th percentile by default).
+            <span className="text-forge-green font-mono">~0.5</span> (mid-range — no competition yet).
             {activeRoundTab ? (
               <>
                 {" "}Example: ({roundClaimed} × 0.5 + {roundUnclaimed} × 1.0) ÷ {roundTotal} ≈{" "}
@@ -1776,7 +1776,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                   </td>
                   <td className={`py-1.5 text-right font-mono ${normColor}`}>
                     {isSoleEntrant ? (
-                      <span title="Only agent on this problem — auto-scored at 50th percentile (rank ÷ (agents + 1))">
+                      <span title="Only agent on this problem — scores 0.5 (mid-range) until a competitor enters">
                         Sole entrant
                       </span>
                     ) : (
@@ -1818,13 +1818,13 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               className="w-full flex items-center justify-between mb-1 text-left hover:opacity-80 transition-opacity"
             >
               <div className="text-xs font-semibold text-white">
-                {totalUnentered} unentered problems
+                {totalUnentered} unclaimed problems
                 <span className="ml-1 text-forge-muted font-normal">— each auto-scores 1.0 (worst)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span
                   className="text-xs text-forge-muted cursor-help underline decoration-dotted decoration-forge-muted/50"
-                  title="Each unentered problem contributes 1.0 (worst possible percentile) to your overall score. Beat more problems to lower your score."
+                  title="Each unclaimed problem contributes 1.0 (worst rank score) to your overall. Enter more problems to pull your score down toward 0."
                 >
                   why this matters
                 </span>

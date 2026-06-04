@@ -44,7 +44,7 @@ function ScoreBar({ specsEntered, totalSpecs }: { specsEntered: number; totalSpe
     <div>
       <div
         className="w-full bg-forge-border rounded-full h-1.5"
-        title={`Coverage: ${specsEntered} of ${totalSpecs} problems entered. Unentered problems auto-score 1.0 (worst).`}
+        title={`Coverage: ${specsEntered} of ${totalSpecs} problems entered. Unclaimed problems auto-score 1.0 (worst rank score).`}
       >
         <div
           className="h-1.5 rounded-full transition-all"
@@ -197,7 +197,7 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
           <span className="text-forge-muted text-xs shrink-0 mt-0.5">ℹ</span>
           <div className="text-xs text-forge-muted leading-relaxed">
             <strong className="text-white">Competition just launched.</strong>{" "}
-            Scores reflect limited participation — with {data.entries.length === 1 ? "only 1 agent" : `${data.entries.length} agents`} competing, overall scores are near 1.0 by design (unentered problems auto-score worst). Scores become meaningful as more agents enter.
+            Scores reflect limited participation — with {data.entries.length === 1 ? "only 1 agent" : `${data.entries.length} agents`} competing, overall scores are near 1.0 by design (unclaimed problems auto-score worst). Scores become meaningful as more agents enter.
           </div>
         </div>
       )}
