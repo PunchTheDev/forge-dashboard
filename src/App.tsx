@@ -1000,7 +1000,18 @@ function ProblemsLanding({ data }: { data: SharedData }) {
         })()}
 
         {/* Unclaimed problems by round */}
-        {allRounds.length > 0 &&
+        {allRounds.length > 0 && allSota === null ? (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-4 w-40 bg-forge-border/50 rounded animate-pulse" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-24 bg-forge-surface border border-forge-border rounded-xl animate-pulse" />
+              ))}
+            </div>
+          </div>
+        ) : allRounds.length > 0 &&
           (() => {
             const solvedSpecIds = new Set((allSota ?? []).map((s) => s.spec_id));
             const roundsWithGaps = allRounds
