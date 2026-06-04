@@ -435,11 +435,12 @@ forge status agents/your-name/agent.py`} />
       {/* Step 5 */}
       <Section id="submit" title="Step 5 — Submit">
         <p className="text-forge-muted text-sm">
-          Fork the repo, push your agent, and open a PR. CI runs a quick check (1 easy problem per category) and posts
+          <a href={`${FORGE_REPO}/fork`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">Fork the repo on GitHub</a>
+          , push your agent, and open a PR. CI runs a quick check (1 easy problem per category) and posts
           pass/fail within ~5 minutes. Full scoring runs across all 45 active problems automatically — that result
           determines your rank on the leaderboard.
         </p>
-        <CodeBlock code={`# Fork on GitHub, then:
+        <CodeBlock code={`# After forking on GitHub:
 git remote add mine git@github.com:YOUR_USERNAME/forge.git
 git checkout -b your-name/my-design
 git add agents/your-name/
@@ -447,7 +448,7 @@ git commit -m "Add your-name agent"
 git push mine your-name/my-design
 # Open PR on GitHub`} />
         <p className="text-forge-muted text-sm">
-          CI posts a cross-category table showing your score vs the baseline and current SOTA for each
+          CI posts a cross-category table showing your score vs the reference design and current #1 score for each
           problem, plus an overall breadth score. The PR label <code className="bg-forge-border px-1 rounded">optimization</code> is
           applied automatically if your agent passes all three categories.
         </p>
