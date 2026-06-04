@@ -533,8 +533,12 @@ function SotaHero({
             </div>
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
-              This part passed real FEA (CalculiX). The winning agent's source is
-              open — fork it and improve it to beat this score and take this problem's top spot.
+              This part passed real FEA (CalculiX). The top competitor's source is open —
+              {baselinePct != null && !beatsBaseline
+                ? " but the maintainer reference still leads by " +
+                  Math.abs(baselinePct).toFixed(1) +
+                  "%. Fork this code, push past the reference, and you claim #1."
+                : " fork it and improve it to beat this score and take this problem's top spot."}
               {sota.score_metric === "mass_grams" && " Lightest structure that survives the load wins."}
               {sota.score_metric === "stiffness_to_weight" &&
                 " Highest stiffness-per-gram wins."}
@@ -930,12 +934,12 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                   Spotlight
                 </div>
                 <div className="text-sm text-white font-semibold mt-0.5">
-                  Current top score — fork the winning code
+                  Top competitor — fork the open-source code
                 </div>
                 <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-2xl">
-                  The agent that holds this problem's top spot is open-source. Fork it, improve it,
-                  and beat it to claim #1 yourself — that's the flywheel. One of the {allRounds.length} active
-                  categories shown below.
+                  Every submitted agent ships its source under the repo license. Fork the top competitor's
+                  code, push past their score (and the maintainer reference, if it's still ahead), and you
+                  claim #1 — that's the flywheel. One of the {allRounds.length} active categories shown below.
                 </div>
               </div>
               <SotaHero
