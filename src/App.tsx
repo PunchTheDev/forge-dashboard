@@ -382,7 +382,7 @@ function SotaHero({
             </div>
             <div className="text-forge-muted text-xs mb-1 font-mono">{sota.spec_id}</div>
             <div className="text-forge-muted text-xs mb-4 leading-relaxed">
-              {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id} · by{" "}
+              {spec?.name?.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "") ?? sota.spec_id} · by{" "}
               <span className="text-white">{sota.contributor}</span>
             </div>
 
@@ -582,7 +582,7 @@ function CompactSpecTable({
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold text-white font-mono truncate">{spec.id}</div>
                 <div className="text-xs text-forge-muted truncate">
-                  {spec.name.replace(/ — .*$/, "")}
+                  {spec.name.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "")}
                 </div>
               </div>
               {sota != null ? (
@@ -779,7 +779,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                       )}
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-semibold text-white leading-snug line-clamp-1">
-                          {spec?.name?.replace(/ — .*$/, "") ?? sota.spec_id}
+                          {spec?.name?.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "") ?? sota.spec_id}
                         </span>
                         <span
                           className={`font-mono font-semibold text-sm shrink-0 ${meta?.color ?? "text-forge-green"}`}
