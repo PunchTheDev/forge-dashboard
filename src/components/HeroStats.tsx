@@ -103,6 +103,12 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
       : marginPct === 0
         ? "any improvement wins"
         : `beat by ≥${marginPct < 0.5 ? marginPct.toFixed(1) : marginPct.toFixed(0)}% to claim`;
+  // When the maintainer reference is still ahead of the best competitor, the SOTA
+  // bar to claim #1 is the reference value — not the best competitor. Surface it
+  // explicitly so first-timers don't read "beat the current best by 1%" and assume
+  // that claims SOTA when it actually doesn't.
+  const seedLeads = sota != null && baselineRawPct != null && baselineRawPct < 0;
+  const baselineStr = baseline != null ? `${baseline.toFixed(decimals)} ${scoreUnit}` : null;
 
   return (
     <div>
@@ -171,11 +177,15 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           value={sotaScore != null ? `${sotaScore.toFixed(decimals)} ${scoreUnit}` : "—"}
           sub={
             sota
-              ? `by ${sota.contributor}${marginNote ? ` · ${marginNote}` : ""}`
+              ? seedLeads
+                ? `top competitor · by ${sota.contributor}`
+                : `by ${sota.contributor}${marginNote ? ` · ${marginNote}` : ""}`
               : "no submissions yet"
           }
           title={
-            marginPct != null
+            seedLeads && baselineStr
+              ? `Top competitor's score. The maintainer reference (${baselineStr}) still leads — to claim #1, beat the reference, not the current best. Any margin wins until a competitor takes SOTA.`
+              : marginPct != null
               ? `To claim #1, beat the current best. It has been held for ${sotaAgeDays != null ? Math.floor(sotaAgeDays) : "?"} days. ` +
                 (marginPct === 0
                   ? "Any improvement claims #1."
@@ -230,15 +240,15 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
       </div>
 
       {/* Seed-still-leads callout */}
-      {sota && baselineRawPct != null && baselineRawPct < 0 && (
+      {seedLeads && (
         <div className="mt-3 px-4 py-2.5 bg-amber-400/5 border border-amber-400/20 rounded-xl flex items-start gap-2">
           <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚡</span>
           <div className="text-xs text-amber-300/80 leading-relaxed">
             <strong className="text-amber-300">Maintainer reference still leads.</strong>{" "}
-            No competitor has beaten the maintainer's baseline yet — the current best is{" "}
-            {Math.abs(baselineRawPct).toFixed(1)}%{" "}
+            No competitor has beaten the maintainer's baseline yet — the top competitor is{" "}
+            {Math.abs(baselineRawPct!).toFixed(1)}%{" "}
             {metric === "mass_grams" ? "heavier" : isMaximize ? "less stiff" : "worse (more deflection)"} than the reference.
-            Fork the winning agent below and claim #1.
+            To claim #1 on this problem, beat <span className="font-mono text-amber-200">{baselineStr}</span> — any margin wins until a competitor takes SOTA.
           </div>
         </div>
       )}
@@ -247,13 +257,24 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
       {sota && (
         <div className="mt-4 bg-forge-surface border border-forge-border rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-semibold text-white mb-0.5">Winning agent — open-source code</div>
+            <div className="text-xs font-semibold text-white mb-0.5">
+              {seedLeads ? "Top competitor — open-source code" : "Winning agent — open-source code"}
+            </div>
             <div className="text-xs text-forge-muted">
-              The current best score was set by this agent. Fork it,{" "}
-              {marginNote
-                ? <span>beat it by <span className="text-white font-mono">{marginNote}</span>,</span>
-                : "beat it,"}{" "}
-              and claim #1.
+              {seedLeads ? (
+                <>
+                  This is the highest-ranked competitor submission so far — fork it as your starting point, then push past the{" "}
+                  <span className="text-white font-mono">{baselineStr}</span> reference to claim #1.
+                </>
+              ) : (
+                <>
+                  The current best score was set by this agent. Fork it,{" "}
+                  {marginNote
+                    ? <span>beat it by <span className="text-white font-mono">{marginNote}</span>,</span>
+                    : "beat it,"}{" "}
+                  and claim #1.
+                </>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
