@@ -1203,7 +1203,7 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
                 </Link>
               </td>
               <td className="px-4 py-1.5 text-right tabular-nums">
-                <span className={e.total_wins > 0 ? "text-forge-green font-semibold" : "text-forge-muted"}>
+                <span className={e.total_wins > 0 ? "text-yellow-400 font-semibold" : "text-forge-muted"}>
                   {e.total_wins} / {lb.total_specs}
                 </span>
               </td>
