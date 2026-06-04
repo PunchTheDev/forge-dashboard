@@ -3,7 +3,7 @@
  * Spec → Agent → FEA test → Score vs SOTA
  */
 import { lazy, Suspense } from "react";
-import { Submission, Spec, SotaRecord, stepUrl, metricConfig, specBaseline, MATERIAL_META } from "../lib/api";
+import { Submission, Spec, SotaRecord, stepUrl, metricConfig, specBaseline, MATERIAL_META, submissionCodeUrl } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const StepViewer = lazy(() => import("./StepViewer").then((m) => ({ default: m.StepViewer })));
@@ -207,17 +207,28 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
               </div>
             )}
 
-            {/* PR link */}
-            {submission.pr_number && (
+            {/* PR + code links */}
+            <div className="flex items-center gap-3">
+              {submission.pr_number && (
+                <a
+                  href={`https://github.com/PunchTheDev/forge/pull/${submission.pr_number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-forge-accent hover:underline"
+                >
+                  PR #{submission.pr_number} →
+                </a>
+              )}
               <a
-                href={`https://github.com/PunchTheDev/forge/pull/${submission.pr_number}`}
+                href={submissionCodeUrl(submission.agent_path, submission.commit_hash)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-forge-accent hover:underline"
+                title={`View ${submission.agent_path} at commit ${submission.commit_hash.slice(0, 7)} — fork to beat this score`}
               >
-                PR #{submission.pr_number} →
+                agent.py @ {submission.commit_hash.slice(0, 7)} →
               </a>
-            )}
+            </div>
           </div>
         </div>
       )}
