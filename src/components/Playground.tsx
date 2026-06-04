@@ -137,7 +137,8 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
         <p className="text-xs text-forge-muted mt-1 leading-relaxed max-w-2xl">
           Browse every competition problem. A <span className="text-white font-semibold">problem</span> defines
           a cantilever bracket challenge: material, load applied downward at the arm tip, bolt pattern,
-          and build volume. Your agent generates a STEP file — the eval harness runs FEA and scores it.
+          and build volume. Your agent generates a <span className="cursor-help underline decoration-dotted decoration-forge-border" title="STEP (ISO 10303) — a CAD interchange format. The eval harness loads it as a solid, meshes it, and runs structural simulation.">STEP file</span>
+          {" "}— the eval harness runs <span className="cursor-help underline decoration-dotted decoration-forge-border" title="FEA = Finite Element Analysis — structural simulation that predicts stress, deflection, and whether the part survives the rated load with the required safety margin.">FEA</span> and scores it.
           Select a problem to see its constraints and generate a ready-to-run eval command.
         </p>
       </div>
