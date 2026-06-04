@@ -57,6 +57,29 @@ function MaterialBadge({ material }: { material: string }) {
   );
 }
 
+function EvalCommandBox({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="relative group">
+      <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs">
+        <span className="text-forge-muted">$ </span>
+        <span className="text-forge-green">{command}</span>
+      </div>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(command);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        }}
+        className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded border border-forge-border bg-forge-bg text-forge-muted hover:text-white hover:border-forge-accent/50 transition-colors opacity-0 group-hover:opacity-100"
+        title="Copy to clipboard"
+      >
+        {copied ? "copied ✓" : "copy"}
+      </button>
+    </div>
+  );
+}
+
 interface Props {
   specs: Spec[];
   loading?: boolean;
@@ -342,10 +365,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
             <div className="text-xs text-forge-muted mb-3 leading-relaxed">
               Run locally after cloning the forge repo. Identical to CI — deterministic and reproducible.
             </div>
-            <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs">
-              <span className="text-forge-muted">$ </span>
-              <span className="text-forge-green">{evalCommand}</span>
-            </div>
+            <EvalCommandBox command={evalCommand} />
             {selectedSpec && (
               <div className="mt-2 text-xs text-forge-muted">
                 Problem: <span className="text-white">{specLabel(selectedSpec)}</span>
