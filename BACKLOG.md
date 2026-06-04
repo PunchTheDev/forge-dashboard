@@ -53,7 +53,7 @@ If any seat would be confused, the component fails.
 
 - `LandingBanner` (hero with title, sub, CTA stack) — ◐ ◐ ◐ — investor-seat scan passes; first-timer "what's a Forge problem?" still soft.
 - 4-step "Choose / Write / Open PR / Earn TAO" cards — ● ● ● — clean copy, sequential, no rework needed.
-- `Spotlight` (SOTA hero with 3D viewer + spec sidecar) — ● ● ◐ — 3D loads cleanly; sidecar has metric card + prose, no chip row (BACKLOG note about "PETG · 15 kg load · 78mm arm" chips was phantom — those chips live on `HeroStats` spec-detail header, not `SotaHero`). Remaining gap: sidecar prose talks about "FEA / structural simulation" without a first-timer-friendly aside.
+- `Spotlight` (SOTA hero with 3D viewer + spec sidecar) — ● ● ● — 3D loads cleanly; sidecar metric card + prose. `FEA (CalculiX)` in the sidecar prose is now a routed `<Link to="/guide#fea">` with dotted-underline + 233-char hover tooltip ("FEA = structural simulation that meshes the part into thousands of elements and solves for stress + displacement under load. CalculiX is the open-source solver Forge runs."). Tooltip gives the definition in-place; click jumps to the canonical `#fea` explainer in `QuickstartGuide` (verified `feaSectionInView: true` after navigation). Step 353 (`App.tsx` L546–559).
 - Category grid (`CategoryCard`) — ● ● ● — three cards (Mass / Stiffness / Deflection) each with problem count + claim status.
 - ~~`OverallLeaderboard` preview~~ — N/A. `ProblemsLanding` only reads `overallData.entries.length` for the `LandingBanner` agent count; no leaderboard preview is rendered on `/problems`. The actual `<OverallLeaderboard>` mount is on `/rankings` (App.tsx:1940), already reviewed under Rankings.
 - Footer — ○ ○ ○ — not reviewed.
