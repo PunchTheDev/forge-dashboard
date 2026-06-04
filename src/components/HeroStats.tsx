@@ -88,7 +88,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
     <div>
       <div className="mb-4">
         <div className="flex flex-wrap items-center gap-2 mb-1">
-          <h2 className="text-lg font-bold text-white">{spec.name}</h2>
+          <h1 className="text-lg font-bold text-white">{spec.name}</h1>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
             {spec.material.toUpperCase().replace("_", " ")}
           </span>
@@ -131,6 +131,13 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           label="vs. reference agent"
           value={baselineDelta && baselineSign ? `${baselineSign}${baselineDelta}%` : "—"}
           sub={baseline != null ? `ref: ${baseline.toFixed(decimals)} ${scoreUnit} (our seed)` : undefined}
+          title={
+            baseline != null
+              ? `The reference agent is the maintainer's optimized baseline, set offline when this spec was designed — it is not a competition submission. ` +
+                `Current SOTA: ${sotaScore != null ? `${sotaScore.toFixed(decimals)} ${scoreUnit}` : "none yet"}. ` +
+                `Your goal is to beat the SOTA by the required margin (see the SOTA stat), not the reference.`
+              : undefined
+          }
         />
         <Stat
           label="Stress headroom"

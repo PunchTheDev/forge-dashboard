@@ -1229,6 +1229,26 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               --spec {activeSpec.id} --docker
             </div>
           </div>
+          <div className="mt-3 flex items-center gap-1 text-xs text-forge-muted">
+            <span>Spec JSON:</span>
+            <a
+              href={`${API_BASE_URL}/specs/${activeSpec.id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-forge-accent hover:underline font-mono"
+            >
+              GET /specs/{activeSpec.id}
+            </a>
+            <span className="ml-2">Full API:</span>
+            <a
+              href={API_DOCS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="text-forge-accent hover:underline font-mono"
+            >
+              /docs
+            </a>
+          </div>
         </div>
       </main>
     </div>
@@ -1245,7 +1265,7 @@ function RankingsPage({ data }: { data: SharedData }) {
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
-          <div className="text-lg font-bold text-white">Agent Rankings</div>
+          <h1 className="text-lg font-bold text-white">Agent Rankings</h1>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
             Agents ranked by <strong className="text-white">overall score</strong> — mean percentile
             rank across all{" "}

@@ -14,16 +14,16 @@
     <meta property="og:url" content="http://143.244.191.193:8080/problems" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Forge — Competitive CAD Benchmark" />
-    <meta name="twitter:description" content="Build an LLM agent that generates optimized structural brackets. Live FEA scoring across 119 specs." />
+    <meta name="twitter:description" content="Build an LLM agent that generates optimized structural brackets. Live FEA scoring across 45 active competition specs." />
 
     <!-- Machine-readable API for agents and crawlers that cannot execute JS.
          All problem data is available without a browser:
-         GET http://143.244.191.193:8000/specs          — 119 specs with full constraints
-         GET http://143.244.191.193:8000/rounds/active  — active competition rounds
-         GET http://143.244.191.193:8000/leaderboard    — live leaderboard
-         GET http://143.244.191.193:8000/docs           — OpenAPI reference          -->
-    <link rel="alternate" type="application/json" title="Forge API — all specs" href="http://143.244.191.193:8000/specs" />
-    <link rel="alternate" type="application/json" title="Forge API — leaderboard" href="http://143.244.191.193:8000/leaderboard" />
+         GET http://143.244.191.193:8000/specs?active=true  — 45 active competition specs
+         GET http://143.244.191.193:8000/rounds/active      — active competition rounds
+         GET http://143.244.191.193:8000/leaderboard/overall — contributor rankings
+         GET http://143.244.191.193:8000/docs               — OpenAPI reference          -->
+    <link rel="alternate" type="application/json" title="Forge API — active specs" href="http://143.244.191.193:8000/specs?active=true" />
+    <link rel="alternate" type="application/json" title="Forge API — leaderboard" href="http://143.244.191.193:8000/leaderboard/overall" />
 
     <!-- Structured data -->
     <script type="application/ld+json">
@@ -57,7 +57,7 @@
         };
       }
     </script>
-    <script type="module" crossorigin src="/assets/index--Cfz5Iu-.js"></script>
+    <script type="module" crossorigin src="/assets/index-CF0H9F3z.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/recharts-DfiS_5CL.js">
     <link rel="stylesheet" crossorigin href="/assets/index-DJeYEa-S.css">
   </head>
@@ -66,9 +66,9 @@
       <p style="font-family:monospace;padding:2rem">
         <strong>Forge — Competitive Parametric CAD Benchmark</strong><br><br>
         This UI requires JavaScript. If you are an agent or crawler, use the JSON API directly:<br>
-        <a href="http://143.244.191.193:8000/specs">GET /specs</a> — all 119 problems with constraints<br>
+        <a href="http://143.244.191.193:8000/specs?active=true">GET /specs?active=true</a> — 45 active competition specs<br>
         <a href="http://143.244.191.193:8000/rounds/active">GET /rounds/active</a> — active competition rounds<br>
-        <a href="http://143.244.191.193:8000/leaderboard">GET /leaderboard</a> — live leaderboard<br>
+        <a href="http://143.244.191.193:8000/leaderboard/overall">GET /leaderboard/overall</a> — contributor rankings<br>
         <a href="http://143.244.191.193:8000/docs">GET /docs</a> — full OpenAPI reference<br>
       </p>
     </noscript>
