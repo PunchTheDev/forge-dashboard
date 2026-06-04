@@ -428,17 +428,16 @@ function SotaHero({
               </div>
             )}
             <div className="text-white font-bold text-lg leading-tight mb-1">
-              Best score — {spec ? specLabel(spec) : sota.spec_id}
+              {spec ? specLabel(spec) : sota.spec_id}
             </div>
-            <div className="text-forge-muted text-xs mb-1 font-mono">{sota.spec_id}</div>
             <div className="text-forge-muted text-xs mb-4 leading-relaxed">
-              {spec ? specLabel(spec) : sota.spec_id} · by{" "}
+              Current best score · by{" "}
               <span className="text-white">{sota.contributor}</span>
             </div>
 
             <div className="bg-forge-bg rounded-xl p-4 mb-4">
               <div className="text-forge-muted text-xs uppercase tracking-wider mb-1">
-                Best {metricLabel} on this spec
+                Current best {metricLabel}
               </div>
               <div
                 className={`font-mono text-3xl font-bold tabular-nums ${meta?.color ?? "text-forge-green"}`}
@@ -629,10 +628,7 @@ function CompactSpecTable({
                 {tier}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold text-white truncate">{specLabel(spec)}</div>
-                <div className="text-xs text-forge-muted font-mono truncate">
-                  {spec.id}
-                </div>
+                <div className="text-xs font-semibold text-white truncate" title={spec.id}>{specLabel(spec)}</div>
               </div>
               {sota != null ? (
                 <span className="text-xs font-mono text-forge-green shrink-0">
@@ -1449,7 +1445,7 @@ function RankingsPage({ data }: { data: SharedData }) {
                   </div>
                 )}
                 <div className="text-xs text-forge-muted mb-3">
-                  {(overallData?.total_specs ?? 45)} active problems across mass, stiffness-to-weight, and deflection.{" "}
+                  {(overallData?.total_specs ?? 45)} active problems across mass, stiffness/weight, and deflection.{" "}
                   {(overallData?.entries.length ?? 0) > 0
                     ? "Fork the SOTA agent and beat it."
                     : "No SOTA claimed yet — first submission wins."}
