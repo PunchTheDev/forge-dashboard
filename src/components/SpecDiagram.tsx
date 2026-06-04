@@ -136,16 +136,16 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             strokeWidth={1}
             strokeDasharray="4 3"
           />
-          {/* Build volume label — top-right corner of the dashed box */}
+          {/* Build volume label — top-left corner of the dashed box, with actual dims */}
           <text
-            x={bvRight - 2}
-            y={bvTop + 7}
-            textAnchor="end"
-            fill="#374151"
-            fontSize={6}
+            x={bvLeft + 2}
+            y={bvTop - 2}
+            textAnchor="start"
+            fill="#6b7280"
+            fontSize={7}
             fontFamily="monospace"
           >
-            build vol.
+            {bvx.toFixed(0)}×{bvz.toFixed(0)}mm build vol.
           </text>
 
           {/* Arm sketch — simplified hollow box in material color */}
@@ -226,21 +226,21 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           {/* Dimension labels */}
           <text
             x={svgX(lx / 2)}
-            y={SH - 5}
+            y={SH - 3}
             textAnchor="middle"
-            fill="#6b7280"
-            fontSize={8}
+            fill="#9ca3af"
+            fontSize={9}
             fontFamily="monospace"
           >
-            {lx.toFixed(0)}mm arm
+            ←{lx.toFixed(0)}mm arm→
           </text>
           <text
-            x={SW - 4}
+            x={SW - 2}
             y={svgY(bvz / 2)}
             textAnchor="end"
             dominantBaseline="middle"
-            fill="#6b7280"
-            fontSize={8}
+            fill="#9ca3af"
+            fontSize={9}
             fontFamily="monospace"
           >
             {bvz.toFixed(0)}mm

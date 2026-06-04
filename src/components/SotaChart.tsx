@@ -158,7 +158,15 @@ export function SotaChart({ spec }: Props) {
               axisLine={false}
               tickLine={false}
               domain={domain}
-              width={58}
+              width={65}
+              label={{
+                value: unit ? unit : metric.replace(/_/g, " "),
+                angle: -90,
+                position: "insideLeft",
+                fill: "#6b7280",
+                fontSize: 9,
+                offset: 8,
+              }}
               tickFormatter={(v: number) => {
                 if (v >= 100) return v.toFixed(0);
                 if (v >= 1)   return v.toFixed(2);

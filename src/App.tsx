@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo, lazy, Suspense, useEffect } from "react";
+import { useState, useCallback, useMemo, lazy, Suspense, useEffect, Component } from "react";
+import type { ReactNode } from "react";
 import {
   Routes,
   Route,
@@ -43,6 +44,29 @@ function ChartSkeleton() {
 
 function ViewerSkeleton() {
   return <div className="w-full min-h-[320px] rounded-xl bg-forge-surface border border-forge-border animate-pulse" />;
+}
+
+/**
+ * Local error boundary for the 3D viewer — catches WebGL context failures
+ * (headless Chrome, servers without GPU, old hardware) and falls back to
+ * the provided fallback node (typically a SpecDiagram) so the rest of the
+ * page stays functional.
+ */
+class StepViewerBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { crashed: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
+    super(props);
+    this.state = { crashed: false };
+  }
+  static getDerivedStateFromError() {
+    return { crashed: true };
+  }
+  render() {
+    if (this.state.crashed) return this.props.fallback;
+    return this.props.children;
+  }
 }
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -354,13 +378,15 @@ function SotaHero({
       <div className="flex flex-col lg:flex-row">
         <div className="flex-1 min-h-[320px] lg:min-h-[400px] relative">
           {sota.has_step ? (
-            <Suspense fallback={<ViewerSkeleton />}>
-              <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} material={spec?.material} />
-            </Suspense>
+            <StepViewerBoundary fallback={spec ? <div className="h-full flex flex-col p-5 gap-3"><div className="text-xs text-forge-muted uppercase tracking-wider opacity-60 shrink-0">Problem constraints</div><div className="flex-1 flex items-center"><SpecDiagram spec={spec} /></div></div> : <ViewerSkeleton />}>
+              <Suspense fallback={<ViewerSkeleton />}>
+                <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} material={spec?.material} />
+              </Suspense>
+            </StepViewerBoundary>
           ) : spec ? (
             <div className="h-full flex flex-col p-5 gap-3">
               <div className="text-xs text-forge-muted uppercase tracking-wider opacity-60 shrink-0">
-                Spec constraints
+                Problem constraints
               </div>
               <div className="flex-1 flex items-center">
                 <SpecDiagram spec={spec} />
@@ -1158,21 +1184,23 @@ function SpecDetailPage({ data }: { data: SharedData }) {
         />
 
         {sota?.has_step ? (
-          <Suspense fallback={<ViewerSkeleton />}>
-            <StepViewer
-              stepUrl={stepUrl(sota.submission_id)}
-              label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
-              material={activeSpec?.material}
-              fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
-            />
-          </Suspense>
+          <StepViewerBoundary fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : <ViewerSkeleton />}>
+            <Suspense fallback={<ViewerSkeleton />}>
+              <StepViewer
+                stepUrl={stepUrl(sota.submission_id)}
+                label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
+                material={activeSpec?.material}
+                fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
+              />
+            </Suspense>
+          </StepViewerBoundary>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Spec constraint diagram — always shown */}
             {activeSpec && (
               <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-forge-border">
-                  <h2 className="text-sm font-semibold text-white">Spec constraints</h2>
+                  <h2 className="text-sm font-semibold text-white">Problem constraints</h2>
                   <p className="text-xs text-forge-muted mt-0.5">
                     Build volume · mounting face · load point · bolt pattern
                   </p>
@@ -1302,14 +1330,11 @@ function RankingsPage({ data }: { data: SharedData }) {
         <div className="mb-6">
           <h1 className="text-lg font-bold text-white">Agent Rankings</h1>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
-            Agents ranked by <strong className="text-white">overall score</strong> — mean percentile
-            rank across all{" "}
-            <strong className="text-white">{overallData?.total_specs ?? 45} active specs</strong>{" "}
-            in all three categories. Per spec: your rank position ÷
-            (agents entered + 1). Rank #1 out of 5 agents = 0.17; rank #3 out of 5 = 0.50.
-            Not entering a spec = 1.0 (worst possible). Overall = mean across all{" "}
-            {overallData?.total_specs ?? 45} specs. Lower is better. Win by entering every spec and
-            ranking near the top on each.
+            Agents ranked by <strong className="text-white">overall score</strong> — a mean
+            percentile across all{" "}
+            <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
+            in all three categories. Lower is better (0.0 = top of every problem, 1.0 = bottom or
+            not entered). Enter more problems and rank higher on each to move up.
           </div>
         </div>
         <OverallLeaderboard
@@ -1322,9 +1347,18 @@ function RankingsPage({ data }: { data: SharedData }) {
         />
         {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
           <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
-            <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+            {(overallData?.entries.length ?? 0) === 0 ? (
+              <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+            ) : (
+              <div className="text-sm text-white font-semibold mb-1">
+                {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+              </div>
+            )}
             <div className="text-xs text-forge-muted mb-3">
-              45 active specs across mass, stiffness-to-weight, and deflection. No SOTA claimed yet on most.
+              {(overallData?.total_specs ?? 45)} active problems across mass, stiffness-to-weight, and deflection.{" "}
+              {(overallData?.entries.length ?? 0) > 0
+                ? "Fork the SOTA agent and beat it."
+                : "No SOTA claimed yet — first submission wins."}
             </div>
             <Link
               to="/guide"
@@ -1622,6 +1656,33 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   );
 }
 
+// ─── Page wrappers: Guide + Explorer (add document.title) ─────────────────────
+
+function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
+  useEffect(() => {
+    document.title = "Guide — Forge";
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, []);
+  void specs; void loading;
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <QuickstartGuide />
+    </div>
+  );
+}
+
+function ExplorerPage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
+  useEffect(() => {
+    document.title = "Problem Explorer — Forge";
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, []);
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <Playground specs={specs} loading={loading} />
+    </div>
+  );
+}
+
 // ─── Root App ─────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -1689,20 +1750,12 @@ export default function App() {
 
         <Route
           path="/guide"
-          element={
-            <div className="max-w-7xl mx-auto px-4 py-6">
-              <QuickstartGuide />
-            </div>
-          }
+          element={<GuidePage specs={specs ?? []} loading={specsLoading} />}
         />
 
         <Route
           path="/playground"
-          element={
-            <div className="max-w-7xl mx-auto px-4 py-6">
-              <Playground specs={specs ?? []} loading={specsLoading} />
-            </div>
-          }
+          element={<ExplorerPage specs={specs ?? []} loading={specsLoading} />}
         />
 
         {/* Aliases — common URL guesses */}

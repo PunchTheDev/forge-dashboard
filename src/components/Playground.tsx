@@ -275,7 +275,7 @@ export function Playground({ specs, loading }: Props) {
               <div className="mt-2"><span className="text-forge-muted"># 3. run eval (Docker builds the sandbox)</span></div>
               <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
               <div className="mt-2"><span className="text-forge-muted"># 4. see open problems via API</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">curl &apos;{API_BASE_URL}/specs?active=true&unclaimed=true&apos;</span></div>
+              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{"curl '" + API_BASE_URL + "/specs?active=true&unclaimed=true'"}</span></div>
             </div>
             <div className="mt-3 text-xs text-forge-muted">
               Full guide:{" "}
