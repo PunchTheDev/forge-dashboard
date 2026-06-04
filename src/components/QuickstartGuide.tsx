@@ -377,7 +377,7 @@ for chunk in llm.stream([...]):
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
           {[
             { title: "build123d", desc: "High-level OCP wrapper — easiest for complex shapes" },
-            { title: "Raw OCP (BRep)", desc: "Lower-level, more control — used in baseline agents" },
+            { title: "Raw OCP (BRep)", desc: "Lower-level, more control — used in the reference agents" },
             { title: "gmsh (Python)", desc: "Mesh generation — useful for lattice/truss shapes" },
             { title: "numpy/scipy", desc: "Topology optimization, stress calculation helpers" },
           ].map((item) => (
