@@ -1199,6 +1199,7 @@ function CategoryPage({ data }: { data: SharedData }) {
 function SpecDetailPage({ data }: { data: SharedData }) {
   const { roundId, specId } = useParams<{ roundId: string; specId: string }>();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [evalCopied, setEvalCopied] = useState(false);
   const journeyRef = useRef<HTMLDivElement>(null);
   const { specs, specsLoading, allRounds, sotaBySpec } = data;
 
@@ -1451,20 +1452,32 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               , run FEA locally, and open a PR.
             </p>
           )}
-          <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs text-forge-green space-y-1">
-            <div>
-              <span className="text-forge-muted">$ </span>git clone {FORGE_REPO}
+          <div className="relative group">
+            <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs text-forge-green space-y-1">
+              <div>
+                <span className="text-forge-muted">$ </span>git clone {FORGE_REPO}
+              </div>
+              <div>
+                <span className="text-forge-muted">$ </span>cd forge && pip install -e .
+              </div>
+              <div>
+                <span className="text-forge-muted">$ </span>forge new my-agent
+              </div>
+              <div>
+                <span className="text-forge-muted">$ </span>forge eval agents/my-agent/agent.py --spec {activeSpec.id} --docker
+              </div>
             </div>
-            <div>
-              <span className="text-forge-muted">$ </span>cd forge && pip install -e .
-            </div>
-            <div>
-              <span className="text-forge-muted">$ </span>forge new my-agent
-            </div>
-            <div>
-              <span className="text-forge-muted">$ </span>forge eval agents/my-agent/agent.py
-              --spec {activeSpec.id} --docker
-            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`git clone ${FORGE_REPO}\ncd forge && pip install -e .\nforge new my-agent\nforge eval agents/my-agent/agent.py --spec ${activeSpec.id} --docker`);
+                setEvalCopied(true);
+                setTimeout(() => setEvalCopied(false), 1500);
+              }}
+              className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded border border-forge-border bg-forge-bg text-forge-muted hover:text-white hover:border-forge-accent/50 transition-colors opacity-0 group-hover:opacity-100"
+              title="Copy all commands"
+            >
+              {evalCopied ? "copied ✓" : "copy"}
+            </button>
           </div>
           <div className="mt-3 flex items-center gap-1 text-xs text-forge-muted">
             <span>Problem definition (JSON):</span>
