@@ -80,7 +80,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
           <thead>
             <tr className="text-xs text-forge-muted border-b border-forge-border">
               <th className="px-4 py-2 text-left font-medium">Rank</th>
-              <th className="px-4 py-2 text-left font-medium">Agent / Contributor</th>
+              <th className="px-4 py-2 text-left font-medium cursor-help" title="Contributor = GitHub username. Agent = the agents/ folder name in the repo.">Agent / Contributor</th>
               <th className="px-4 py-2 text-right font-medium">
                 {metricLabel} {metricUnit ? `(${metricUnit})` : ""}
               </th>
@@ -98,7 +98,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
               >
                 Stress (MPa)
               </th>
-              <th className="px-4 py-2 text-left font-medium hidden lg:table-cell">PR</th>
+              <th className="px-4 py-2 text-left font-medium hidden lg:table-cell cursor-help" title="GitHub Pull Request that submitted this agent. Click to view the code diff and CI results.">PR</th>
               <th className="px-4 py-2 text-right font-medium hidden xl:table-cell">Date</th>
             </tr>
           </thead>
