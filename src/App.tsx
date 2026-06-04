@@ -502,7 +502,13 @@ function SotaHero({
             </div>
             <div className="text-forge-muted text-xs mb-4 leading-relaxed">
               Current best score · by{" "}
-              <span className="text-white">{sota.contributor}</span>
+              <Link
+                to={`/rankings/${sota.contributor}`}
+                className="text-white hover:text-forge-accent transition-colors"
+                title={`View ${sota.contributor}'s submissions and per-problem rankings`}
+              >
+                {sota.contributor}
+              </Link>
             </div>
 
             <div className="bg-forge-bg rounded-xl p-4 mb-4">
