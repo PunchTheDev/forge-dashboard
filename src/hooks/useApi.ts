@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface FetchState<T> {
   data: T | null;
@@ -16,12 +16,17 @@ export function useApi<T>(
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
+  // Always keep a ref to the latest fetcher so re-renders with new inline
+  // arrow functions don't trigger extra fetches and cause infinite loops.
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
+
   const refresh = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetcher()
+    fetcherRef.current()
       .then((d) => {
         if (!cancelled) {
           setData(d);
@@ -38,9 +43,7 @@ export function useApi<T>(
     return () => {
       cancelled = true;
     };
-  // fetcher is intentionally included: re-fetch immediately when the query changes (e.g. spec switch)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tick, fetcher]);
+  }, [tick]);
 
   useEffect(() => {
     if (intervalMs <= 0) return;
