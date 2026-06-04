@@ -63,7 +63,10 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
         <h2 className="text-sm font-semibold text-white">
           Passing submissions — ranked by {metricLabel.toLowerCase()}
         </h2>
-        <span className="text-xs text-forge-muted">{ranked.length} passing</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-forge-muted/50 hidden sm:block">click row for details</span>
+          <span className="text-xs text-forge-muted">{ranked.length} passing</span>
+        </div>
       </div>
 
       {ranked.length === 0 && (
