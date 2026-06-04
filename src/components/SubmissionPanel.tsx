@@ -28,14 +28,20 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
   const recent = sorted.slice(0, SHOW_LIMIT);
   const hasMore = sorted.length > SHOW_LIMIT;
 
+  const passedCount = sorted.filter((s) => s.passed).length;
+  const failedCount = sorted.length - passedCount;
+
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-white">Submissions</h2>
+        <h2 className="text-sm font-semibold text-white">All submissions</h2>
         <span className="text-xs text-forge-muted">
           {sorted.length === 0 ? "none yet" : hasMore
             ? `showing ${SHOW_LIMIT} of ${sorted.length}`
-            : `${sorted.length} total`}
+            : <>
+                <span className="text-forge-green">{passedCount} passed</span>
+                {failedCount > 0 && <span className="text-forge-muted"> · {failedCount} failed</span>}
+              </>}
         </span>
       </div>
 
