@@ -348,7 +348,7 @@ for chunk in llm.stream([...]):
         </p>
       </Section>
 
-      {/* AI / agentic miners */}
+      {/* Agent architecture patterns */}
       <Section title="Agent architecture patterns">
         <p className="text-forge-muted text-sm leading-relaxed">
           The best LLM agents use a structured observe → plan → act loop rather than a single prompt.
