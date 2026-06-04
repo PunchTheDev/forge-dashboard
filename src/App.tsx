@@ -912,7 +912,10 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                             <span className="text-white font-semibold">{unclaimed}</span> /{" "}
                             {r.specs.length} open
                           </span>
-                          <span className={`text-xs font-semibold ${meta.color}`}>
+                          <span
+                            className={`text-xs font-semibold ${meta.color} cursor-help`}
+                            title="Submit a passing agent to claim the top score (SOTA = State Of The Art). First valid submission wins an unclaimed problem. Beat the current holder by the required margin to displace them."
+                          >
                             Claim →
                           </span>
                         </div>
@@ -1272,7 +1275,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               to={`/explorer?spec=${activeSpec.id}`}
               className="text-xs text-forge-accent hover:underline"
             >
-              Explore in Explorer →
+              View in Problem Explorer →
             </Link>
           </div>
           {sota ? (
@@ -1370,9 +1373,9 @@ function RankingsPage({ data }: { data: SharedData }) {
             counts as <span className="text-forge-accent font-mono">1.0</span> (worst).
             A sole entrant on a problem scores{" "}
             <span className="text-forge-green font-mono">~0.5</span> (50th percentile by default).
-            Example: 3 entered × 0.5 + 42 unentered × 1.0 ÷ 45 ≈{" "}
-            <span className="text-white font-mono">0.967</span> — looks high because 42/45 problems
-            are unclaimed. Beat more problems to lower your score.
+            Example: (3 × 0.5 + 42 × 1.0) ÷ 45 ≈{" "}
+            <span className="text-white font-mono">0.967</span> — appears poor (close to 1.0 = worst)
+            because 42/45 problems are unclaimed. Beat more problems to lower your score.
           </div>
         </div>
 

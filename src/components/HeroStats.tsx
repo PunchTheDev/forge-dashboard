@@ -152,7 +152,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <Stat
           label="Stress headroom"
           value={stressHeadroom ? `${stressHeadroom}% free` : "—"}
-          sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} of ${allowable.toFixed(0)} MPa used` : "no submission yet"}
+          sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} MPa actual · ${allowable.toFixed(0)} MPa limit` : "no submission yet"}
           accent
           title={`Stress headroom = how much of the allowable stress is still unused. ${stressHeadroom}% free means only ${100 - Number(stressHeadroom)}% of the ${allowable.toFixed(0)} MPa limit is used — the design has a lot of room to shed mass.`}
         />
