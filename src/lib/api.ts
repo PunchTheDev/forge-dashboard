@@ -170,11 +170,14 @@ export function allowableStress(spec: Spec): number {
 }
 
 /** Human-readable spec label — strips the "Cantilever Bracket — " prefix and "[tier]" suffix,
- *  and rewrites "@ X mm" → "· X mm arm" so the cantilever arm distance is self-explanatory. */
+ *  rewrites "X kg" → "X kg load" so kg is never mistaken for part mass on a "minimize mass"
+ *  page (the kg figure is the *applied load*, not the part), and rewrites "@ X mm" → "· X mm arm"
+ *  so the cantilever arm distance is self-explanatory. */
 export function specLabel(spec: Spec): string {
   return spec.name
     .replace(/^Cantilever Bracket — /, "")
     .replace(/\s*\[.*?\]$/, "")
+    .replace(/ — (\d+(?:\.\d+)?) kg/, " · $1 kg load")
     .replace(/ @ (\d+(?:\.\d+)?) mm/, " · $1mm arm");
 }
 
