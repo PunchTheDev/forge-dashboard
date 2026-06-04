@@ -168,9 +168,13 @@ export function allowableStress(spec: Spec): number {
   return (YIELD_STRESS[spec.material] ?? 50) / spec.constraints.safety_factor;
 }
 
-/** Human-readable spec label — strips the "Cantilever Bracket — " prefix and "[tier]" suffix. */
+/** Human-readable spec label — strips the "Cantilever Bracket — " prefix and "[tier]" suffix,
+ *  and rewrites "@ X mm" → "· X mm arm" so the cantilever arm distance is self-explanatory. */
 export function specLabel(spec: Spec): string {
-  return spec.name.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "");
+  return spec.name
+    .replace(/^Cantilever Bracket — /, "")
+    .replace(/\s*\[.*?\]$/, "")
+    .replace(/ @ (\d+(?:\.\d+)?) mm/, " · $1mm arm");
 }
 
 /** GitHub blob URL for the SOTA agent code (commit-pinned, browse the winning implementation). */

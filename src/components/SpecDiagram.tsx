@@ -136,6 +136,17 @@ export function SpecDiagram({ spec, compact = false }: Props) {
             strokeWidth={1}
             strokeDasharray="4 3"
           />
+          {/* Build volume label — top-right corner of the dashed box */}
+          <text
+            x={bvRight - 2}
+            y={bvTop + 7}
+            textAnchor="end"
+            fill="#374151"
+            fontSize={6}
+            fontFamily="monospace"
+          >
+            build vol.
+          </text>
 
           {/* Arm sketch — simplified hollow box in material color */}
           <rect
