@@ -1,4 +1,4 @@
-import { Round, SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, sotaCodeUrl } from "../lib/api";
+import { Round, SotaRecord, Spec, allowableStress, metricConfig, specBaseline, specLabel, sotaCodeUrl, MATERIAL_META } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 interface Props {
@@ -120,8 +120,11 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         )}
         <div className="flex flex-wrap items-center gap-2 mb-1">
           <h1 className="text-lg font-bold text-white">{specLabel(spec)}</h1>
-          <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
-            {spec.material.toUpperCase().replace("_", " ")}
+          <span
+            className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
+            title={MATERIAL_META[spec.material]?.note ?? spec.material}
+          >
+            {MATERIAL_META[spec.material]?.label ?? spec.material.toUpperCase().replace(/_/g, " ")}
           </span>
           <span className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded">
             {loadKg} kg load
