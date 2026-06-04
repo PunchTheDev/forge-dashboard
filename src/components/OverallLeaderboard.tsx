@@ -107,10 +107,16 @@ function EntryRow({ entry, specToRound, totalSpecs }: {
   specToRound: Record<string, string>;
   totalSpecs: number;
 }) {
+  const rankBorder =
+    entry.rank === 1 ? "border-yellow-400/40 bg-yellow-400/[0.03]" :
+    entry.rank === 2 ? "border-slate-400/40" :
+    entry.rank === 3 ? "border-amber-600/40" :
+    "border-forge-border";
+
   return (
     <Link
       to={`/rankings/${encodeURIComponent(entry.contributor)}`}
-      className="block bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-2 cursor-pointer transition-all hover:border-forge-accent/50 hover:scale-[1.005] active:scale-[0.998]"
+      className={`block bg-forge-surface border rounded-xl px-5 py-4 flex flex-col gap-2 cursor-pointer transition-all hover:border-forge-accent/50 hover:scale-[1.005] active:scale-[0.998] ${rankBorder}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
