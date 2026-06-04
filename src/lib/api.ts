@@ -28,13 +28,14 @@ export interface MetricConfig {
   unit: string;
   decimals: number;
   baselineKey: keyof SpecScoring;
+  description: string;
 }
 
 export const METRIC_CONFIG: Record<string, MetricConfig> = {
-  mass_grams:          { label: "Mass",             unit: "g",        decimals: 2, baselineKey: "baseline_mass_grams" },
-  volume_mm3:          { label: "Volume",            unit: "mm³",      decimals: 0, baselineKey: "baseline_mass_grams" },
-  stiffness_to_weight: { label: "Stiffness/weight", unit: "N/(mm·g)", decimals: 3, baselineKey: "baseline_stiffness_to_weight" },
-  deflection_mm:       { label: "Deflection",       unit: "mm",       decimals: 4, baselineKey: "baseline_deflection_mm" },
+  mass_grams:          { label: "Mass",             unit: "g",        decimals: 2, baselineKey: "baseline_mass_grams",           description: "Total part mass in grams. Lower is better — lightest bracket that survives the applied load wins." },
+  volume_mm3:          { label: "Volume",            unit: "mm³",      decimals: 0, baselineKey: "baseline_mass_grams",           description: "Part volume in cubic millimetres. Lower is better — smallest volume that passes FEA wins." },
+  stiffness_to_weight: { label: "Stiffness/weight", unit: "N/(mm·g)", decimals: 3, baselineKey: "baseline_stiffness_to_weight",  description: "Stiffness per gram = (load_N ÷ deflection_mm) ÷ mass_g. Higher is better — stiffer per unit weight wins. Units: N/(mm·g)." },
+  deflection_mm:       { label: "Deflection",       unit: "mm",       decimals: 4, baselineKey: "baseline_deflection_mm",        description: "Tip displacement in mm under the applied load. Lower is better — least bending wins." },
 };
 
 export function metricConfig(metric: string): MetricConfig {
