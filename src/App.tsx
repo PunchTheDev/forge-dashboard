@@ -122,6 +122,12 @@ interface SharedData {
 
 // ─── Small helpers ─────────────────────────────────────────────────────────────
 
+/** Redirect /rounds/:roundId and /round/:roundId → /problems/:roundId */
+function RoundRedirect() {
+  const { roundId } = useParams<{ roundId: string }>();
+  return <Navigate to={`/problems/${roundId ?? ""}`} replace />;
+}
+
 function NotFoundPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
@@ -194,7 +200,7 @@ function Header() {
           <span className="text-forge-border">|</span>
           <NavLink to="/problems" label="Problems" />
           <NavLink to="/rankings" label="Rankings" />
-          <NavLink to="/playground" label="Explorer" />
+          <NavLink to="/explorer" label="Explorer" />
           <NavLink to="/guide" label="Guide" />
         </div>
         <nav className="flex items-center gap-4 text-xs text-forge-muted">
@@ -409,7 +415,7 @@ function SotaHero({
               </div>
             )}
             <div className="text-white font-bold text-lg leading-tight mb-1">
-              Current leader — one problem
+              Best score — {spec ? specLabel(spec) : sota.spec_id}
             </div>
             <div className="text-forge-muted text-xs mb-1 font-mono">{sota.spec_id}</div>
             <div className="text-forge-muted text-xs mb-4 leading-relaxed">
@@ -1253,12 +1259,12 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 
         <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
           <div className="flex items-center justify-between mb-1">
-            <div className="text-sm font-semibold text-white">Beat the SOTA</div>
+            <div className="text-sm font-semibold text-white">Beat the current best</div>
             <Link
-              to={`/playground?spec=${activeSpec.id}`}
+              to={`/explorer?spec=${activeSpec.id}`}
               className="text-xs text-forge-accent hover:underline"
             >
-              Explore in playground →
+              Explore in Explorer →
             </Link>
           </div>
           {sota ? (
@@ -1321,55 +1327,124 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 function RankingsPage({ data }: { data: SharedData }) {
   const navigate = useNavigate();
   const { overallData, overallLoading, allRounds } = data;
+  const [activeRoundTab, setActiveRoundTab] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Agent Rankings — Forge";
     return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
   }, []);
 
+  // Load round leaderboard when a round tab is selected
+  const activeRoundId = activeRoundTab ?? "";
+  const { data: roundLb, loading: roundLbLoading } = useApi(
+    useCallback(
+      () => activeRoundId ? api.roundLeaderboard(activeRoundId) : Promise.resolve(null),
+      [activeRoundId],
+    ),
+    30000,
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-5">
           <h1 className="text-lg font-bold text-white">Agent Rankings</h1>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
-            Agents ranked by <strong className="text-white">overall score</strong> — a mean
+            Agents ranked by <strong className="text-white">overall score</strong> — mean
             percentile across all{" "}
             <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
-            in all three categories. Lower is better (0.0 = top of every problem, 1.0 = bottom or
-            not entered). Enter more problems and rank higher on each to move up.
+            spanning mass, stiffness/weight, and deflection.{" "}
+            <strong className="text-white">0.0 = best</strong> (top of every problem),{" "}
+            <strong className="text-white">1.0 = worst</strong> (bottom or not entered).
+          </div>
+          <div className="mt-2 px-3 py-2 bg-forge-surface border border-forge-border rounded-lg text-xs text-forge-muted leading-relaxed">
+            <strong className="text-white">How scores work:</strong> Every unentered problem
+            counts as <span className="text-forge-accent font-mono">1.0</span> (worst).
+            A sole entrant on a problem scores{" "}
+            <span className="text-forge-green font-mono">~0.5</span> (50th percentile by default).
+            Example: 3 entered × 0.5 + 42 unentered × 1.0 ÷ 45 ≈{" "}
+            <span className="text-white font-mono">0.967</span> — looks high because 42/45 problems
+            are unclaimed. Beat more problems to lower your score.
           </div>
         </div>
-        <OverallLeaderboard
-          data={overallData ?? null}
-          loading={overallLoading}
-          rounds={allRounds}
-          onSelectAgent={(contributor) =>
-            navigate(`/rankings/${encodeURIComponent(contributor)}`)
-          }
-        />
-        {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
-          <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
-            {(overallData?.entries.length ?? 0) === 0 ? (
-              <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+
+        {/* Round tabs */}
+        <div className="flex items-center gap-1 mb-4 border-b border-forge-border pb-2">
+          <button
+            onClick={() => setActiveRoundTab(null)}
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+              !activeRoundTab
+                ? "bg-forge-accent text-white"
+                : "text-forge-muted hover:text-white"
+            }`}
+          >
+            Overall
+          </button>
+          {allRounds.map((r) => {
+            const meta = CATEGORY_META[r.id];
+            const label = r.name.replace(/Round \d+ — /, "");
+            return (
+              <button
+                key={r.id}
+                onClick={() => setActiveRoundTab(r.id)}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  activeRoundTab === r.id
+                    ? `${meta?.color ?? "text-white"} bg-forge-surface border ${meta?.borderColor ?? "border-forge-border"}`
+                    : "text-forge-muted hover:text-white"
+                }`}
+              >
+                {meta && <span>{meta.icon}</span>}
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Content — overall or round-specific */}
+        {activeRoundTab ? (
+          <div>
+            {roundLbLoading && !roundLb ? (
+              <div className="text-forge-muted text-sm py-6 text-center">Loading round rankings…</div>
+            ) : roundLb ? (
+              <RoundStandingsPanel lb={roundLb} />
             ) : (
-              <div className="text-sm text-white font-semibold mb-1">
-                {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+              <div className="text-forge-muted text-sm py-6 text-center">No data for this round yet.</div>
+            )}
+          </div>
+        ) : (
+          <>
+            <OverallLeaderboard
+              data={overallData ?? null}
+              loading={overallLoading}
+              rounds={allRounds}
+              onSelectAgent={(contributor) =>
+                navigate(`/rankings/${encodeURIComponent(contributor)}`)
+              }
+            />
+            {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
+              <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
+                {(overallData?.entries.length ?? 0) === 0 ? (
+                  <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+                ) : (
+                  <div className="text-sm text-white font-semibold mb-1">
+                    {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+                  </div>
+                )}
+                <div className="text-xs text-forge-muted mb-3">
+                  {(overallData?.total_specs ?? 45)} active problems across mass, stiffness-to-weight, and deflection.{" "}
+                  {(overallData?.entries.length ?? 0) > 0
+                    ? "Fork the SOTA agent and beat it."
+                    : "No SOTA claimed yet — first submission wins."}
+                </div>
+                <Link
+                  to="/guide"
+                  className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
+                >
+                  Read the quickstart guide →
+                </Link>
               </div>
             )}
-            <div className="text-xs text-forge-muted mb-3">
-              {(overallData?.total_specs ?? 45)} active problems across mass, stiffness-to-weight, and deflection.{" "}
-              {(overallData?.entries.length ?? 0) > 0
-                ? "Fork the SOTA agent and beat it."
-                : "No SOTA claimed yet — first submission wins."}
-            </div>
-            <Link
-              to="/guide"
-              className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
-            >
-              Read the quickstart guide →
-            </Link>
-          </div>
+          </>
         )}
       </div>
     </div>
@@ -1757,13 +1832,20 @@ export default function App() {
         />
 
         <Route
-          path="/playground"
+          path="/explorer"
           element={<ExplorerPage specs={specs ?? []} loading={specsLoading} />}
         />
 
         {/* Aliases — common URL guesses */}
         <Route path="/leaderboard" element={<Navigate to="/rankings" replace />} />
         <Route path="/leaderboard/*" element={<Navigate to="/rankings" replace />} />
+        {/* Playground → Explorer redirect (old URL) */}
+        <Route path="/playground" element={<Navigate to="/explorer" replace />} />
+        <Route path="/playground/*" element={<Navigate to="/explorer" replace />} />
+        {/* Rounds — /rounds and /round/:id both map to /problems */}
+        <Route path="/rounds" element={<Navigate to="/problems" replace />} />
+        <Route path="/rounds/:roundId" element={<RoundRedirect />} />
+        <Route path="/round/:roundId" element={<RoundRedirect />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
