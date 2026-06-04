@@ -96,6 +96,7 @@ If any seat would be confused, the component fails.
 
 - Page intro — ● ◐ ◐ — defines "problem" but mixes with "spec" elsewhere on the site.
 - `Browse Problems` panel — ● ● ◐ — material/tier filters work; row labels (`PETG · 15 kg load · 78mm arm`) need literacy.
+- `Constraints` card (material / load / arm / SF / build volume / bolts / optimize) — ● ● ● — Safety factor row now reads `1.5× (≤{computed} MPa max stress)` so the abstract multiplier resolves to the concrete stress ceiling a designer reasons about. Allowable pulled from `allowableStress(spec)` (material-aware: PETG → 27 MPa, harder PLA-based spec → 33 MPa). Tooltip rewritten to spell the division: "Yield stress ÷ 1.5 = 27 MPa max allowable stress." (`Playground.tsx` L448–457)
 - `Eval Command` panel — ● ● ● — copy-pasteable, well annotated.
 - `Sample Eval Output` panel — ● ● ●
 - Diagram (front view + side view) — ○ ○ ○ — small, easy to miss.

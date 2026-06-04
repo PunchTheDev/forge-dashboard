@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore, SotaRecord, sotaCodeUrl } from "../lib/api";
+import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore, SotaRecord, sotaCodeUrl, allowableStress } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 import { SotaCodeViewer } from "./SotaCodeViewer";
 
@@ -445,9 +445,14 @@ export function Playground({ specs, loading, sotaBySpec = {}, sotaRecordsBySpec 
                     {selectedSpec.constraints.load_point_mm[0].toFixed(0)} mm
                   </span>
                 </div>
-                <div className="flex justify-between" title="Yield stress divided by this factor = maximum allowable stress. Higher SF = stricter.">
+                <div className="flex justify-between" title={`Yield stress ÷ ${selectedSpec.constraints.safety_factor} = ${allowableStress(selectedSpec).toFixed(0)} MPa max allowable stress. Your design's peak von Mises stress must stay below this. Higher SF = stricter.`}>
                   <span className="text-forge-muted cursor-help">Safety factor</span>
-                  <span className="text-white">{selectedSpec.constraints.safety_factor}×</span>
+                  <span className="text-white">
+                    {selectedSpec.constraints.safety_factor}×
+                    <span className="text-forge-muted ml-1">
+                      (≤{allowableStress(selectedSpec).toFixed(0)} MPa max stress)
+                    </span>
+                  </span>
                 </div>
                 <div className="flex justify-between" title="Maximum bounding box your STEP geometry must fit inside.">
                   <span className="text-forge-muted cursor-help">Build volume (X × Y × Z)</span>
