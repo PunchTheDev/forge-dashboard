@@ -458,7 +458,7 @@ function SotaHero({
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
               This part passed real FEA (CalculiX). The winning agent's source is
-              open — fork it and beat this score on this problem (and all others) to claim #1.
+              open — fork it and improve it to beat this score and take this problem's top spot.
               {sota.score_metric === "mass_grams" && " Lightest structure that survives the load wins."}
               {sota.score_metric === "stiffness_to_weight" &&
                 " Highest stiffness-per-gram wins."}
