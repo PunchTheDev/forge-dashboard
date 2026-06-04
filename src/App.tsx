@@ -1144,7 +1144,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   const { roundId, specId } = useParams<{ roundId: string; specId: string }>();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const journeyRef = useRef<HTMLDivElement>(null);
-  const { specs, allRounds, sotaBySpec } = data;
+  const { specs, specsLoading, allRounds, sotaBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
   const activeSpec = specs?.find((s) => s.id === specId) ?? null;
@@ -1187,6 +1187,13 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   }, [selectedSubmission]);
 
   if (!activeSpec) {
+    if (specsLoading) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-6 text-forge-muted text-sm">
+          Loading problem…
+        </div>
+      );
+    }
     return (
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="text-forge-muted text-sm mb-2">Problem not found — check the ID or browse all problems.</div>
