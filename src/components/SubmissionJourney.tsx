@@ -72,12 +72,16 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
   const displayScore = submission.score ?? submission.mass_grams;
   const { unit: scoreUnit, decimals } = metricConfig(metric);
   const baseline = specBaseline(spec.scoring);
-  const baselinePct =
+  // positive = beats reference in the optimization direction (same convention as Leaderboard)
+  const baselinePctRaw =
     baseline != null
       ? isMaximize
-        ? ((displayScore / baseline - 1) * 100).toFixed(1)
-        : ((1 - displayScore / baseline) * 100).toFixed(1)
+        ? (displayScore / baseline - 1) * 100
+        : (1 - displayScore / baseline) * 100
       : null;
+  const baselinePct = baselinePctRaw != null
+    ? `${baselinePctRaw >= 0 ? "+" : "−"}${Math.abs(baselinePctRaw).toFixed(1)}`
+    : null;
   const sotaScore = sota ? sota.score : null;
   const vsSOTA = sotaScore != null ? (isMaximize ? displayScore - sotaScore : sotaScore - displayScore) : null;
   const beatsSOTA = vsSOTA != null && vsSOTA > 0;
@@ -126,7 +130,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
       passed: submission.passed,
       detail: submission.passed
         ? baselinePct != null
-          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${isMaximize ? "+" : "−"}${baselinePct}% vs. reference`
+          ? `${displayScore.toFixed(decimals)} ${scoreUnit} · ${baselinePct}% vs. reference`
           : `${displayScore.toFixed(decimals)} ${scoreUnit}`
         : similarityFailed && failReason
           ? failReason
