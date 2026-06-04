@@ -156,7 +156,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           }
           title={
             marginPct != null
-              ? `Marginal gain rule: SOTA held for ${sotaAgeDays != null ? Math.floor(sotaAgeDays) : "?"} days. ` +
+              ? `To claim #1, beat the current best. It has been held for ${sotaAgeDays != null ? Math.floor(sotaAgeDays) : "?"} days. ` +
                 (marginPct === 0
                   ? "Any improvement is eligible to claim the SOTA spot."
                   : `You need to beat it by ≥${marginPct < 0.5 ? marginPct.toFixed(1) : marginPct.toFixed(0)}% to claim it. ` +
