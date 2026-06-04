@@ -111,6 +111,11 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
   const seedLeads = sota != null && baselineRawPct != null && baselineRawPct < 0;
   const baselineStr = baseline != null ? `${baseline.toFixed(decimals)} ${scoreUnit}` : null;
 
+  // Plain-English summary that ties material + load + arm + allowable to the diagram below.
+  // Bridges the dense chip recipe ("PETG · 15 kg load · 78mm arm") to the visual SpecDiagram.
+  const materialLabel = MATERIAL_META[spec.material]?.label ?? spec.material.toUpperCase().replace(/_/g, " ");
+  const armMm = spec.constraints.load_point_mm[0].toFixed(0);
+
   return (
     <div>
       <div className="mb-4">
@@ -166,8 +171,17 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
             </span>
           )}
         </div>
-        <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-4">
+        <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-2">
           {spec.description}
+        </p>
+        <p className="text-forge-text/85 text-xs leading-relaxed max-w-2xl mb-4">
+          <span className="text-white font-semibold">In plain English:</span>{" "}
+          a <span className="text-white">{materialLabel}</span> bracket bolted to a wall must hold{" "}
+          <span className="text-white">{loadKg} kg</span> pulling{" "}
+          <span className="text-white">straight down</span> at the tip of a{" "}
+          <span className="text-white">{armMm} mm</span> cantilever arm, without exceeding{" "}
+          <span className="text-white">{allowable.toFixed(0)} MPa</span> peak stress (safety factor{" "}
+          {spec.constraints.safety_factor}×). The diagram below shows the geometry — arm length, load arrow, bolt plate.
         </p>
         <SpecDiagram spec={spec} />
       </div>
