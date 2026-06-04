@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Submission, Spec, allowableStress, metricConfig, specBaseline } from "../lib/api";
+import { Submission, Spec, allowableStress, metricConfig, specBaseline, submissionCodeUrl } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
@@ -159,9 +159,17 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                         </span>
                       )}
                     </div>
-                    <div className="text-forge-muted text-xs font-mono" title={s.agent_path}>
+                    <a
+                      href={submissionCodeUrl(s.agent_path, s.commit_hash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-forge-muted text-xs font-mono hover:text-forge-accent hover:underline inline-flex items-center gap-0.5"
+                      title={`View ${s.agent_path} at commit ${s.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                    >
                       {s.agent_path.split("/").slice(-2, -1)[0] ?? s.agent_path.replace("agents/", "")}
-                    </div>
+                      <span className="text-[9px] opacity-60">↗</span>
+                    </a>
                   </td>
                   <td className="px-4 py-2.5 text-right font-mono font-semibold tabular-nums">
                     <span className={isLeader ? "text-forge-gold" : "text-forge-green"}>
@@ -192,9 +200,16 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                         #{s.pr_number}
                       </a>
                     ) : (
-                      <span className="text-forge-muted font-mono text-xs">
+                      <a
+                        href={`${FORGE_REPO}/commit/${s.commit_hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-forge-muted font-mono text-xs hover:text-forge-accent hover:underline"
+                        title="View commit on GitHub"
+                      >
                         {s.commit_hash.slice(0, 7)}
-                      </span>
+                      </a>
                     )}
                   </td>
                   <td className="px-4 py-2.5 text-forge-muted text-xs hidden xl:table-cell text-right">

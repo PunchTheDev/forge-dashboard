@@ -1,4 +1,4 @@
-import { Submission, metricConfig } from "../lib/api";
+import { Submission, metricConfig, submissionCodeUrl } from "../lib/api";
 
 interface Props {
   submissions: Submission[];
@@ -81,9 +81,16 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
                 </span>
               ) : null;
             })()}
-            <span className="font-mono text-forge-muted text-xs shrink-0 hidden sm:block">
+            <a
+              href={submissionCodeUrl(s.agent_path, s.commit_hash)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="font-mono text-forge-muted hover:text-forge-accent hover:underline text-xs shrink-0 hidden sm:block"
+              title={`View ${s.agent_path} at this commit on GitHub`}
+            >
               {s.commit_hash.slice(0, 7)}
-            </span>
+            </a>
             <span className="text-forge-muted text-xs ml-auto shrink-0 hidden md:block">
               {new Date(s.submitted_at).toLocaleString("en-US", {
                 month: "short",
