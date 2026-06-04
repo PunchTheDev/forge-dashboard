@@ -223,6 +223,16 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                           : "hover:bg-forge-bg text-forge-muted hover:text-white border border-transparent"
                       }`}
                     >
+                      {s.tier && (
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                            s.tier === "easy" ? "bg-forge-green" :
+                            s.tier === "medium" ? "bg-forge-accent" :
+                            "bg-forge-red"
+                          }`}
+                          title={`${s.tier} difficulty`}
+                        />
+                      )}
                       <span className="font-medium flex-1 truncate">{specLabel(s)}</span>
                       {hasSota ? (
                         <span className="font-mono text-[10px] text-forge-green shrink-0">
