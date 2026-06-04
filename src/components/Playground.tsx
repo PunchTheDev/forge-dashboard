@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore, SotaRecord, sotaCodeUrl } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
+import { SotaCodeViewer } from "./SotaCodeViewer";
 
 
 /** Build a sample eval output block tailored to the selected spec's scoring metric. */
@@ -396,6 +397,19 @@ export function Playground({ specs, loading, sotaBySpec = {}, sotaRecordsBySpec 
                       <div className="text-[10px] text-forge-muted mt-1">
                         Copy the winning agent, iterate, beat by ≥0.5% in {selectedSpec.scoring.direction === "minimize" ? "lower" : "higher"} {unit} to claim #1.
                       </div>
+                      <details className="mt-2 group">
+                        <summary
+                          className="text-[11px] text-forge-accent hover:text-white cursor-pointer select-none list-none flex items-center gap-1.5 font-mono"
+                          title="Fetches the agent file from GitHub at this commit and renders it inline. Stays closed until clicked so the page doesn't fetch unless you ask."
+                        >
+                          <span className="inline-block transition-transform group-open:rotate-90">▶</span>
+                          <span>Preview winning agent code</span>
+                          <span className="text-forge-muted/70 normal-case">— inline, no tab-switching</span>
+                        </summary>
+                        <div className="mt-2 rounded-lg border border-forge-border bg-forge-bg overflow-hidden">
+                          <SotaCodeViewer sota={sota} label="Top competitor — agent.py" />
+                        </div>
+                      </details>
                     </div>
                   );
                 }

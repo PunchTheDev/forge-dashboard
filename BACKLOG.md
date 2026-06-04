@@ -34,6 +34,8 @@ If any seat would be confused, the component fails.
 4. **Spec vs problem vs round** — pick one word per concept across all pages. Audit copy; remove the synonym drift.
 5. **Rankings → agent profile → per-problem code-fork loop** — closing the loop: from rankings, a miner should reach the best agent's code in ≤2 clicks.
 6. **Extend inline code viewer to the Spotlight panel + Explorer "Current #1" panel** — they still link-out; the new `SotaCodeViewer` component is reusable. (Spotlight ref in App.tsx ~L557; Explorer ref ~L773/L861.)
+   - ✅ Explorer "Current #1 — fork to beat" panel (`Playground.tsx`): lazy `<details>` gate added — `▶ Preview winning agent code — inline, no tab-switching`. Closed by default (no GitHub fetch); on click, renders `SotaCodeViewer` inline. Existing `↗ fork code` chip kept as the row-level link-out. Puppeteer verified: 0 GH fetches when closed, 1 fetch after open, body populates ≥1.2 KB with agent.py content.
+   - ⏸️ Spotlight panel (`SotaHero` in App.tsx L460–578): inlining `SotaCodeViewer` here is the wrong move — the right column is fixed at `lg:w-72` (288 px) and already carries the title, contributor link, big metric card, prose, and two CTAs. Inline code at that width would force horizontal scroll on every line. Decision: keep the "View winning code →" link-out, and treat the **spec-detail page (step 343)** as the canonical inline-code surface. Spotlight's job is to point you at the spec page, not duplicate it.
 
 ---
 
@@ -89,7 +91,7 @@ If any seat would be confused, the component fails.
 - `Eval Command` panel — ● ● ● — copy-pasteable, well annotated.
 - `Sample Eval Output` panel — ● ● ●
 - Diagram (front view + side view) — ○ ○ ○ — small, easy to miss.
-- "Current #1 — fork to beat" panel — ● ● ◐ — shows winner + fork-code chip; could inline a code snippet.
+- "Current #1 — fork to beat" panel — ● ● ● — now carries a lazy `▶ Preview winning agent code` `<details>` that renders `SotaCodeViewer` inline on click. Closed by default to avoid GH fetches for every spec view. Step 345 (`Playground.tsx`).
 - `Quick Start` block — ○ ○ ○
 
 ### Guide (`/guide`)
