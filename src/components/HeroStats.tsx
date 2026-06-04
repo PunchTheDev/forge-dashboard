@@ -278,19 +278,42 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         />
       </div>
 
-      {/* Seed-still-leads callout */}
-      {seedLeads && (
-        <div className="mt-3 px-4 py-2.5 bg-amber-400/5 border border-amber-400/20 rounded-xl flex items-start gap-2">
-          <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚡</span>
-          <div className="text-xs text-amber-300/80 leading-relaxed">
-            <strong className="text-amber-300">Maintainer reference still leads.</strong>{" "}
-            No competitor has beaten the maintainer's baseline yet — the top competitor is{" "}
-            {Math.abs(baselineRawPct!).toFixed(1)}%{" "}
-            {metric === "mass_grams" ? "heavier" : isMaximize ? "less stiff" : "worse (more deflection)"} than the reference.
-            To claim #1 on this problem, beat <span className="font-mono text-amber-200">{baselineStr}</span> — any margin wins until a competitor takes SOTA.
+      {/* Seed-still-leads callout — first-timer needs the "which direction wins" anchor
+       *  BEFORE the percentage gap reads naturally. e.g. "5.2% heavier" only means worse if
+       *  you already know lower mass wins. Lead with the direction, then the gap with a
+       *  metric-specific verb, then the concrete bar-to-beat inline. */}
+      {seedLeads && (() => {
+        const directionLine =
+          metric === "mass_grams"
+            ? "Lower mass wins this category"
+            : isMaximize
+            ? "Higher stiffness wins this category"
+            : "Lower deflection wins this category";
+        const pct = (
+          <span className="font-mono text-amber-200">{Math.abs(baselineRawPct!).toFixed(1)}%</span>
+        );
+        const refStr = (
+          <span className="font-mono text-amber-200">{baselineStr}</span>
+        );
+        const gapPhrase =
+          metric === "mass_grams" ? (
+            <>is {pct} heavier than the reference at {refStr}</>
+          ) : isMaximize ? (
+            <>still falls {pct} short of the reference at {refStr}</>
+          ) : (
+            <>deflects {pct} more than the reference at {refStr}</>
+          );
+        return (
+          <div className="mt-3 px-4 py-2.5 bg-amber-400/5 border border-amber-400/20 rounded-xl flex items-start gap-2">
+            <span className="text-amber-400 text-xs shrink-0 mt-0.5">⚡</span>
+            <div className="text-xs text-amber-300/80 leading-relaxed">
+              <strong className="text-amber-300">Maintainer reference still leads.</strong>{" "}
+              {directionLine} — the top competitor {gapPhrase}.
+              {" "}Beat {refStr} to claim #1 — any margin wins until a competitor takes SOTA.
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* SOTA agent source — the flywheel: read it, fork it, beat it by a decaying margin.
        *  We pull the file inline (not link-out) so the loop stays on this page.

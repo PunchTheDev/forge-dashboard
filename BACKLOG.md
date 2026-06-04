@@ -71,7 +71,7 @@ If any seat would be confused, the component fails.
 - Spec spec-card (material / load / wall / overhang / score) — ◐ ◐ ○ — units (N vs kg) repeated; "SF 1.5×" cryptic.
 - `SpecDiagram` (front view + side view miniature) — ○ ○ ○ — too small; load arrow direction not labeled.
 - 4 KPI tiles (best mass / vs reference / stress margin / passing entries) — ● ● ● — clean.
-- "Maintainer reference still leads" banner — ● ● ◐ — banner clear; "by 5.2% heavier than the reference" phrasing slightly inverted for first-timer.
+- "Maintainer reference still leads" banner — ● ● ● — banner now front-loads the category direction sentence ("Lower mass wins this category" / "Higher stiffness wins this category" / "Lower deflection wins this category") before the gap %, and uses metric-specific gap verbs ("is 5.2% heavier than the reference at 263.20 g" / "still falls X% short of the reference at Y N/(mm·g)" / "deflects X% more than the reference at Y mm"). Bar-to-beat is inline with the percentage so a first-timer reads direction → gap → concrete target in one pass. (`HeroStats.tsx` L281–319, step 352)
 - **"Top competitor — open-source code"** panel — ● ● ● — `SotaCodeViewer` now renders `agent.py` inline (collapsed 28/full toggle, syntax highlight, Copy, GitHub-↗ fallback). Shipped step 343.
 - `StepViewer` (3D viewer) — ● ● ● — drag/zoom hint visible, lazy-loaded.
 - `SotaChart` (best score over time) — ○ ○ ○
