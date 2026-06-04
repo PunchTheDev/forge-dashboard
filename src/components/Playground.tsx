@@ -93,7 +93,7 @@ export function Playground({ specs, loading }: Props) {
                 <option value="">{specs.length === 0 ? "— no specs available —" : "— pick a spec —"}</option>
                 {filteredSpecs.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.id} — {s.name.replace(/ — .*$/, "")}
+                    {s.id} — {s.name.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "")}
                   </option>
                 ))}
               </select>
