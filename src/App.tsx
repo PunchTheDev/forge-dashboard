@@ -983,7 +983,7 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
             <th className="px-4 py-1.5 text-left font-medium">Rank</th>
             <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
             <th className="px-4 py-1.5 text-right font-medium cursor-help" title="Problems where this agent currently holds the #1 spot — the best score on record.">#1 problems</th>
-            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Score <span className="text-forge-muted/60 font-normal">(↓ 0 best)</span></th>
+            <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell cursor-help" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Score <span className="text-forge-muted/60 font-normal">(↓ 0 best)</span></th>
           </tr>
         </thead>
         <tbody>
@@ -1103,7 +1103,7 @@ function CategoryPage({ data }: { data: SharedData }) {
             {round.description}
           </div>
           <div className="text-xs text-forge-muted font-mono mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span title={round.scoring_direction === "minimize" ? "Lower score wins" : "Higher score wins"}>
+            <span className="cursor-help" title={round.scoring_direction === "minimize" ? "Lower score wins" : "Higher score wins"}>
               {round.scoring_direction === "minimize" ? "↓ lower wins" : "↑ higher wins"}
             </span>
             <span className="text-forge-border">·</span>
@@ -1113,7 +1113,7 @@ function CategoryPage({ data }: { data: SharedData }) {
               return claimed > 0 ? (
                 <>
                   <span className="text-forge-border">·</span>
-                  <span title="Problems where at least one agent holds the #1 spot — still open to beat by the required margin">
+                  <span className="cursor-help" title="Problems where at least one agent holds the #1 spot — still open to beat by the required margin">
                     <span className="text-forge-green">{claimed}</span>
                     <span className="text-forge-muted">/{round.specs.length} claimed</span>
                   </span>
@@ -1733,7 +1733,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                 <div className="font-mono text-sm font-semibold text-white">
                   {entry.overall_score.toFixed(3)}
                 </div>
-                <div className="text-xs text-forge-muted" title="Rank score is the mean normalized rank across all problems. 0 means #1 on every problem; 1 means last on every problem; unclaimed problems count as 1.">overall score <span className="text-forge-muted/60">· 0 best · 1 worst</span></div>
+                <div className="text-xs text-forge-muted cursor-help" title="Rank score is the mean normalized rank across all problems. 0 means #1 on every problem; 1 means last on every problem; unclaimed problems count as 1.">overall score <span className="text-forge-muted/60">· 0 best · 1 worst</span></div>
               </>
             ) : (
               <>
@@ -1783,7 +1783,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
       <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
         <div className="text-xs text-forge-muted mb-3 font-semibold uppercase tracking-wide flex items-center justify-between">
           <span>Results by problem</span>
-          <span className="text-forge-muted/50 normal-case font-normal tracking-normal" title="Sorted by rank score, worst first — shows where you're losing the most ground">worst first ↓</span>
+          <span className="text-forge-muted/50 normal-case font-normal tracking-normal cursor-help" title="Sorted by rank score, worst first — shows where you're losing the most ground">worst first ↓</span>
         </div>
         <table className="w-full text-xs">
           <thead>
@@ -1837,7 +1837,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                   </td>
                   <td className={`py-1.5 text-right font-mono ${normColor}`}>
                     {isSoleEntrant ? (
-                      <span title="Only agent on this problem — scores 0.5 (mid-range) until a competitor enters">
+                      <span className="cursor-help" title="Only agent on this problem — scores 0.5 (mid-range) until a competitor enters">
                         Sole entrant
                       </span>
                     ) : (
