@@ -29,7 +29,7 @@ If any seat would be confused, the component fails.
 ## NEXT UP (priority queue)
 
 1. ~~**Surface the SOTA agent's actual code inline**~~ ✅ shipped step 343 (`fb4d06f`). `SotaCodeViewer` renders `agent.py` inline on spec detail with Python syntax highlight + line numbers + 28-line collapsed view with Expand toggle + Copy chip + GitHub-↗ as secondary affordance.
-2. **Spec detail header literacy** — "PETG · 15 kg load · 78mm arm" assumes you know what PETG is, what direction the load applies, what the arm length means. Header chips need plain-language tooltips and an inline diagram tying material/load/arm to the actual geometry.
+2. ~~**Spec detail header literacy**~~ ✅ shipped step 344 (`735dbec`). Plain-English sentence above `SpecDiagram` names material + kg load + arm mm + allowable MPa in connecting prose ("a PETG bracket bolted to a wall must hold 15 kg pulling straight down at the tip of a 78 mm cantilever arm, without exceeding 27 MPa peak stress"). Chips on the H1 row also already had per-chip hover tooltips since prior steps. Diagram remains for visual confirmation. Still soft: chips themselves don't visibly indicate they're hoverable.
 3. **Side / front-view diagram** — currently small and weak, only shown after spec selection. Promote it; explain the bolt pattern, the load arrow, the wall-mount plane.
 4. **Spec vs problem vs round** — pick one word per concept across all pages. Audit copy; remove the synonym drift.
 5. **Rankings → agent profile → per-problem code-fork loop** — closing the loop: from rankings, a miner should reach the best agent's code in ≤2 clicks.
@@ -57,7 +57,7 @@ If any seat would be confused, the component fails.
 
 ### Spec detail (`/problems/:roundId/:specId`)
 
-- Spec header — ◐ ◐ ◐ — `PETG · 15 kg load · 78mm arm` is a recipe, not a sentence. Needs literacy pass.
+- Spec header + plain-English summary — ● ● ● — sentence above diagram ties material+load+arm+MPa together; chips on H1 row carry tooltips. (step 344, `735dbec`)
 - Spec spec-card (material / load / wall / overhang / score) — ◐ ◐ ○ — units (N vs kg) repeated; "SF 1.5×" cryptic.
 - `SpecDiagram` (front view + side view miniature) — ○ ○ ○ — too small; load arrow direction not labeled.
 - 4 KPI tiles (best mass / vs reference / stress margin / passing entries) — ● ● ● — clean.
