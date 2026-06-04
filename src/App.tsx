@@ -496,7 +496,10 @@ function SotaHero({
               </div>
               <div className="text-forge-muted text-xs mt-0.5">{unit}</div>
               {baselinePct != null && (
-                <div className={`text-xs mt-1.5 font-mono ${beatsBaseline ? "text-forge-green" : "text-amber-400"}`}>
+                <div
+                  className={`text-xs mt-1.5 font-mono cursor-help ${beatsBaseline ? "text-forge-green" : "text-amber-400"}`}
+                  title={`vs. reference = compared to the maintainer's private baseline design. ${beatsBaseline ? "Green = this agent beats the reference." : "Amber = the reference still leads."} Your goal is to beat the current #1, not the reference — this is context only.`}
+                >
                   {beatsBaseline ? "+" : "−"}{Math.abs(baselinePct).toFixed(1)}% vs. reference
                 </div>
               )}
