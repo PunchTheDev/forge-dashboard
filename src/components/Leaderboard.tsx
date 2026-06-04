@@ -175,6 +175,16 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                     <span className={isLeader ? "text-forge-gold" : "text-forge-green"}>
                       {formatScore(score, metric)}
                     </span>
+                    {!isLeader && ranked.length > 0 && (() => {
+                      const leaderScore = scoreOf(ranked[0]);
+                      const gap = direction === "minimize" ? score - leaderScore : leaderScore - score;
+                      const { decimals } = metricConfig(metric);
+                      return (
+                        <div className="text-forge-muted/60 text-[10px]">
+                          +{gap.toFixed(decimals)} vs #1
+                        </div>
+                      );
+                    })()}
                   </td>
                   {baseline != null && (
                   <td className="px-4 py-2.5 text-right hidden sm:table-cell">
