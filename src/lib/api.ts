@@ -249,7 +249,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 }
 
 export const api = {
-  specs: () => get<Spec[]>("/specs"),
+  specs: () => get<Spec[]>("/specs?active=true"),
   spec: (id: string) => get<Spec>(`/specs/${id}`),
   submissions: (specId?: string, passedOnly = false) =>
     get<Submission[]>(

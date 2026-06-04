@@ -120,7 +120,7 @@ export function SotaChart({ spec }: Props) {
               tick={{ fill: "#6b7280", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              domain={["auto", "auto"]}
+              domain={[0, "auto"]}
               unit={unit}
               width={65}
             />
