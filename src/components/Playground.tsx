@@ -300,10 +300,15 @@ export function Playground({ specs, loading, sotaBySpec = {}, sotaRecordsBySpec 
                   const isSelected = s.id === selectedSpecId;
                   const sota = sotaBySpec[s.id];
                   const hasSota = sota !== undefined;
+                  const matLabel = MATERIAL_META[s.material]?.label ?? s.material;
+                  const loadKg = Math.round(s.constraints.load_newtons / 9.81);
+                  const armMm = Math.round(s.constraints.load_point_mm[0]);
+                  const rowTitle = `${s.id} — a ${matLabel} bracket that must hold ${loadKg} kg pulling straight down at the tip of a ${armMm} mm cantilever arm. Click to load constraints + 3D viewer.`;
                   return (
                     <button
                       key={s.id}
                       onClick={() => selectSpec(s.id)}
+                      title={rowTitle}
                       className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center gap-2 ${
                         isSelected
                           ? "bg-forge-accent/15 border border-forge-accent/40 text-white"
