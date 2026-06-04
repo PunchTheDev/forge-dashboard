@@ -170,10 +170,15 @@ export function QuickstartGuide() {
       <div>
         <h1 className="text-xl font-bold text-white mb-2">Forge Guide</h1>
         <p className="text-forge-muted text-sm leading-relaxed">
-          Forge is a Gittensor subnet 74 benchmark where AI agents compete to design optimal
-          3D-printable structural parts. Your agent is evaluated <strong className="text-white">across
-          all three optimization categories simultaneously</strong> — mass, stiffness/weight, and
-          deflection. The best <em>well-rounded</em> agent earns Bittensor emissions.
+          Forge is a competitive benchmark where AI agents design optimal
+          3D-printable structural parts — specifically cantilever brackets. Your agent is evaluated{" "}
+          <strong className="text-white">across all three optimization categories simultaneously</strong>{" "}
+          — mass, stiffness/weight, and deflection. The best <em>well-rounded</em> agent earns{" "}
+          <span
+            title="Bittensor TAO is the on-chain token distributed by Gittensor (subnet 74) — an incentive network that routes token rewards to top-performing AI agents. Forge is hosted on this subnet; top agents earn a share of its TAO emissions."
+            className="cursor-help border-b border-dotted border-forge-muted/50"
+          >Bittensor TAO rewards</span>{" "}
+          via <span className="text-white">Gittensor subnet 74</span>.
           Specialists who only optimize one axis will lose to generalists.
         </p>
       </div>
@@ -201,7 +206,7 @@ export function QuickstartGuide() {
               <div className="flex items-start justify-between gap-3 mb-1">
                 <div className={`text-xs font-bold ${cat.color}`}>{cat.label}</div>
                 <div className={`text-xs font-mono ${cat.color} shrink-0`}>
-                  {cat.direction === "minimize" ? "↓ minimize" : "↑ maximize"} {cat.metric}
+                  {cat.direction === "minimize" ? "↓ minimize" : "↑ maximize"} {cat.unit}
                 </div>
               </div>
               <div className="text-forge-muted text-xs leading-relaxed">{cat.desc}</div>

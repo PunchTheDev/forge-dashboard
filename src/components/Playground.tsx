@@ -33,7 +33,7 @@ function buildSampleOutput(spec: Spec | null): string {
 [forge] Running FEA pipeline...
   mesh:       12,847 elements
   load nodes: 3
-  stress max: 38.2 MPa  (allowable: ${spec.constraints.safety_factor}×)  ✓
+  stress max: 38.2 MPa  (SF: ${spec.constraints.safety_factor}×, within limit)  ✓
   deflection: 0.0412 mm
 [forge] PASSED
   score:      ${exampleScore.toFixed(decimals)} ${unit}  (${spec.scoring.metric})
@@ -126,7 +126,7 @@ export function Playground({ specs, loading }: Props) {
           Browse every competition problem. A <span className="text-white font-semibold">problem</span> defines
           a cantilever bracket challenge: material, load applied downward at the arm tip, bolt pattern,
           and build volume. Your agent generates a STEP file — the eval harness runs FEA and scores it.
-          Everything here is read-only.
+          Select a problem to see its constraints and generate a ready-to-run eval command.
         </p>
       </div>
 
@@ -164,9 +164,8 @@ export function Playground({ specs, loading }: Props) {
                           : "hover:bg-forge-bg text-forge-muted hover:text-white border border-transparent"
                       }`}
                     >
-                      <span className="font-mono">{s.id}</span>
-                      <span className="text-forge-muted mx-1">·</span>
-                      <span>{specLabel(s)}</span>
+                      <span className="font-medium">{specLabel(s)}</span>
+                      <span className="text-forge-muted/50 ml-1.5 font-mono text-[10px]">{s.id}</span>
                     </button>
                   );
                 })}
@@ -233,7 +232,7 @@ export function Playground({ specs, loading }: Props) {
                   const { label, unit, decimals } = metricConfig(selectedSpec.scoring.metric);
                   return (
                     <div className="flex justify-between">
-                      <span className="text-forge-muted">Reference seed {label.toLowerCase()}</span>
+                      <span className="text-forge-muted cursor-help" title="Score from the maintainer's baseline agent, set offline when this problem was designed. Your goal is to beat the current SOTA, not this seed — but it shows the expected difficulty level.">Baseline agent {label.toLowerCase()}</span>
                       <span className="text-white">{bl.toFixed(decimals)} {unit}</span>
                     </div>
                   );
@@ -295,7 +294,7 @@ export function Playground({ specs, loading }: Props) {
             </div>
             <div className="mt-3 text-xs text-forge-muted">
               Full guide:{" "}
-              <a href="/guide" className="text-forge-accent hover:underline">forge.dev/guide</a>
+              <a href="/guide" className="text-forge-accent hover:underline">Forge Guide →</a>
               {" · "}
               Results are written to <code className="text-forge-accent">.forge/results/</code>
             </div>

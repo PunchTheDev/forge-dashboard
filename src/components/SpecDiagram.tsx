@@ -103,7 +103,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
       {/* Side view */}
       <div className="flex-1">
         <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
-          Side view (XZ)
+          Side view
         </div>
         <svg
           viewBox={`0 0 ${SW} ${SH}`}
@@ -262,7 +262,7 @@ export function SpecDiagram({ spec, compact = false }: Props) {
       {/* Front view — bolt pattern (hidden in compact mode) */}
       {!compact && <div className="shrink-0">
         <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
-          Bolt pattern (YZ)
+          Mounting face (bolt holes)
         </div>
         <svg
           viewBox={`0 0 ${FW} ${FH}`}
