@@ -1369,12 +1369,15 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               <span className="text-forge-green font-mono">
                 {fmtScore(sota.score, sota.score_metric)}
               </span>{" "}
-              by <span className="text-white">{sota.contributor}</span>. Fork the repo, write a
-              better design, open a PR.
+              by <span className="text-white">{sota.contributor}</span>.{" "}
+              <a href={`${FORGE_REPO}/fork`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">Fork the repo</a>
+              , write a better design, open a PR.
             </p>
           ) : (
             <p className="text-forge-muted text-xs mb-3">
-              No submissions yet — be the first. Fork the repo, run FEA locally, and open a PR.
+              No submissions yet — be the first.{" "}
+              <a href={`${FORGE_REPO}/fork`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">Fork the repo</a>
+              , run FEA locally, and open a PR.
             </p>
           )}
           <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs text-forge-green space-y-1">
