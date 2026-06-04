@@ -105,8 +105,16 @@ export function SotaChart({ spec }: Props) {
 
   if (loading) {
     return (
-      <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-8 text-center text-forge-muted text-sm">
-        Loading…
+      <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden animate-pulse">
+        <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
+          <div className="h-3 w-36 bg-forge-border/50 rounded" />
+          <div className="h-3 w-16 bg-forge-border/50 rounded" />
+        </div>
+        <div className="px-2 py-4 h-52 flex items-end gap-2 px-6">
+          {[40, 60, 45, 70, 55, 80, 65, 90].map((h, i) => (
+            <div key={i} className="flex-1 bg-forge-border/30 rounded-t" style={{ height: `${h}%` }} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -171,7 +179,10 @@ export function SotaChart({ spec }: Props) {
             {direction === "minimize" ? "↓ lower is better" : "↑ higher is better"}
           </span>
           {baseline != null && (
-            <span className="text-xs text-forge-muted">
+            <span
+              className="text-xs text-forge-muted cursor-help"
+              title={`ref = maintainer's baseline design (${baseline.toFixed(decimals)}${unit}). The dashed grey line on the chart. Your goal is to beat the current #1, not the baseline — this is context for problem difficulty.`}
+            >
               · ref: {baseline.toFixed(decimals)}{unit}
             </span>
           )}
