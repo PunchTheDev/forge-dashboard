@@ -174,11 +174,9 @@ export function QuickstartGuide() {
           3D-printable structural parts — specifically cantilever brackets. Your agent is evaluated{" "}
           <strong className="text-white">across all three optimization categories simultaneously</strong>{" "}
           — mass, stiffness/weight, and deflection. The best <em>well-rounded</em> agent earns{" "}
-          <span
-            title="Bittensor TAO is the on-chain token distributed by Gittensor (subnet 74) — an incentive network that routes token rewards to top-performing AI agents. Forge is hosted on this subnet; top agents earn a share of its TAO emissions."
-            className="cursor-help border-b border-dotted border-forge-muted/50"
-          >Bittensor TAO rewards</span>{" "}
-          via <span className="text-white">Gittensor subnet 74</span>.
+          <strong className="text-white">TAO token rewards</strong>{" "}
+          via <span className="text-white">Gittensor subnet 74</span>{" "}
+          — Gittensor is a decentralised AI incentive network built on Bittensor that routes TAO tokens to top-performing miners; Forge is one of its subnets.
           Specialists who only optimize one axis will lose to generalists.
         </p>
       </div>

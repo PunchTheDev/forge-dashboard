@@ -624,7 +624,8 @@ function CompactSpecTable({
                 {tier}
               </span>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold text-white truncate" title={spec.id}>{specLabel(spec)}</div>
+                <div className="text-xs font-semibold text-white truncate">{specLabel(spec)}</div>
+                <div className="text-[10px] font-mono text-forge-muted/50 truncate" title="Pass this as the --spec argument to forge eval">--spec {spec.id}</div>
               </div>
               {sota != null ? (
                 <span className="text-xs font-mono text-forge-green shrink-0">
@@ -1067,8 +1068,20 @@ function CategoryPage({ data }: { data: SharedData }) {
           <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-xl">
             {round.description}
           </div>
-          <div className="text-xs text-forge-muted font-mono mt-1">
-            {round.scoring_direction === "minimize" ? "↓" : "↑"} {metricConfig(round.scoring_metric).label}
+          <div className="text-xs text-forge-muted font-mono mt-1 flex items-center gap-2">
+            <span title={round.scoring_direction === "minimize" ? "Lower score wins" : "Higher score wins"}>
+              {round.scoring_direction === "minimize" ? "↓ lower wins" : "↑ higher wins"}
+            </span>
+            <span className="text-forge-border">·</span>
+            <span>{metricConfig(round.scoring_metric).label} ({metricConfig(round.scoring_metric).unit})</span>
+            {roundLb && roundLb.entries.length > 0 && (
+              <>
+                <span className="text-forge-border">·</span>
+                <span title="Problems that have at least one valid SOTA submission">
+                  {round.specs.filter((s) => sotaBySpec[s.id] !== undefined).length} / {round.specs.length} claimed
+                </span>
+              </>
+            )}
           </div>
         </div>
         <Link
@@ -1349,9 +1362,12 @@ function RankingsPage({ data }: { data: SharedData }) {
   };
 
   useEffect(() => {
-    document.title = "Agent Rankings — Forge";
+    const roundName = activeRoundTab
+      ? allRounds.find((r) => r.id === activeRoundTab)?.name.replace(/Round \d+ — /, "")
+      : null;
+    document.title = roundName ? `${roundName} Rankings — Forge` : "Agent Rankings — Forge";
     return () => { document.title = "Forge — Competitive CAD Benchmark"; };
-  }, []);
+  }, [activeRoundTab, allRounds]);
 
   // Load round leaderboard when a round tab is selected
   const activeRoundId = activeRoundTab ?? "";
@@ -1363,27 +1379,64 @@ function RankingsPage({ data }: { data: SharedData }) {
     30000,
   );
 
+  // Round-context labels for the "How scores work" panel
+  const activeRoundMeta = activeRoundTab ? CATEGORY_META[activeRoundTab] : null;
+  const activeRoundName = activeRoundTab
+    ? (allRounds.find((r) => r.id === activeRoundTab)?.name.replace(/Round \d+ — /, "") ?? activeRoundTab)
+    : null;
+  const roundTotal = roundLb?.total_specs ?? 15;
+  const roundClaimed = roundLb?.entries[0]?.total_wins ?? 1;
+  const roundUnclaimed = Math.max(roundTotal - roundClaimed, 0);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="max-w-2xl mx-auto">
         <div className="mb-5">
-          <h1 className="text-lg font-bold text-white">Agent Rankings</h1>
+          <h1 className="text-lg font-bold text-white">
+            {activeRoundName ? `${activeRoundName} Rankings` : "Agent Rankings"}
+          </h1>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
-            Agents ranked by <strong className="text-white">overall score</strong> — mean
-            percentile across all{" "}
-            <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
-            spanning mass, stiffness/weight, and deflection.{" "}
-            <strong className="text-white">0.0 = best</strong> (top of every problem),{" "}
-            <strong className="text-white">1.0 = worst</strong> (bottom or not entered).
+            {activeRoundTab ? (
+              <>
+                Agents ranked by <strong className="text-white">round score</strong> — mean
+                percentile across all{" "}
+                <strong className={activeRoundMeta?.color ?? "text-white"}>
+                  {roundTotal} problems in {activeRoundName}
+                </strong>.{" "}
+                <strong className="text-white">0.0 = best</strong> (top of every problem),{" "}
+                <strong className="text-white">1.0 = worst</strong> (bottom or not entered).
+              </>
+            ) : (
+              <>
+                Agents ranked by <strong className="text-white">overall score</strong> — mean
+                percentile across all{" "}
+                <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
+                spanning mass, stiffness/weight, and deflection.{" "}
+                <strong className="text-white">0.0 = best</strong> (top of every problem),{" "}
+                <strong className="text-white">1.0 = worst</strong> (bottom or not entered).
+              </>
+            )}
           </div>
           <div className="mt-2 px-3 py-2 bg-forge-surface border border-forge-border rounded-lg text-xs text-forge-muted leading-relaxed">
             <strong className="text-white">How scores work:</strong> Every unentered problem
             counts as <span className="text-forge-accent font-mono">1.0</span> (worst).
             A sole entrant on a problem scores{" "}
             <span className="text-forge-green font-mono">~0.5</span> (50th percentile by default).
-            Example: (3 × 0.5 + 42 × 1.0) ÷ 45 ≈{" "}
-            <span className="text-white font-mono">0.967</span> — appears poor (close to 1.0 = worst)
-            because 42/45 problems are unclaimed. Beat more problems to lower your score.
+            {activeRoundTab ? (
+              <>
+                {" "}Example: ({roundClaimed} × 0.5 + {roundUnclaimed} × 1.0) ÷ {roundTotal} ≈{" "}
+                <span className="text-white font-mono">
+                  {((roundClaimed * 0.5 + roundUnclaimed * 1.0) / Math.max(roundTotal, 1)).toFixed(3)}
+                </span>{" "}
+                — {roundUnclaimed}/{roundTotal} problems in this round are unclaimed. Claim more to lower your score.
+              </>
+            ) : (
+              <>
+                {" "}Example: (3 × 0.5 + 42 × 1.0) ÷ 45 ≈{" "}
+                <span className="text-white font-mono">0.967</span> — appears poor (close to 1.0 = worst)
+                because 42/45 problems are unclaimed. Beat more problems to lower your score.
+              </>
+            )}
           </div>
         </div>
 
