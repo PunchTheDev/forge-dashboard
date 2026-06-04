@@ -53,14 +53,14 @@ If any seat would be confused, the component fails.
 
 - `LandingBanner` (hero with title, sub, CTA stack) — ◐ ◐ ◐ — investor-seat scan passes; first-timer "what's a Forge problem?" still soft.
 - 4-step "Choose / Write / Open PR / Earn TAO" cards — ● ● ● — clean copy, sequential, no rework needed.
-- `Spotlight` (SOTA hero with 3D viewer + spec sidecar) — ◐ ● ◐ — 3D loads cleanly; sidecar tags "PETG · 15 kg load · 78mm arm" are unexplained for first-timer.
+- `Spotlight` (SOTA hero with 3D viewer + spec sidecar) — ● ● ◐ — 3D loads cleanly; sidecar has metric card + prose, no chip row (BACKLOG note about "PETG · 15 kg load · 78mm arm" chips was phantom — those chips live on `HeroStats` spec-detail header, not `SotaHero`). Remaining gap: sidecar prose talks about "FEA / structural simulation" without a first-timer-friendly aside.
 - Category grid (`CategoryCard`) — ● ● ● — three cards (Mass / Stiffness / Deflection) each with problem count + claim status.
-- `OverallLeaderboard` preview — ○ ○ ○ — review for repetition with `/rankings`.
+- ~~`OverallLeaderboard` preview~~ — N/A. `ProblemsLanding` only reads `overallData.entries.length` for the `LandingBanner` agent count; no leaderboard preview is rendered on `/problems`. The actual `<OverallLeaderboard>` mount is on `/rankings` (App.tsx:1940), already reviewed under Rankings.
 - Footer — ○ ○ ○ — not reviewed.
 
 ### Category page (`/problems/:roundId`)
 
-- Round header (title, scoring metric, problem count) — ○ ○ ○
+- Round header (title, scoring metric, problem count) — ◐ ◐ ● — first-timer now reads a one-line plain-English goal directly under the H1 in the category accent color: "Lightest part that survives the load wins." (mass) / "Highest stiffness-per-gram wins." (stiffness) / "Least bending under the applied load wins." (deflection). Goal sentence sourced from a new `goal` field on `CATEGORY_META` (App.tsx:79) — same vocabulary as the `CATEGORY_PILL.goal` row used on spec-detail, so first-timer's mental model carries across pages. Still needs review for Beautiful/Seamless (visual rhythm, breadcrumb, claim-count layout).
 - Tier groups (easy / medium / hard) — ○ ○ ○
 - `SpecCard` grid — ● ● ● — chips render, and the dim sub-label on each row now reads as `--spec r01_001_easy` (amber-prefixed flag + tooltip "Spec ID — the handle passed to the CLI: forge eval … --spec <id> --docker"), so a first-timer sees the ID's role on first scan. (App.tsx:761)
 - Round-level SOTA chart — ○ ○ ○

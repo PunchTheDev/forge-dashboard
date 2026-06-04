@@ -78,7 +78,7 @@ const API_DOCS_URL = `${API_BASE_URL}/docs`;
 
 const CATEGORY_META: Record<
   string,
-  { icon: string; tooltip: string; color: string; bgColor: string; borderColor: string; hex: string }
+  { icon: string; tooltip: string; color: string; bgColor: string; borderColor: string; hex: string; goal: string }
 > = {
   round_001: {
     icon: "⚖",
@@ -87,6 +87,7 @@ const CATEGORY_META: Record<
     bgColor: "bg-forge-green/10",
     borderColor: "border-forge-green/40",
     hex: "#10b981",
+    goal: "Lightest part that survives the load wins.",
   },
   round_002: {
     icon: "⊕",
@@ -95,6 +96,7 @@ const CATEGORY_META: Record<
     bgColor: "bg-forge-accent/10",
     borderColor: "border-forge-accent/40",
     hex: "#6366f1",
+    goal: "Highest stiffness-per-gram wins.",
   },
   round_003: {
     icon: "↕",
@@ -103,6 +105,7 @@ const CATEGORY_META: Record<
     bgColor: "bg-forge-red/10",
     borderColor: "border-forge-red/40",
     hex: "#ef4444",
+    goal: "Least bending under the applied load wins.",
   },
 };
 
@@ -779,16 +782,14 @@ function CompactSpecTable({
                     const rec = sotaRecordsBySpec?.[spec.id];
                     if (!rec) return null;
                     return (
-                      <a
-                        href={sotaCodeUrl(rec)}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <Link
+                        to={`/problems/${round.id}/${spec.id}#sota-code`}
                         onClick={(e) => e.stopPropagation()}
                         className="text-[10px] text-forge-muted hover:text-forge-accent transition-colors whitespace-nowrap"
-                        title={`View ${rec.agent} at commit ${rec.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                        title={`Read ${rec.agent} inline on this problem's page (GitHub link kept inside) — fork to beat this score`}
                       >
                         ↗ code
-                      </a>
+                      </Link>
                     );
                   })()}
                 </span>
@@ -867,16 +868,14 @@ function SidebarSpecList({
                           {fmtScore(sota, round.scoring_metric)}
                         </span>
                         {rec && (
-                          <a
-                            href={sotaCodeUrl(rec)}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <Link
+                            to={`/problems/${round.id}/${spec.id}#sota-code`}
                             onClick={(e) => e.stopPropagation()}
                             className="shrink-0 text-[10px] text-forge-muted hover:text-forge-accent transition-colors"
-                            title={`View ${rec.agent} at commit ${rec.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                            title={`Read ${rec.agent} inline on this problem's page (GitHub link kept inside) — fork to beat this score`}
                           >
                             ↗ code
-                          </a>
+                          </Link>
                         )}
                       </>
                     ) : (
@@ -1352,6 +1351,7 @@ function CategoryPage({ data }: { data: SharedData }) {
     bgColor: "bg-forge-surface",
     borderColor: "border-forge-border",
     hex: "#6b7280",
+    goal: "",
   };
 
   return (
@@ -1378,6 +1378,11 @@ function CategoryPage({ data }: { data: SharedData }) {
               </h1>
             </div>
           </div>
+          {meta.goal && (
+            <div className={`text-sm font-medium mt-1 ${meta.color}`}>
+              {meta.goal}
+            </div>
+          )}
           <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-xl">
             {round.description}
           </div>
