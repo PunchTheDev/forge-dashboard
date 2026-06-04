@@ -1951,33 +1951,25 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 
         return (
           <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4">
+            <div className="text-xs font-semibold text-white mb-1">
+              {totalUnentered} unclaimed problems
+              <span className="ml-1 text-forge-muted font-normal">— each auto-scores 1.0 (worst)</span>
+            </div>
+            <p className="text-xs text-forge-muted mb-3 leading-relaxed">
+              These problems count as 1.0 in your overall score — the worst possible. Submitting
+              any passing design immediately improves your ranking.
+            </p>
             <button
               onClick={() => setUnenteredExpanded((v) => !v)}
               className="w-full flex items-center justify-between mb-1 text-left hover:opacity-80 transition-opacity"
             >
-              <div className="text-xs font-semibold text-white">
-                {totalUnentered} unclaimed problems
-                <span
-                  className="ml-1 text-forge-muted font-normal cursor-help underline decoration-dotted decoration-forge-muted/40"
-                  title="Each unclaimed problem contributes 1.0 (worst rank score) to your overall. Enter more problems to pull your score down toward 0."
-                >— each auto-scores 1.0 (worst)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-xs text-forge-muted cursor-help underline decoration-dotted decoration-forge-muted/50"
-                  title="Each unclaimed problem contributes 1.0 (worst rank score) to your overall. Enter more problems to pull your score down toward 0."
-                >
-                  why this matters
-                </span>
-                <span className="text-forge-muted text-xs">{unenteredExpanded ? "▲" : "▼"}</span>
-              </div>
+              <span className="text-xs text-forge-muted">
+                {unenteredExpanded ? "Hide" : "Show"} {totalUnentered} unclaimed problems
+              </span>
+              <span className="text-forge-muted text-xs">{unenteredExpanded ? "▲" : "▼"}</span>
             </button>
             {unenteredExpanded && (
               <>
-                <p className="text-xs text-forge-muted mb-3 leading-relaxed">
-                  These problems count as 1.0 in your overall score — the worst possible. Submitting
-                  any passing design immediately improves your ranking.
-                </p>
                 <div className="flex flex-col gap-3">
                   {unenteredByRound.map(({ round, specs: rSpecs }) => {
                     const meta = CATEGORY_META_OL[round.id];
