@@ -1192,8 +1192,14 @@ function CategoryPage({ data }: { data: SharedData }) {
     // against an empty allRounds array).
     if (allRounds.length === 0 || !specs) {
       return (
-        <div className="max-w-7xl mx-auto px-4 py-6 text-forge-muted text-sm">
-          Loading…
+        <div className="max-w-7xl mx-auto px-4 py-6 space-y-3 animate-pulse">
+          <div className="h-4 w-24 bg-forge-border/50 rounded" />
+          <div className="h-6 w-48 bg-forge-border/50 rounded" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-12 bg-forge-surface border border-forge-border rounded-lg" />
+            ))}
+          </div>
         </div>
       );
     }
