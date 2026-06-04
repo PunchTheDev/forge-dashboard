@@ -36,15 +36,16 @@ function fmtAvgRank(avg: number): { text: string; color: string } {
   return { text: `#${avg.toFixed(1)}`, color: "text-forge-red" };
 }
 
-function ScoreBar({ score }: { score: number }) {
-  // overall_score <= 1.0. Bar fills from right: 0 = full green, 1.0 = empty.
-  const fill = Math.max(0, Math.min(1, 1 - score));
-  const hue = Math.round(fill * 120);
+/** Breadth bar: fills proportionally to specs entered — more specs = wider bar. */
+function ScoreBar({ specsEntered, totalSpecs }: { specsEntered: number; totalSpecs: number }) {
+  const fill = totalSpecs > 0 ? Math.min(1, specsEntered / totalSpecs) : 0;
+  // Color: green ≥50%, amber 20–49%, slate <20%
+  const color = fill >= 0.5 ? "#22c55e" : fill >= 0.2 ? "#f59e0b" : "#64748b";
   return (
-    <div className="w-full bg-forge-border rounded-full h-1.5 mt-1">
+    <div className="w-full bg-forge-border rounded-full h-1.5 mt-1" title={`${specsEntered} of ${totalSpecs} specs entered`}>
       <div
         className="h-1.5 rounded-full transition-all"
-        style={{ width: `${fill * 100}%`, backgroundColor: `hsl(${hue}, 70%, 50%)` }}
+        style={{ width: `${Math.max(fill * 100, fill > 0 ? 2 : 0)}%`, backgroundColor: color }}
       />
     </div>
   );
@@ -94,10 +95,9 @@ function CategoryBreakdown({ entry, specToRound }: {
 }
 
 
-function EntryRow({ entry, specToRound, totalEntries, totalSpecs, onSelect }: {
+function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
   entry: OverallEntry;
   specToRound: Record<string, string>;
-  totalEntries: number;
   totalSpecs: number;
   onSelect?: (contributor: string) => void;
 }) {
@@ -144,7 +144,7 @@ function EntryRow({ entry, specToRound, totalEntries, totalSpecs, onSelect }: {
         </div>
       </div>
 
-      <ScoreBar score={entry.overall_score ?? (entry.avg_rank / (totalEntries || 1))} />
+      <ScoreBar specsEntered={entry.specs_entered} totalSpecs={totalSpecs} />
 
       <CategoryBreakdown entry={entry} specToRound={specToRound} />
     </div>
@@ -203,7 +203,7 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
             key={entry.contributor}
             entry={entry}
             specToRound={specToRound}
-            totalEntries={data.entries.length}
+
             totalSpecs={data.total_specs}
             onSelect={onSelectAgent}
           />

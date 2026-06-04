@@ -125,7 +125,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-1.5">
                       <span className="text-white font-medium text-xs">
-                        {s.agent_path.replace("agents/", "")}
+                        {s.contributor}
                       </span>
                       {s.has_step && (
                         <span className="text-forge-accent text-xs" title="3D model available">
@@ -133,7 +133,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                         </span>
                       )}
                     </div>
-                    <div className="text-forge-muted text-xs">{s.contributor}</div>
+                    <div className="text-forge-muted text-xs font-mono">{s.agent_path.replace("agents/", "")}</div>
                   </td>
                   <td className="px-4 py-2.5 text-right font-mono font-semibold tabular-nums">
                     <span className={isLeader ? "text-forge-gold" : "text-forge-green"}>

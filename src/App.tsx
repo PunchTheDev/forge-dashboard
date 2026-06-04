@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, lazy, Suspense } from "react";
+import { useState, useCallback, useMemo, lazy, Suspense, useEffect } from "react";
 import {
   Routes,
   Route,
@@ -972,6 +972,12 @@ function CategoryPage({ data }: { data: SharedData }) {
     hex: "#6b7280",
   };
 
+  const roundLabel = round.name.replace(/Round \d+ — /, "");
+  useEffect(() => {
+    document.title = `${roundLabel} — Forge`;
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, [roundLabel]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
@@ -1057,6 +1063,12 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   );
 
   const passedSubmissions = (submissions ?? []).filter((s) => s.passed);
+
+  const specShortName = activeSpec?.name?.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "");
+  useEffect(() => {
+    if (specShortName) document.title = `${specShortName} — Forge`;
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, [specShortName]);
 
   if (!activeSpec) {
     return (
@@ -1268,6 +1280,11 @@ function RankingsPage({ data }: { data: SharedData }) {
   const navigate = useNavigate();
   const { overallData, overallLoading, allRounds } = data;
 
+  useEffect(() => {
+    document.title = "Agent Rankings — Forge";
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="max-w-2xl mx-auto">
@@ -1292,6 +1309,20 @@ function RankingsPage({ data }: { data: SharedData }) {
             navigate(`/rankings/${encodeURIComponent(contributor)}`)
           }
         />
+        {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
+          <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
+            <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+            <div className="text-xs text-forge-muted mb-3">
+              45 active specs across mass, stiffness-to-weight, and deflection. No SOTA claimed yet on most.
+            </div>
+            <Link
+              to="/guide"
+              className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
+            >
+              Read the quickstart guide →
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1305,6 +1336,11 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   const contributor = agentId ? decodeURIComponent(agentId) : "";
 
   const entry = overallData?.entries.find((e) => e.contributor === contributor) ?? null;
+
+  useEffect(() => {
+    if (contributor) document.title = `${contributor} — Forge Rankings`;
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, [contributor]);
 
   const specToRound = useMemo(() => {
     const map: Record<string, string> = {};
@@ -1548,7 +1584,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                             >
                               {rs.tier}
                             </span>
-                            <span className="flex-1 min-w-0 font-mono text-white/70 truncate">
+                            <span className="flex-1 min-w-0 font-mono text-white/70 break-words">
                               {fullSpec?.name?.replace(/^Cantilever Bracket — /, "").replace(/\s*\[.*?\]$/, "") ?? rs.id}
                             </span>
                             {sota != null ? (
