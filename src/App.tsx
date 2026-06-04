@@ -1034,7 +1034,12 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
                   {e.total_wins} / {lb.total_specs}
                 </span>
               </td>
-              <td className="px-4 py-1.5 text-right tabular-nums font-mono hidden sm:table-cell text-forge-muted">
+              <td className={`px-4 py-1.5 text-right tabular-nums font-mono hidden sm:table-cell ${
+                e.overall_score == null ? "text-forge-muted"
+                : e.overall_score <= 0.80 ? "text-forge-green"
+                : e.overall_score <= 0.95 ? "text-forge-accent"
+                : "text-forge-muted"
+              }`}>
                 {e.overall_score != null ? e.overall_score.toFixed(3) : "—"}
               </td>
             </tr>
