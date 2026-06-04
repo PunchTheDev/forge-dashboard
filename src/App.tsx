@@ -544,7 +544,15 @@ function SotaHero({
             </div>
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
-              This part passed real FEA (CalculiX). The top competitor's source is open —
+              This part passed real{" "}
+              <Link
+                to="/guide#fea"
+                className="text-white/80 hover:text-forge-accent transition-colors underline decoration-dotted decoration-forge-muted/40 underline-offset-2"
+                title="FEA (Finite Element Analysis) = a structural simulation that meshes the part into thousands of elements and solves for stress + displacement under load. CalculiX is the open-source FEA solver Forge runs. Click for the full explainer."
+              >
+                FEA (CalculiX)
+              </Link>
+              . The top competitor's source is open —
               {baselinePct != null && !beatsBaseline
                 ? " but the maintainer reference still leads by " +
                   Math.abs(baselinePct).toFixed(1) +
