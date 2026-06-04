@@ -5,10 +5,11 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 // Material colours — visually distinct, physically inspired
 const MATERIAL_COLORS: Record<string, THREE.Color> = {
-  pla: new THREE.Color(0.92, 0.90, 0.86),       // warm off-white
-  petg: new THREE.Color(0.72, 0.83, 0.94),      // light translucent blue
-  aluminum_6061: new THREE.Color(0.76, 0.78, 0.82), // silvery aluminium
-  stainless_316: new THREE.Color(0.55, 0.57, 0.62), // cool dark steel
+  pla:           new THREE.Color(0.92, 0.90, 0.86),  // warm off-white
+  petg:          new THREE.Color(0.72, 0.83, 0.94),  // light translucent blue
+  aluminum_6061: new THREE.Color(0.76, 0.78, 0.82),  // silvery aluminium
+  stainless_316: new THREE.Color(0.55, 0.57, 0.62),  // cool dark steel
+  steel_mild:    new THREE.Color(0.50, 0.48, 0.44),  // warm dark grey carbon steel
 };
 
 interface Props {
