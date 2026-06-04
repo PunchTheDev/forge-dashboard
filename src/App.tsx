@@ -642,6 +642,11 @@ function CompactSpecTable({
   const tiers = ["easy", "medium", "hard"].filter((t) => round.specs.some((s) => s.tier === t));
   const unclaimedCount = round.specs.filter((s) => sotaBySpec[s.id] === undefined).length;
 
+  // Auto-deactivate the unclaimed filter if all problems get claimed (e.g. after a data refresh)
+  useEffect(() => {
+    if (unclaimedCount === 0 && unclaimedOnly) setUnclaimedOnly(false);
+  }, [unclaimedCount, unclaimedOnly]);
+
   return (
     <div className="flex flex-col gap-3">
       {/* Tier filter */}
@@ -680,6 +685,13 @@ function CompactSpecTable({
 
       {/* Two-column grid of compact spec rows */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {visibleSpecs.length === 0 && (
+          <div className="col-span-2 px-4 py-6 text-center text-forge-muted text-sm">
+            {unclaimedOnly
+              ? "All problems in this round are claimed — every spec has at least one passing submission."
+              : "No problems match the selected filters."}
+          </div>
+        )}
         {visibleSpecs.map((spec) => {
           const tier = tierMap[spec.id] ?? "easy";
           const sota = sotaBySpec[spec.id];
