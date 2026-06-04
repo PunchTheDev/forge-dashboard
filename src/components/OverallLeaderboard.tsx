@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { OverallEntry, OverallLeaderboard as OverallLeaderboardData, Round, fmtScore } from "../lib/api";
+import { OverallEntry, OverallLeaderboard as OverallLeaderboardData, Round, fmtScore, submissionCodeUrl } from "../lib/api";
 
 interface Props {
   data: OverallLeaderboardData | null;
@@ -85,7 +85,21 @@ function CategoryBreakdown({ entry, specToRound }: {
         const rep = bests.find((b) => b.rank === 1) ?? bests[0];
         return (
           <div key={rid} className={`rounded-lg border px-3 py-2 ${meta.bg} ${meta.border}`}>
-            <div className={`text-xs font-semibold ${meta.color} mb-1`}>{meta.label}</div>
+            <div className={`text-xs font-semibold ${meta.color} mb-1 flex items-center justify-between gap-2`}>
+              <span>{meta.label}</span>
+              {rep.agent_path && rep.commit_hash && (
+                <a
+                  href={submissionCodeUrl(rep.agent_path, rep.commit_hash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-[10px] text-forge-muted hover:text-forge-accent font-mono font-normal whitespace-nowrap"
+                  title={`View ${rep.agent_path} at commit ${rep.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                >
+                  ↗ code
+                </a>
+              )}
+            </div>
             <div className="text-xs text-white font-mono">
               {fmtScore(rep.score, rep.score_metric)}
             </div>
