@@ -127,7 +127,7 @@ function ResultCard({ result }: { result: EvalPreviewResult }) {
           )}
           {result.similarity != null && (
             <div>
-              <div className="text-xs text-forge-muted">Similarity to SOTA</div>
+              <div className="text-xs text-forge-muted" title="How similar this design is to the current #1 submission — too similar (≥ threshold) and the submission is rejected to prevent copy-wins.">Similarity to #1</div>
               <div className="font-mono text-sm text-white">{(result.similarity * 100).toFixed(1)}%</div>
             </div>
           )}

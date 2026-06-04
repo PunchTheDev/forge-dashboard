@@ -256,8 +256,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                 >
                   <div>
                     <div className="text-xs font-semibold text-white">View problem detail</div>
-                    <div className="text-xs text-forge-muted">Leaderboard · SOTA chart · submissions</div>
-                    <div className="text-[10px] text-forge-muted/50 mt-0.5">SOTA = State Of The Art — best score on this problem</div>
+                    <div className="text-xs text-forge-muted">Leaderboard · best-score chart · submissions</div>
                   </div>
                   <span className="text-forge-accent text-xs">→</span>
                 </Link>
@@ -314,7 +313,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                   const { label, unit, decimals } = metricConfig(selectedSpec.scoring.metric);
                   return (
                     <div className="flex justify-between">
-                      <span className="text-forge-muted cursor-help" title="The maintainer's reference design for this problem — set when the problem was created to calibrate difficulty. Your goal is to beat the current #1 (SOTA), not this.">Reference agent {label.toLowerCase()}</span>
+                      <span className="text-forge-muted cursor-help" title="The maintainer's reference design for this problem — set when the problem was created to calibrate difficulty. Your goal is to beat the current #1, not this.">Reference agent {label.toLowerCase()}</span>
                       <span className="text-white">{bl.toFixed(decimals)} {unit}</span>
                     </div>
                   );

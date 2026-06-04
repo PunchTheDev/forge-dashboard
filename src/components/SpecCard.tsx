@@ -59,7 +59,7 @@ export function SpecCard({ spec, sotaScore, isSelected, onClick }: Props) {
               <div className="font-mono text-forge-green font-bold text-sm">
                 {fmtScore(sotaScore, spec.scoring.metric)}
               </div>
-              <div className="text-forge-muted text-xs">SOTA</div>
+              <div className="text-forge-muted text-xs" title="Top score — current #1 on this problem">#1 score</div>
             </>
           ) : isNew ? (
             <div className="text-xs text-forge-accent font-medium">first!</div>

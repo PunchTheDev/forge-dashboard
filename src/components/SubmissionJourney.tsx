@@ -147,8 +147,8 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             Submission Journey
           </span>
           {isSOTA && (
-            <span className="text-xs bg-forge-gold/20 text-forge-gold px-2 py-0.5 rounded-full font-semibold">
-              SOTA
+            <span className="text-xs bg-forge-gold/20 text-forge-gold px-2 py-0.5 rounded-full font-semibold" title="This submission holds the current #1 spot">
+              #1 ★
             </span>
           )}
           {beatsSOTA && !isSOTA && (
@@ -210,8 +210,8 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             {sota && sotaScore != null && (
               <div className={`text-sm font-mono font-bold ${beatsSOTA ? "text-forge-green" : "text-forge-muted"}`}>
                 {beatsSOTA
-                  ? `${isMaximize ? "+" : "−"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs SOTA`
-                  : `${isMaximize ? "−" : "+"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs SOTA (${sotaScore.toFixed(decimals)} ${scoreUnit})`}
+                  ? `${isMaximize ? "+" : "−"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs #1`
+                  : `${isMaximize ? "−" : "+"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs #1 (${sotaScore.toFixed(decimals)} ${scoreUnit})`}
               </div>
             )}
 
