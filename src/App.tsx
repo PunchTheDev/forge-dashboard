@@ -291,7 +291,7 @@ function LandingBanner({
                       to={`/problems/${r.id}`}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all hover:opacity-80 ${meta.bgColor} ${meta.borderColor}`}
                     >
-                      <span className={`text-sm ${meta.color}`} title={meta.tooltip}>{meta.icon}</span>
+                      <span className={`text-sm ${meta.color} cursor-help`} title={meta.tooltip}>{meta.icon}</span>
                       <span className="text-xs font-medium text-white">
                         {r.name.replace(/Round \d+ — /, "")}
                       </span>
@@ -517,7 +517,7 @@ function CategoryCard({
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
-          <div className="text-2xl mb-2" title={meta.tooltip}>{meta.icon}</div>
+          <div className="text-2xl mb-2 cursor-help inline-block" title={meta.tooltip}>{meta.icon}</div>
           <div className="text-white font-bold text-sm">{round.name.replace(/Round \d+ — /, "")}</div>
           <div className="text-forge-muted text-xs mt-0.5 leading-relaxed max-w-xs">
             {round.description}
@@ -1089,7 +1089,7 @@ function CategoryPage({ data }: { data: SharedData }) {
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-xl ${meta.color}`} title={meta.tooltip}>{meta.icon}</span>
+            <span className={`text-xl ${meta.color} cursor-help`} title={meta.tooltip}>{meta.icon}</span>
             <div>
               <div className="text-xs text-forge-muted font-mono uppercase tracking-wider mb-0.5">
                 {round.name.match(/Round \d+/)?.[0] ?? round.id}
@@ -1574,7 +1574,7 @@ function RankingsPage({ data }: { data: SharedData }) {
                     : "text-forge-muted hover:text-white"
                 }`}
               >
-                {meta && <span>{meta.icon}</span>}
+                {meta && <span title={meta.tooltip} className="cursor-help">{meta.icon}</span>}
                 {label}
               </button>
             );
@@ -1876,7 +1876,10 @@ function AgentDetailPage({ data }: { data: SharedData }) {
             >
               <div className="text-xs font-semibold text-white">
                 {totalUnentered} unclaimed problems
-                <span className="ml-1 text-forge-muted font-normal">— each auto-scores 1.0 (worst)</span>
+                <span
+                  className="ml-1 text-forge-muted font-normal cursor-help underline decoration-dotted decoration-forge-muted/40"
+                  title="Each unclaimed problem contributes 1.0 (worst rank score) to your overall. Enter more problems to pull your score down toward 0."
+                >— each auto-scores 1.0 (worst)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span

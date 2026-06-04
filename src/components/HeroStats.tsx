@@ -110,7 +110,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         {pill && (
           <div className="flex items-center gap-2 mb-2">
             <span
-              className={`text-[10px] font-bold uppercase tracking-widest ${pill.color} ${pill.bg} border ${pill.border} px-2 py-0.5 rounded`}
+              className={`text-[10px] font-bold uppercase tracking-widest ${pill.color} ${pill.bg} border ${pill.border} px-2 py-0.5 rounded cursor-help`}
               title={pill.goal}
             >
               {pill.label} round
