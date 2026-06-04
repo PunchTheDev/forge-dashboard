@@ -1230,13 +1230,38 @@ function CategoryPage({ data }: { data: SharedData }) {
   );
 
   // Hook must be called unconditionally (Rules of Hooks) — before any early
-  // returns below. When round is null the title is left unchanged.
+  // returns below. When round is null and we haven't yet decided it's a
+  // not-found case, title is left unchanged; when not-found is confirmed we
+  // surface a context-aware title so back-button + meta scrapers see it.
   const roundLabel = round ? round.name.replace(/Round \d+ — /, "") : "";
+  const dataReady = allRounds.length > 0 && !!specs;
+  // Heuristic: the URL noun the user *meant*. /rounds/* + /sota/* + numeric
+  // shorthand all normalize to `round_NNN`. Spec ids look like `rNN_NNN_<tier>`.
+  const idKind: "round" | "problem" | "unknown" = (() => {
+    const id = roundId ?? "";
+    if (/^round_\d+$/i.test(id)) return "round";
+    if (/^r\d+_\d+/i.test(id)) return "problem";
+    return "unknown";
+  })();
+  const isNotFound =
+    !round &&
+    dataReady &&
+    !allRounds.some((r) => r.specs.some((sp) => sp.id === roundId)) &&
+    !specs?.some((s) => s.id === roundId);
+  const notFoundTitle = isNotFound
+    ? idKind === "round"
+      ? "Round not found — Forge"
+      : idKind === "problem"
+        ? "Problem not found — Forge"
+        : "Not found — Forge"
+    : null;
   useDocumentMeta(
-    roundLabel ? `${roundLabel} — Forge` : null,
+    roundLabel ? `${roundLabel} — Forge` : notFoundTitle,
     roundLabel
       ? `${roundLabel} — competition round on Forge. Browse all problems in this round, view the live leaderboard, and submit an LLM agent to claim SOTA.`
-      : null,
+      : isNotFound
+        ? "That round or problem doesn't exist on Forge. Browse all 3 active rounds and 45 problems from the Problems page."
+        : null,
   );
 
   if (!round) {
@@ -1245,7 +1270,7 @@ function CategoryPage({ data }: { data: SharedData }) {
     // a spec belonging to a known round can race-resolve as _legacy when specs
     // lands before allRounds (the owner-round lookup below returns undefined
     // against an empty allRounds array).
-    if (allRounds.length === 0 || !specs) {
+    if (!dataReady) {
       return (
         <div className="max-w-7xl mx-auto px-4 py-6 space-y-3 animate-pulse">
           <div className="h-4 w-24 bg-forge-border/50 rounded" />
@@ -1268,12 +1293,45 @@ function CategoryPage({ data }: { data: SharedData }) {
     if (specs.find((s) => s.id === roundId)) {
       return <Navigate to={`/problems/_legacy/${roundId}`} replace />;
     }
+    // Not-found: name the noun, echo the id, surface real next-step links.
+    const headline =
+      idKind === "round"
+        ? "No round matches that URL"
+        : idKind === "problem"
+          ? "No problem matches that URL"
+          : "We couldn't find that round or problem";
+    const nounPhrase =
+      idKind === "round" ? "round" : idKind === "problem" ? "problem" : "round or problem";
+    const specsTotal = specs.length;
     return (
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="text-forge-muted text-sm">Category not found.</div>
-        <Link to="/problems" className="text-forge-accent text-xs hover:underline mt-2 inline-block">
-          ← Problems
-        </Link>
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-forge-muted font-mono text-5xl mb-4">·</h1>
+        <div className="text-white text-lg font-semibold mb-2">{headline}</div>
+        <div className="text-forge-muted text-sm mb-2">
+          We couldn't find a {nounPhrase} with id{" "}
+          <code className="bg-forge-border px-1.5 py-0.5 rounded text-forge-accent font-mono text-xs">
+            {roundId}
+          </code>
+          .
+        </div>
+        <div className="text-forge-muted text-xs mb-6">
+          Forge has {allRounds.length} active rounds and {specsTotal} problems. Browse them all
+          from Problems, or open the Guide for what each round optimizes.
+        </div>
+        <div className="flex items-center justify-center gap-4 text-xs">
+          <Link to="/problems" className="text-forge-accent hover:underline">
+            Problems
+          </Link>
+          <Link to="/rankings" className="text-forge-accent hover:underline">
+            Rankings
+          </Link>
+          <Link to="/explorer" className="text-forge-accent hover:underline">
+            Explorer
+          </Link>
+          <Link to="/guide" className="text-forge-accent hover:underline">
+            Guide
+          </Link>
+        </div>
       </div>
     );
   }
