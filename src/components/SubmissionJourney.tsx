@@ -77,7 +77,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
   const sotaScore = sota ? sota.score : null;
   const vsSOTA = sotaScore != null ? (isMaximize ? displayScore - sotaScore : sotaScore - displayScore) : null;
   const beatsSOTA = vsSOTA != null && vsSOTA > 0;
-  const isSOTA = sota?.commit_hash === submission.commit_hash;
+  const isSOTA = sota?.submission_id === submission.id;
 
   const agentName = submission.agent_path.split("/").slice(-2, -1)[0] ?? submission.agent_path;
   const material = MATERIAL_META[spec.material]?.label ?? spec.material;
@@ -183,7 +183,12 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             {/* Stress bar */}
             <div className="flex-1 min-w-[160px] max-w-xs">
               <div className="flex justify-between text-xs text-forge-muted mb-1">
-                <span>Stress utilization</span>
+                <span
+                  className="cursor-help"
+                  title={`How much of the allowable stress budget is consumed. ${stressUsed}% used means the peak von Mises stress (${submission.fea_stress_mpa.toFixed(1)} MPa) is ${stressUsed}% of the allowable limit (${submission.fea_allowable_mpa.toFixed(1)} MPa). ${stressHeadroom}% headroom remains — more headroom usually means the structure can be lightened further.`}
+                >
+                  Stress utilization
+                </span>
                 <span className="font-mono">{stressUsed}%</span>
               </div>
               <div className="h-2 bg-forge-bg rounded-full overflow-hidden">
