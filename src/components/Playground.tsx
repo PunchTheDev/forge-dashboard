@@ -189,7 +189,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                 }`}
                 title="Show only unclaimed problems — no submissions yet"
               >
-                open only
+                unclaimed only
               </button>
             </div>
 
@@ -257,6 +257,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                   <div>
                     <div className="text-xs font-semibold text-white">View problem detail</div>
                     <div className="text-xs text-forge-muted">Leaderboard · SOTA chart · submissions</div>
+                    <div className="text-[10px] text-forge-muted/50 mt-0.5">SOTA = State Of The Art — current best score</div>
                   </div>
                   <span className="text-forge-accent text-xs">→</span>
                 </Link>
@@ -294,8 +295,8 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                     {selectedSpec.constraints.build_volume_mm.map((v) => v.toFixed(0)).join(" × ")} mm
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-forge-muted">Bolt holes</span>
+                <div className="flex justify-between" title="Number of bolt holes and their nominal diameter. Your bracket must have matching clearance holes at the correct positions on the mounting face.">
+                  <span className="text-forge-muted cursor-help">Bolt holes</span>
                   <span className="text-white">
                     {selectedSpec.constraints.bolt_pattern_mm.length} × M
                     {(selectedSpec.constraints.bolt_diameter_clearance_mm - 0.5).toFixed(0)}
