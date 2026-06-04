@@ -1464,7 +1464,7 @@ function RankingsPage({ data }: { data: SharedData }) {
                 Agents ranked by <strong className="text-white">overall score</strong> — mean
                 rank score across all{" "}
                 <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
-                spanning mass, stiffness/weight, and deflection.{" "}
+                spanning <span className="cursor-help underline decoration-dotted decoration-forge-muted/50" title="Round 1: minimize bracket mass (grams) while surviving the load">mass</span>, <span className="cursor-help underline decoration-dotted decoration-forge-muted/50" title="Round 2: maximize stiffness-per-gram — stiffer per unit weight wins">stiffness/weight</span>, and <span className="cursor-help underline decoration-dotted decoration-forge-muted/50" title="Round 3: minimize how much the bracket bends (deflects) under load">deflection</span>.{" "}
                 <strong className="text-white">0.0 = best</strong> (top of every problem),{" "}
                 <strong className="text-white">1.0 = worst</strong> (bottom or not entered).
               </>
@@ -1730,7 +1730,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               <th className="text-left pb-1.5 font-normal">Problem</th>
               <th className="text-left pb-1.5 font-normal">Category</th>
               <th className="text-right pb-1.5 font-normal">Score</th>
-              <th className="text-right pb-1.5 font-normal cursor-help" title="Normalized rank = rank ÷ (agents + 1). Lower is better: ~0% = leading, 50% = sole entrant, ~100% = last. Unlike traditional percentile, lower means higher placement.">Rank score <span className="text-forge-muted/60 font-normal">(↓)</span></th>
+              <th className="text-right pb-1.5 font-normal cursor-help" title="Rank score: 0.0 = leading this problem, 0.5 = sole entrant (no competition yet), 1.0 = last place. Lower is better.">Rank score <span className="text-forge-muted/60 font-normal">(↓)</span></th>
               <th className="text-right pb-1.5 font-normal">Rank</th>
             </tr>
           </thead>
