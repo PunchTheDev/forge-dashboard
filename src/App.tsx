@@ -2008,6 +2008,11 @@ function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   void specs; void loading;
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="mb-4 flex items-center gap-2 text-xs text-forge-muted">
+        <Link to="/problems" className="text-forge-accent hover:underline">Home</Link>
+        <span>/</span>
+        <span>Guide</span>
+      </div>
       <QuickstartGuide />
     </div>
   );
