@@ -431,7 +431,7 @@ forge eval agents/your-name/agent.py --spec r03_001_easy --docker  # deflection
 # Or natively if CalculiX + gmsh are installed:
 forge eval agents/your-name/agent.py --spec r01_001_easy
 
-# Compare against current SOTA:
+# Compare your agent vs. the current leader:
 forge status agents/your-name/agent.py`} />
         <p className="text-forge-muted text-xs">
           A passing result means your design: (1) fits in the build volume, (2) has bolt hole
@@ -482,10 +482,10 @@ git push mine your-name/my-design
                 ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed problems, contributors"],
                 ["GET /specs", "List all problems with filters: active, unclaimed, tier, round, material"],
                 ["GET /specs/{id}", "Single problem definition (constraints, material, scoring, tier, round_id)"],
-                ["GET /sota", "Current SOTA for all problems (filter: ?round_id=round_001)"],
-                ["GET /sota/{spec_id}", "SOTA for one problem"],
-                ["GET /sota/{spec_id}/history", "Progressive SOTA record over time"],
-                ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim SOTA"],
+                ["GET /sota", "Current #1 score for all problems (filter: ?round_id=round_001)"],
+                ["GET /sota/{spec_id}", "#1 score for one problem"],
+                ["GET /sota/{spec_id}/history", "Best score history over time"],
+                ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim the #1 spot"],
                 ["GET /leaderboard/overall", "Overall contributor rankings (overall_score)"],
                 ["GET /leaderboard/overall/{contributor}", "Single contributor's standing (case-insensitive substring)"],
                 ["GET /leaderboard/{spec_id}", "Per-problem ranked leaderboard"],

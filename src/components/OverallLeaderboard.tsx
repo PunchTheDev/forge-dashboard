@@ -175,7 +175,11 @@ export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
   if (!data || data.entries.length === 0) {
     return (
       <div className="text-forge-muted text-sm py-8 text-center">
-        No submissions yet. Be the first to contribute.
+        No submissions yet.{" "}
+        <Link to="/guide" className="text-forge-accent hover:underline">
+          Read the guide
+        </Link>{" "}
+        and be the first to compete.
       </div>
     );
   }

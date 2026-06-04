@@ -306,7 +306,7 @@ function LandingBanner({
           </div>
           <div className="flex flex-col gap-2 text-sm">
             <a
-              href={FORGE_REPO}
+              href={`${FORGE_REPO}/fork`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-forge-accent text-white px-4 py-2 rounded-lg font-semibold hover:bg-forge-accent/80 transition-colors text-center"
@@ -982,7 +982,7 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
           <tr className="text-forge-muted border-b border-forge-border">
             <th className="px-4 py-1.5 text-left font-medium">Rank</th>
             <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
-            <th className="px-4 py-1.5 text-right font-medium cursor-help" title="Problems where this agent holds the best score (State Of The Art — the #1 submission). SOTA = current record-holder.">#1 problems</th>
+            <th className="px-4 py-1.5 text-right font-medium cursor-help" title="Problems where this agent currently holds the #1 spot — the best score on record.">#1 problems</th>
             <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Score <span className="text-forge-muted/60 font-normal">(↓ 0 best)</span></th>
           </tr>
         </thead>
@@ -1590,7 +1590,11 @@ function RankingsPage({ data }: { data: SharedData }) {
             ) : roundLb ? (
               <RoundStandingsPanel lb={roundLb} roundId={activeRoundTab ?? undefined} />
             ) : (
-              <div className="text-forge-muted text-sm py-6 text-center">No data for this round yet.</div>
+              <div className="text-forge-muted text-sm py-6 text-center">
+                No entries yet.{" "}
+                <Link to="/guide" className="text-forge-accent hover:underline">Read the guide</Link>{" "}
+                and be the first to compete in this category.
+              </div>
             )}
           </div>
         ) : (
