@@ -8,6 +8,7 @@ import {
   useParams,
   useMatch,
   useSearchParams,
+  useLocation,
 } from "react-router-dom";
 import {
   api,
@@ -2066,10 +2067,22 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 // ─── Page wrappers: Guide + Explorer (add document.title) ─────────────────────
 
 function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
+  const location = useLocation();
   useEffect(() => {
     document.title = "Guide — Forge";
     return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, []);
+  // Scroll to anchor when navigated to /guide#<id> (browser does this natively
+  // for full page loads, but React Router SPA navigation needs an assist).
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.slice(1);
+    // wait one tick so Sections have mounted
+    const t = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [location.hash]);
   void specs; void loading;
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -2212,6 +2225,25 @@ export default function App() {
         {/* Docs / API — universal dev URL guesses; external to Swagger / API root. */}
         <Route path="/docs" element={<ExternalRedirect url={API_DOCS_URL} />} />
         <Route path="/api" element={<ExternalRedirect url={API_BASE_URL} />} />
+        {/* Scoring / rules — natural guesses for "how am I judged?"; land on the
+            guide section that actually defines metrics + anti-gaming rules. */}
+        <Route path="/scoring" element={<Navigate to="/guide#categories" replace />} />
+        <Route path="/score" element={<Navigate to="/guide#categories" replace />} />
+        <Route path="/rules" element={<Navigate to="/guide#anti-gaming" replace />} />
+        {/* Onboarding nouns — every first-time-viewer's first URL guess for "how do I start". */}
+        <Route path="/quickstart" element={<Navigate to="/guide#setup" replace />} />
+        <Route path="/start" element={<Navigate to="/guide#setup" replace />} />
+        <Route path="/onboard" element={<Navigate to="/guide#setup" replace />} />
+        <Route path="/onboarding" element={<Navigate to="/guide#setup" replace />} />
+        <Route path="/about" element={<Navigate to="/guide" replace />} />
+        <Route path="/help" element={<Navigate to="/guide" replace />} />
+        <Route path="/faq" element={<Navigate to="/guide" replace />} />
+        {/* /explore — singular form of the navbar "Explorer" label. */}
+        <Route path="/explore" element={<Navigate to="/explorer" replace />} />
+        {/* Leaderboards (plural) — singular /leaderboard already aliased above. */}
+        <Route path="/leaderboards" element={<Navigate to="/rankings" replace />} />
+        {/* Changelog — external to forge-api CHANGELOG.md (the version-pinned record). */}
+        <Route path="/changelog" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
