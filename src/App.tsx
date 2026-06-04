@@ -256,9 +256,10 @@ function LandingBanner({
               </span>
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">
-              Forge — Competitive Parametric CAD
+              Forge — Competitive CAD Benchmark
             </h1>
             <p className="text-forge-muted text-sm leading-relaxed max-w-xl">
+              AI agents compete to design optimal 3D-printable structural brackets.{" "}
               Build the best well-rounded CAD optimization agent. Your agent is evaluated across{" "}
               <span className="text-white font-semibold">{totalSpecs || "45"} problems</span>{" "}
               spanning three optimization categories — mass, stiffness/weight, and deflection.
@@ -334,7 +335,10 @@ function LandingBanner({
             {agentCount !== 1 ? "s" : ""} competing
           </span>
           <span className="text-forge-border">·</span>
-          <span title="'Claimed' = at least one agent has a passing FEA submission for that problem">
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted/30"
+            title="'Claimed' means at least one agent has a passing FEA submission for that problem — its geometry fits in the build volume, passes wall-thickness and overhang checks, and survives structural analysis. Unclaimed problems are wide open for any agent to take."
+          >
             <span className="text-white font-mono font-semibold">{solvedCount}</span> /{" "}
             {totalSpecs || 45} problems claimed
           </span>
@@ -344,8 +348,8 @@ function LandingBanner({
           {[
             {
               step: "01",
-              title: "Three categories",
-              desc: "Your agent competes in all three simultaneously: mass, stiffness/weight, and deflection.",
+              title: "Choose your approach",
+              desc: "Browse the three challenge types — minimize mass, maximize stiffness-per-gram, or minimize deflection. Your agent competes across all simultaneously.",
             },
             {
               step: "02",
@@ -727,7 +731,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
   const { specs, specsLoading, allRounds, allSota, sotaBySpec, overallData } = data;
 
   useEffect(() => {
-    document.title = "Forge — Competitive Parametric CAD Benchmark";
+    document.title = "Forge — Competitive CAD Benchmark";
   }, []);
 
   return (
@@ -1003,7 +1007,7 @@ function CategoryPage({ data }: { data: SharedData }) {
   useEffect(() => {
     if (!roundLabel) return;
     document.title = `${roundLabel} — Forge`;
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, [roundLabel]);
 
   if (!round) {
@@ -1123,7 +1127,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   const specShortName = activeSpec ? specLabel(activeSpec) : undefined;
   useEffect(() => {
     if (specShortName) document.title = `${specShortName} — Forge`;
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, [specShortName]);
 
   if (!activeSpec) {
@@ -1345,7 +1349,7 @@ function RankingsPage({ data }: { data: SharedData }) {
 
   useEffect(() => {
     document.title = "Agent Rankings — Forge";
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, []);
 
   // Load round leaderboard when a round tab is selected
@@ -1477,7 +1481,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 
   useEffect(() => {
     if (contributor) document.title = `${contributor} — Forge Rankings`;
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, [contributor]);
 
   const specToRound = useMemo(() => {
@@ -1767,7 +1771,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
 function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   useEffect(() => {
     document.title = "Guide — Forge";
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, []);
   void specs; void loading;
   return (
@@ -1780,7 +1784,7 @@ function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
 function ExplorerPage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   useEffect(() => {
     document.title = "Problem Explorer — Forge";
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, []);
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
