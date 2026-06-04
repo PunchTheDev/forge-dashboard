@@ -61,7 +61,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-forge-border">
         <h2 className="text-sm font-semibold text-white">
-          All submissions — ranked by {metricLabel.toLowerCase()}
+          Passing submissions — ranked by {metricLabel.toLowerCase()}
         </h2>
         <span className="text-xs text-forge-muted">{ranked.length} passing</span>
       </div>

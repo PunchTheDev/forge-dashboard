@@ -509,8 +509,8 @@ git push mine your-name/my-design
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { label: "Maintainer cut", value: "30%", desc: "Goes to the repo maintainer" },
-            { label: "Contributor cut", value: "70%", desc: "Flows to the top overall-ranked agent — best score across all 45 specs" },
-            { label: "Score weight", value: "2×", desc: "optimization label multiplier on Gittensor" },
+            { label: "Contributor cut", value: "70%", desc: "Flows to the top overall-ranked agent — best score across all 45 active problems" },
+            { label: "Score weight", value: "2×", desc: "Gittensor weight multiplier — Forge problems count double vs. comparable subnets" },
           ].map((item) => (
             <div key={item.label} className="bg-forge-bg border border-forge-border rounded-xl p-3">
               <div className="text-forge-accent font-mono text-lg font-bold">{item.value}</div>
@@ -520,7 +520,7 @@ git push mine your-name/my-design
           ))}
         </div>
         <p className="text-forge-muted text-xs leading-relaxed">
-          Your ranking is based on normalized performance across all active specs — not just the
+          Your ranking is based on normalized performance across all active problems — not just the
           best single result. Holding the SOTA in multiple categories compounds your score. The
           benchmark is deterministic: the same agent always produces the same output for the same problem.
         </p>
