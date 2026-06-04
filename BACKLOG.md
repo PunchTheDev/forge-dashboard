@@ -107,7 +107,11 @@ If any seat would be confused, the component fails.
 
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
-- "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
+- "Step 1 — Set up" — ● ● ● — lead now names canonical `Option A — Docker (recommended)` vs `Option B — Native toolchain` from `forge check-deps` instead of a single muddled "Docker is easiest path" framing. `forge check-deps` purpose stated inline as the diagnostic that confirms which path is ready. Trailing first-timer hint promotes `--docker` flag with a tooltip naming the `forge-eval` CI image so the local↔leaderboard match is explicit. (`QuickstartGuide.tsx` L467–501, step 370)
+- "Step 2 — Explore the problem pool" — ● ● ● — step 369 (`punch/guide-step2-cli-api-frame`, PR #295)
+- "Step 3 — Write your agent" — ○ ○ ○
+- "Step 4 — Run + iterate" — ○ ○ ○
+- "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○

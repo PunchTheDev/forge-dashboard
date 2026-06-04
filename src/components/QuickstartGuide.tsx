@@ -467,23 +467,31 @@ export function QuickstartGuide() {
       {/* Step 1 */}
       <Section id="setup" title="Step 1 — Set up">
         <p className="text-forge-muted text-sm">
-          Clone the repo and install the eval stack. Docker is the easiest path — the image
+          Two paths to a working eval stack — pick one.{" "}
+          <strong className="text-forge-fg">Option A — Docker (recommended)</strong>: one image
           ships with{" "}
           <span title="Open-source FEA solver — runs the structural simulation that scores your part." className="cursor-help border-b border-dotted border-forge-muted/50">CalculiX</span>
           {" "}(the FEA solver),{" "}
           <span title="Mesh generator — converts your STEP geometry into the element mesh the FEA solver works on." className="cursor-help border-b border-dotted border-forge-muted/50">gmsh</span>
           {" "}(meshing), and{" "}
           <span title="OpenCascade Python bindings — the CAD kernel that reads/writes STEP files and runs the geometry operations." className="cursor-help border-b border-dotted border-forge-muted/50">OCP</span>
-          {" "}(the CAD kernel) pre-installed.
+          {" "}(the CAD kernel) pre-installed; you only install the{" "}
+          <code className="bg-forge-border px-1 rounded">forge</code> CLI locally.{" "}
+          <strong className="text-forge-fg">Option B — Native toolchain</strong>: install CalculiX,
+          gmsh, and the OCP Python bindings yourself (faster startup; more setup friction on macOS
+          and Windows).
         </p>
         <CodeBlock code={`git clone ${FORGE_REPO}
 cd forge
-pip install -e .          # installs the forge CLI
+pip install -e .          # installs the forge CLI (both paths)
 
-# Verify your setup:
-forge check-deps          # checks Docker / native toolchain`} />
+# Confirms which path is ready — Docker, Native, or both:
+forge check-deps`} />
         <p className="text-forge-muted text-xs">
-          No local CalculiX/OCP? Use Docker — it mirrors the CI environment:{" "}
+          First-timer? Stay on Option A: every{" "}
+          <code className="bg-forge-border px-1 rounded">forge eval</code> call takes a{" "}
+          <span title="Runs the FEA evaluation inside the prebuilt forge-eval Docker image — same image CI uses for scoring, so your local result matches the leaderboard." className="cursor-help border-b border-dotted border-forge-muted/50"><code className="bg-forge-border px-1 rounded">--docker</code></span>
+          {" "}flag and you never touch CalculiX directly:{" "}
           <code className="bg-forge-border px-1 rounded">forge eval --docker agents/my-agent/agent.py --spec r01_001_easy</code>
         </p>
       </Section>
