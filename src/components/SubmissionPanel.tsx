@@ -46,7 +46,16 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
       </div>
 
       {loading && !submissions.length && (
-        <div className="px-4 py-6 text-center text-forge-muted text-sm">Loading…</div>
+        <div className="divide-y divide-forge-border/40 animate-pulse">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="px-4 py-2.5 flex items-center gap-3">
+              <div className="h-4 w-12 bg-forge-border/50 rounded-full" />
+              <div className="h-3 w-20 bg-forge-border/50 rounded" />
+              <div className="h-3 w-16 bg-forge-border/40 rounded ml-1" />
+              <div className="ml-auto h-3 w-24 bg-forge-border/30 rounded hidden md:block" />
+            </div>
+          ))}
+        </div>
       )}
 
       {!loading && recent.length === 0 && (
