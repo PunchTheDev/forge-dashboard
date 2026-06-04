@@ -74,10 +74,14 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
               );
             })() : (() => {
               const failMatch = s.notes?.match(/\| fail \[(\w+)\]: (.+)$/);
-              const failReason = failMatch?.[2];
-              return failReason ? (
-                <span className="text-forge-muted text-xs truncate max-w-[160px]" title={failReason}>
-                  {failReason}
+              const failReason = failMatch?.[2] ?? s.notes ?? undefined;
+              const display = failReason ? failReason : onSelect ? "see details →" : null;
+              return display ? (
+                <span
+                  className="text-forge-muted text-xs truncate max-w-[160px]"
+                  title={failReason ?? "Click row for failure details"}
+                >
+                  {display}
                 </span>
               ) : null;
             })()}
