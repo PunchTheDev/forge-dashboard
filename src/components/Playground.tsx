@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META } from "../lib/api";
+import { useSearchParams, Link } from "react-router-dom";
+import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -60,9 +60,10 @@ function MaterialBadge({ material }: { material: string }) {
 interface Props {
   specs: Spec[];
   loading?: boolean;
+  sotaBySpec?: Record<string, number>;
 }
 
-export function Playground({ specs, loading }: Props) {
+export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedSpecId, setSelectedSpecId] = useState<string>(searchParams.get("spec") ?? "");
   const [search, setSearch] = useState("");
@@ -88,17 +89,28 @@ export function Playground({ specs, loading }: Props) {
     }
   }, [specs, selectedSpecId, searchParams]);
 
-  // Map round_id prefix → category label for filter
+  // Category filter
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [openOnly, setOpenOnly] = useState(false);
+
+  // Map round_id prefix → category label
   const ROUND_LABELS: Record<string, string> = {
     r01: "mass", r02: "stiffness", r03: "deflection",
   };
+  const CATEGORY_PILLS = [
+    { key: "mass",       label: "⚖ Mass" },
+    { key: "stiffness",  label: "⊕ Stiffness" },
+    { key: "deflection", label: "↕ Deflection" },
+  ];
 
   const filteredSpecs = useMemo(() => {
     const q = search.toLowerCase().trim();
-    if (!q) return specs;
     return specs.filter((s) => {
       const prefix = s.id.slice(0, 3);
       const category = ROUND_LABELS[prefix] ?? "";
+      if (categoryFilter && ROUND_LABELS[prefix] !== categoryFilter) return false;
+      if (openOnly && sotaBySpec[s.id] !== undefined) return false;
+      if (!q) return true;
       return (
         s.id.toLowerCase().includes(q) ||
         s.name.toLowerCase().includes(q) ||
@@ -107,7 +119,7 @@ export function Playground({ specs, loading }: Props) {
         (s.tier ?? "").includes(q)
       );
     });
-  }, [specs, search]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [specs, search, categoryFilter, openOnly, sotaBySpec]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedSpec = specs.find((s) => s.id === selectedSpecId) ?? null;
 
@@ -134,37 +146,93 @@ export function Playground({ specs, loading }: Props) {
         {/* Left: problem browser */}
         <div className="flex flex-col gap-4">
           <div className="bg-forge-surface border border-forge-border rounded-xl p-4">
-            <div className="text-sm font-semibold text-white mb-3">Browse Problems</div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-sm font-semibold text-white">Browse Problems</div>
+              <div className="text-xs text-forge-muted">
+                {filteredSpecs.length === specs.length
+                  ? `${specs.length} problems`
+                  : `${filteredSpecs.length} of ${specs.length}`}
+              </div>
+            </div>
+
+            {/* Category filter pills */}
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              <button
+                onClick={() => setCategoryFilter(null)}
+                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
+                  categoryFilter === null
+                    ? "bg-forge-accent/20 border-forge-accent/50 text-forge-accent"
+                    : "border-forge-border text-forge-muted hover:text-white"
+                }`}
+              >
+                All
+              </button>
+              {CATEGORY_PILLS.map((c) => (
+                <button
+                  key={c.key}
+                  onClick={() => setCategoryFilter(categoryFilter === c.key ? null : c.key)}
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors ${
+                    categoryFilter === c.key
+                      ? "bg-forge-accent/20 border-forge-accent/50 text-forge-accent"
+                      : "border-forge-border text-forge-muted hover:text-white"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+              <button
+                onClick={() => setOpenOnly(!openOnly)}
+                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-colors ml-auto ${
+                  openOnly
+                    ? "bg-forge-green/20 border-forge-green/50 text-forge-green"
+                    : "border-forge-border text-forge-muted hover:text-white"
+                }`}
+                title="Show only unclaimed problems — no submissions yet"
+              >
+                open only
+              </button>
+            </div>
 
             {/* Search */}
             <input
               type="text"
-              placeholder="Filter by ID, material, category (mass, stiffness, deflection), or tier…"
+              placeholder="Filter by material, tier…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-forge-bg border border-forge-border rounded-lg px-3 py-2 text-xs text-white placeholder-forge-muted focus:outline-none focus:border-forge-accent/50 mb-3"
+              className="w-full bg-forge-bg border border-forge-border rounded-lg px-3 py-2 text-xs text-white placeholder-forge-muted focus:outline-none focus:border-forge-accent/50 mb-2"
             />
 
             {/* Spec list as clickable rows */}
             {loading && specs.length === 0 ? (
               <div className="text-forge-muted text-xs py-3 text-center">Loading problems…</div>
             ) : filteredSpecs.length === 0 ? (
-              <div className="text-forge-muted text-xs py-3 text-center">No matches for "{search}"</div>
+              <div className="text-forge-muted text-xs py-3 text-center">No matches</div>
             ) : (
               <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
                 {filteredSpecs.map((s) => {
                   const isSelected = s.id === selectedSpecId;
+                  const sota = sotaBySpec[s.id];
+                  const hasSota = sota !== undefined;
                   return (
                     <button
                       key={s.id}
                       onClick={() => selectSpec(s.id)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors ${
+                      className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center gap-2 ${
                         isSelected
                           ? "bg-forge-accent/15 border border-forge-accent/40 text-white"
                           : "hover:bg-forge-bg text-forge-muted hover:text-white border border-transparent"
                       }`}
                     >
-                      <span className="font-medium block truncate">{specLabel(s)}</span>
+                      <span className="font-medium flex-1 truncate">{specLabel(s)}</span>
+                      {hasSota ? (
+                        <span className="font-mono text-[10px] text-forge-green shrink-0">
+                          {fmtScore(sota, s.scoring?.metric ?? "mass_grams")}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-forge-accent/60 font-semibold shrink-0" title="No submissions yet">
+                          open
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -179,6 +247,20 @@ export function Playground({ specs, loading }: Props) {
               <div className="mb-4">
                 <SpecDiagram spec={selectedSpec} />
               </div>
+
+              {/* Link to full spec detail (leaderboard, SOTA chart, submissions) */}
+              {selectedSpec.round_id && (
+                <Link
+                  to={`/problems/${selectedSpec.round_id}/${selectedSpec.id}`}
+                  className="flex items-center justify-between mb-3 px-3 py-2 bg-forge-bg border border-forge-border/50 rounded-lg hover:border-forge-accent/50 transition-colors"
+                >
+                  <div>
+                    <div className="text-xs font-semibold text-white">View problem detail</div>
+                    <div className="text-xs text-forge-muted">Leaderboard · SOTA chart · submissions</div>
+                  </div>
+                  <span className="text-forge-accent text-xs">→</span>
+                </Link>
+              )}
 
               {/* Constraints explained in plain language */}
               <div className="text-xs font-semibold text-forge-muted uppercase tracking-wide mb-2">Constraints</div>

@@ -5,7 +5,6 @@ import {
   Route,
   Navigate,
   Link,
-  useNavigate,
   useParams,
   useMatch,
   useSearchParams,
@@ -204,7 +203,7 @@ function Header() {
           <NavLink to="/explorer" label="Explorer" />
           <NavLink to="/guide" label="Guide" />
         </div>
-        <nav className="flex items-center gap-4 text-xs text-forge-muted">
+        <nav className="hidden sm:flex items-center gap-4 text-xs text-forge-muted">
           <a
             href={FORGE_REPO}
             target="_blank"
@@ -385,12 +384,10 @@ function SotaHero({
   sota,
   spec,
   round,
-  onView,
 }: {
   sota: SotaRecord;
   spec: Spec | undefined;
   round: Round | undefined;
-  onView: () => void;
 }) {
   const meta = round ? CATEGORY_META[round.id] : null;
   const { label: metricLabel, unit } = metricConfig(sota.score_metric);
@@ -464,12 +461,12 @@ function SotaHero({
           </div>
 
           <div className="flex flex-col gap-2">
-            <button
-              onClick={onView}
+            <Link
+              to={`/problems/${round?.id ?? ""}/${sota.spec_id}`}
               className="bg-forge-accent text-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-forge-accent/80 transition-colors text-center"
             >
               View problem →
-            </button>
+            </Link>
             <a
               href={FORGE_REPO}
               target="_blank"
@@ -490,11 +487,9 @@ function SotaHero({
 function CategoryCard({
   round,
   sotaBySpec,
-  onSelect,
 }: {
   round: Round;
   sotaBySpec: Record<string, number>;
-  onSelect: () => void;
 }) {
   const meta = CATEGORY_META[round.id] ?? {
     icon: "·",
@@ -509,9 +504,9 @@ function CategoryCard({
   const sotaCount = round.specs.filter((s) => sotaBySpec[s.id] !== undefined).length;
 
   return (
-    <button
-      onClick={onSelect}
-      className={`w-full text-left p-5 rounded-xl border transition-all hover:border-opacity-80 hover:scale-[1.01] active:scale-[0.99] ${meta.bgColor} ${meta.borderColor} border`}
+    <Link
+      to={`/problems/${round.id}`}
+      className={`block p-5 rounded-xl border transition-all hover:border-opacity-80 hover:scale-[1.01] active:scale-[0.99] ${meta.bgColor} ${meta.borderColor} border`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
@@ -546,7 +541,7 @@ function CategoryCard({
         </span>
         <span className="ml-auto text-xs text-forge-accent font-medium">Browse →</span>
       </div>
-    </button>
+    </Link>
   );
 }
 
@@ -723,7 +718,6 @@ function SidebarSpecList({
 // ─── Page: Problems landing (/) ───────────────────────────────────────────────
 
 function ProblemsLanding({ data }: { data: SharedData }) {
-  const navigate = useNavigate();
   const { specs, specsLoading, allRounds, allSota, sotaBySpec, overallData } = data;
 
   useEffect(() => {
@@ -750,14 +744,25 @@ function ProblemsLanding({ data }: { data: SharedData }) {
           );
           const heroSpec = specs?.find((sp) => sp.id === heroSota.spec_id);
           return (
-            <SotaHero
-              sota={heroSota}
-              spec={heroSpec}
-              round={heroRound}
-              onView={() =>
-                navigate(`/problems/${heroRound?.id ?? ""}/${heroSota.spec_id}`)
-              }
-            />
+            <>
+              <div className="mb-3">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-forge-accent">
+                  Spotlight
+                </div>
+                <div className="text-sm text-white font-semibold mt-0.5">
+                  Best agent design so far — one problem
+                </div>
+                <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-2xl">
+                  This is the current top-scoring submission on one of the {allRounds.length} active competition
+                  categories. Open it to see the full leaderboard, FEA results, and the agent code that beat it.
+                </div>
+              </div>
+              <SotaHero
+                sota={heroSota}
+                spec={heroSpec}
+                round={heroRound}
+              />
+            </>
           );
         })()}
 
@@ -780,7 +785,6 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                 key={r.id}
                 round={r}
                 sotaBySpec={sotaBySpec}
-                onSelect={() => navigate(`/problems/${r.id}`)}
               />
             ))}
           </div>
@@ -1197,6 +1201,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
           spec={activeSpec}
           sota={sota ?? null}
           submissionCount={passedSubmissions.length}
+          round={round}
         />
 
         {sota?.has_step ? (
@@ -1271,7 +1276,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               to={`/explorer?spec=${activeSpec.id}`}
               className="text-xs text-forge-accent hover:underline"
             >
-              View in Problem Explorer →
+              View in Explorer →
             </Link>
           </div>
           {sota ? (
@@ -1332,7 +1337,6 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 // ─── Page: Rankings (/rankings) ───────────────────────────────────────────────
 
 function RankingsPage({ data }: { data: SharedData }) {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { overallData, overallLoading, allRounds } = data;
 
@@ -1382,8 +1386,9 @@ function RankingsPage({ data }: { data: SharedData }) {
           </div>
         </div>
 
-        {/* Round tabs */}
-        <div className="flex items-center gap-1 mb-4 border-b border-forge-border pb-2">
+        {/* Round tabs — scrollable on mobile */}
+        <div className="overflow-x-auto mb-4 border-b border-forge-border">
+        <div className="flex items-center gap-1 pb-2 min-w-max whitespace-nowrap">
           <button
             onClick={() => setActiveRoundTab(null)}
             className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
@@ -1413,6 +1418,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             );
           })}
         </div>
+        </div>
 
         {/* Content — overall or round-specific */}
         {activeRoundTab ? (
@@ -1431,9 +1437,6 @@ function RankingsPage({ data }: { data: SharedData }) {
               data={overallData ?? null}
               loading={overallLoading}
               rounds={allRounds}
-              onSelectAgent={(contributor) =>
-                navigate(`/rankings/${encodeURIComponent(contributor)}`)
-              }
             />
             {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
               <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
@@ -1785,14 +1788,14 @@ function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   );
 }
 
-function ExplorerPage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
+function ExplorerPage({ specs, loading, sotaBySpec }: { specs: Spec[]; loading: boolean; sotaBySpec: Record<string, number> }) {
   useEffect(() => {
-    document.title = "Problem Explorer — Forge";
+    document.title = "Explorer — Forge";
     return () => { document.title = "Forge — Competitive CAD Benchmark"; };
   }, []);
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <Playground specs={specs} loading={loading} />
+      <Playground specs={specs} loading={loading} sotaBySpec={sotaBySpec} />
     </div>
   );
 }
@@ -1869,7 +1872,7 @@ export default function App() {
 
         <Route
           path="/explorer"
-          element={<ExplorerPage specs={specs ?? []} loading={specsLoading} />}
+          element={<ExplorerPage specs={specs ?? []} loading={specsLoading} sotaBySpec={sotaBySpec} />}
         />
 
         {/* Aliases — common URL guesses */}

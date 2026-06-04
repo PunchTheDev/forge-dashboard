@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { OverallEntry, OverallLeaderboard as OverallLeaderboardData, Round, fmtScore } from "../lib/api";
 
 interface Props {
   data: OverallLeaderboardData | null;
   loading: boolean;
   rounds?: Round[];
-  onSelectAgent?: (contributor: string) => void;
 }
 
 const CATEGORY_META: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -104,16 +104,15 @@ function CategoryBreakdown({ entry, specToRound }: {
 }
 
 
-function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
+function EntryRow({ entry, specToRound, totalSpecs }: {
   entry: OverallEntry;
   specToRound: Record<string, string>;
   totalSpecs: number;
-  onSelect?: (contributor: string) => void;
 }) {
   return (
-    <div
-      className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-2 cursor-pointer transition-all hover:border-forge-accent/50 hover:scale-[1.005] active:scale-[0.998]"
-      onClick={() => onSelect?.(entry.contributor)}
+    <Link
+      to={`/rankings/${encodeURIComponent(entry.contributor)}`}
+      className="block bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-2 cursor-pointer transition-all hover:border-forge-accent/50 hover:scale-[1.005] active:scale-[0.998]"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -156,11 +155,11 @@ function EntryRow({ entry, specToRound, totalSpecs, onSelect }: {
       <ScoreBar specsEntered={entry.specs_entered} totalSpecs={totalSpecs} />
 
       <CategoryBreakdown entry={entry} specToRound={specToRound} />
-    </div>
+    </Link>
   );
 }
 
-export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }: Props) {
+export function OverallLeaderboard({ data, loading, rounds = [] }: Props) {
   const [query, setQuery] = useState("");
 
   const specToRound = useMemo(() => {
@@ -212,9 +211,7 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
             key={entry.contributor}
             entry={entry}
             specToRound={specToRound}
-
             totalSpecs={data.total_specs}
-            onSelect={onSelectAgent}
           />
         ))
       )}
