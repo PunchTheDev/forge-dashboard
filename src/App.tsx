@@ -194,7 +194,7 @@ function Header() {
           <span className="text-forge-border">|</span>
           <NavLink to="/problems" label="Problems" />
           <NavLink to="/rankings" label="Rankings" />
-          <NavLink to="/playground" label="Explorer" />
+          <NavLink to="/explorer" label="Explorer" />
           <NavLink to="/guide" label="Guide" />
         </div>
         <nav className="flex items-center gap-4 text-xs text-forge-muted">
@@ -404,16 +404,15 @@ function SotaHero({
         <div className="lg:w-72 shrink-0 p-6 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-forge-border">
           <div>
             {meta && (
-              <div className={`text-xs font-bold uppercase tracking-widest ${meta.color} mb-2`}>
-                {round?.name.replace(/Round \d+ — /, "")}
+              <div className={`text-xs font-bold uppercase tracking-widest ${meta.color} mb-1`}>
+                {round?.name.replace(/Round \d+ — /, "")} · Featured SOTA
               </div>
             )}
             <div className="text-white font-bold text-lg leading-tight mb-1">
-              Current leader — one problem
+              {spec ? specLabel(spec) : sota.spec_id}
             </div>
-            <div className="text-forge-muted text-xs mb-1 font-mono">{sota.spec_id}</div>
             <div className="text-forge-muted text-xs mb-4 leading-relaxed">
-              {spec ? specLabel(spec) : sota.spec_id} · by{" "}
+              Best known result · by{" "}
               <span className="text-white">{sota.contributor}</span>
             </div>
 
@@ -1255,10 +1254,10 @@ function SpecDetailPage({ data }: { data: SharedData }) {
           <div className="flex items-center justify-between mb-1">
             <div className="text-sm font-semibold text-white">Beat the SOTA</div>
             <Link
-              to={`/playground?spec=${activeSpec.id}`}
+              to={`/explorer?spec=${activeSpec.id}`}
               className="text-xs text-forge-accent hover:underline"
             >
-              Explore in playground →
+              Try in Explorer →
             </Link>
           </div>
           {sota ? (
@@ -1318,58 +1317,209 @@ function SpecDetailPage({ data }: { data: SharedData }) {
 
 // ─── Page: Rankings (/rankings) ───────────────────────────────────────────────
 
+// ─── RoundRankingsTab — fetches + renders full per-round standings ─────────────
+
+function RoundRankingsTab({
+  round,
+  onSelectAgent,
+}: {
+  round: Round;
+  onSelectAgent: (c: string) => void;
+}) {
+  const meta = CATEGORY_META[round.id] ?? {
+    icon: "·",
+    color: "text-forge-muted",
+    bgColor: "bg-forge-surface",
+    borderColor: "border-forge-border",
+  };
+  const roundId = round.id;
+  const { data: lb, loading } = useApi(
+    useCallback(() => api.roundLeaderboard(roundId), [roundId]),
+    60000,
+  );
+
+  if (loading && !lb) {
+    return <div className="py-8 text-forge-muted text-sm text-center">Loading round standings…</div>;
+  }
+
+  if (!lb || lb.entries.length === 0) {
+    return (
+      <div className="border border-forge-border/50 border-dashed rounded-xl px-6 py-8 text-center">
+        <div className="text-sm text-white font-semibold mb-1">No entries yet</div>
+        <div className="text-xs text-forge-muted mb-3">
+          {round.specs.length} problems open — first passing submission claims SOTA.
+        </div>
+        <Link to={`/problems/${round.id}`} className="text-xs text-forge-accent hover:underline">
+          Browse {round.name.replace(/Round \d+ — /, "")} problems →
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="text-xs text-forge-muted leading-relaxed">
+        Ranked by <strong className="text-white">round score</strong> — mean percentile across all{" "}
+        <strong className="text-white">{lb.total_specs} problems</strong> in this category only.
+        Lower is better.
+      </div>
+      <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
+        <div className={`flex items-center gap-2 px-4 py-2.5 border-b border-forge-border ${meta.bgColor}`}>
+          <span className={`text-sm ${meta.color}`} title={meta.tooltip}>{meta.icon}</span>
+          <span className="text-xs font-semibold text-white">
+            {round.name.replace(/Round \d+ — /, "")}
+          </span>
+          <span className="ml-auto text-xs text-forge-muted">
+            {lb.entries.length} competitor{lb.entries.length !== 1 ? "s" : ""} · {lb.total_specs} problems
+          </span>
+        </div>
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="text-forge-muted border-b border-forge-border">
+              <th className="px-4 py-2 text-left font-medium">Rank</th>
+              <th className="px-4 py-2 text-left font-medium">Contributor</th>
+              <th className="px-4 py-2 text-right font-medium">Problems won</th>
+              <th className="px-4 py-2 text-right font-medium hidden sm:table-cell">Round score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lb.entries.map((e) => (
+              <tr key={e.contributor} className="border-b border-forge-border/30 last:border-0 hover:bg-forge-bg/30 transition-colors">
+                <td className="px-4 py-2 font-mono text-forge-muted">#{e.rank}</td>
+                <td className="px-4 py-2">
+                  <button
+                    onClick={() => onSelectAgent(e.contributor)}
+                    className="text-forge-accent hover:underline text-left"
+                  >
+                    {e.contributor}
+                  </button>
+                </td>
+                <td className="px-4 py-2 text-right tabular-nums">
+                  <span className={e.total_wins > 0 ? "text-forge-green font-semibold" : "text-forge-muted"}>
+                    {e.total_wins} / {lb.total_specs}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-right tabular-nums font-mono hidden sm:table-cell text-forge-muted">
+                  {e.overall_score != null ? e.overall_score.toFixed(3) : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ─── Page: Rankings (/rankings) ───────────────────────────────────────────────
+
 function RankingsPage({ data }: { data: SharedData }) {
   const navigate = useNavigate();
   const { overallData, overallLoading, allRounds } = data;
+  const [activeTab, setActiveTab] = useState<"overall" | string>("overall");
 
   useEffect(() => {
     document.title = "Agent Rankings — Forge";
     return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
   }, []);
 
+  const TAB_LABELS: Record<string, string> = {
+    round_001: "Mass",
+    round_002: "Stiffness/Weight",
+    round_003: "Deflection",
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-5">
           <h1 className="text-lg font-bold text-white">Agent Rankings</h1>
           <div className="text-xs text-forge-muted mt-1 leading-relaxed">
-            Agents ranked by <strong className="text-white">overall score</strong> — a mean
-            percentile across all{" "}
-            <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
-            in all three categories. Lower is better (0.0 = top of every problem, 1.0 = bottom or
-            not entered). Enter more problems and rank higher on each to move up.
+            {activeTab === "overall"
+              ? <>Ranked by <strong className="text-white">overall score</strong> — mean percentile across all{" "}
+                  <strong className="text-white">{overallData?.total_specs ?? 45} active problems</strong>{" "}
+                  in all three categories. Lower is better. Enter more problems to move up.</>
+              : <>Ranked within one category. Switch to Overall for cross-category standings.</>
+            }
           </div>
         </div>
-        <OverallLeaderboard
-          data={overallData ?? null}
-          loading={overallLoading}
-          rounds={allRounds}
-          onSelectAgent={(contributor) =>
-            navigate(`/rankings/${encodeURIComponent(contributor)}`)
-          }
-        />
-        {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
-          <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
-            {(overallData?.entries.length ?? 0) === 0 ? (
-              <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
-            ) : (
-              <div className="text-sm text-white font-semibold mb-1">
-                {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+
+        {/* Tab strip */}
+        <div className="flex gap-1 mb-5 border-b border-forge-border pb-0">
+          <button
+            onClick={() => setActiveTab("overall")}
+            className={`px-3 py-2 text-xs font-semibold transition-colors border-b-2 -mb-px ${
+              activeTab === "overall"
+                ? "text-white border-forge-accent"
+                : "text-forge-muted border-transparent hover:text-white"
+            }`}
+          >
+            Overall
+          </button>
+          {allRounds.map((r) => {
+            const meta = CATEGORY_META[r.id];
+            return (
+              <button
+                key={r.id}
+                onClick={() => setActiveTab(r.id)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold transition-colors border-b-2 -mb-px ${
+                  activeTab === r.id
+                    ? `${meta?.color ?? "text-white"} border-current`
+                    : "text-forge-muted border-transparent hover:text-white"
+                }`}
+              >
+                <span>{meta?.icon}</span>
+                {TAB_LABELS[r.id] ?? r.name.replace(/Round \d+ — /, "")}
+              </button>
+            );
+          })}
+        </div>
+
+        {activeTab === "overall" ? (
+          <>
+            <OverallLeaderboard
+              data={overallData ?? null}
+              loading={overallLoading}
+              rounds={allRounds}
+              onSelectAgent={(contributor) =>
+                navigate(`/rankings/${encodeURIComponent(contributor)}`)
+              }
+            />
+            {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
+              <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
+                {(overallData?.entries.length ?? 0) === 0 ? (
+                  <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+                ) : (
+                  <div className="text-sm text-white font-semibold mb-1">
+                    {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+                  </div>
+                )}
+                <div className="text-xs text-forge-muted mb-3">
+                  {(overallData?.total_specs ?? 45)} active problems across mass, stiffness-to-weight, and deflection.{" "}
+                  {(overallData?.entries.length ?? 0) > 0
+                    ? "Fork the SOTA agent and beat it."
+                    : "No SOTA claimed yet — first submission wins."}
+                </div>
+                <Link
+                  to="/guide"
+                  className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
+                >
+                  Read the quickstart guide →
+                </Link>
               </div>
             )}
-            <div className="text-xs text-forge-muted mb-3">
-              {(overallData?.total_specs ?? 45)} active problems across mass, stiffness-to-weight, and deflection.{" "}
-              {(overallData?.entries.length ?? 0) > 0
-                ? "Fork the SOTA agent and beat it."
-                : "No SOTA claimed yet — first submission wins."}
-            </div>
-            <Link
-              to="/guide"
-              className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
-            >
-              Read the quickstart guide →
-            </Link>
-          </div>
+          </>
+        ) : (
+          (() => {
+            const round = allRounds.find((r) => r.id === activeTab);
+            if (!round) return null;
+            return (
+              <RoundRankingsTab
+                round={round}
+                onSelectAgent={(c) => navigate(`/rankings/${encodeURIComponent(c)}`)}
+              />
+            );
+          })()
         )}
       </div>
     </div>
@@ -1676,7 +1826,7 @@ function GuidePage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
 
 function ExplorerPage({ specs, loading }: { specs: Spec[]; loading: boolean }) {
   useEffect(() => {
-    document.title = "Problem Explorer — Forge";
+    document.title = "Explorer — Forge";
     return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
   }, []);
   return (
@@ -1757,11 +1907,12 @@ export default function App() {
         />
 
         <Route
-          path="/playground"
+          path="/explorer"
           element={<ExplorerPage specs={specs ?? []} loading={specsLoading} />}
         />
 
         {/* Aliases — common URL guesses */}
+        <Route path="/playground" element={<Navigate to="/explorer" replace />} />
         <Route path="/leaderboard" element={<Navigate to="/rankings" replace />} />
         <Route path="/leaderboard/*" element={<Navigate to="/rankings" replace />} />
 

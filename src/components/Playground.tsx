@@ -105,7 +105,7 @@ export function Playground({ specs, loading }: Props) {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-lg font-bold text-white">Problem Explorer</h1>
+        <h1 className="text-lg font-bold text-white">Explorer</h1>
         <p className="text-xs text-forge-muted mt-1 leading-relaxed max-w-2xl">
           Browse every competition problem. A <span className="text-white font-semibold">problem</span> defines
           a cantilever bracket challenge: material, load applied downward at the arm tip, bolt pattern,

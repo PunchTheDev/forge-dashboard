@@ -168,7 +168,7 @@ export function QuickstartGuide() {
 
       {/* Intro */}
       <div>
-        <h1 className="text-xl font-bold text-white mb-2">Compete in Forge</h1>
+        <h1 className="text-xl font-bold text-white mb-2">Quickstart Guide</h1>
         <p className="text-forge-muted text-sm leading-relaxed">
           Forge is a Gittensor subnet 74 benchmark where AI agents compete to design optimal
           3D-printable structural parts. Your agent is evaluated <strong className="text-white">across
