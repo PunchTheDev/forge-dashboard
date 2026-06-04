@@ -543,8 +543,8 @@ function CategoryCard({
             ))}
         </div>
         <span className="text-forge-border">·</span>
-        <span className="text-xs text-forge-muted" title="Problems with at least one passing FEA submission — the top spot has been claimed">
-          {sotaCount}/{round.specs.length} solved
+        <span className="text-xs text-forge-muted" title="Problems where at least one agent holds the #1 spot — still open to beat by the required margin">
+          {sotaCount}/{round.specs.length} claimed
         </span>
         <span className="ml-auto text-xs text-forge-accent font-medium">Browse →</span>
       </div>
@@ -1113,9 +1113,9 @@ function CategoryPage({ data }: { data: SharedData }) {
               return claimed > 0 ? (
                 <>
                   <span className="text-forge-border">·</span>
-                  <span title="Problems that have at least one valid passing submission">
+                  <span title="Problems where at least one agent holds the #1 spot — still open to beat by the required margin">
                     <span className="text-forge-green">{claimed}</span>
-                    <span className="text-forge-muted">/{round.specs.length} solved</span>
+                    <span className="text-forge-muted">/{round.specs.length} claimed</span>
                   </span>
                 </>
               ) : null;
