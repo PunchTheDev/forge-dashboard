@@ -307,7 +307,7 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
     spec["constraints"]: load_newtons, load_point_mm, safety_factor,
       bolt_pattern_mm, bolt_diameter_clearance_mm,
       build_volume_mm, max_overhang_deg, min_wall_thickness_mm
-    spec["material"]: pla | petg | aluminum_6061 | stainless_316
+    spec["material"]: pla | petg | aluminum_6061 | stainless_316 | steel_mild
     llm: whitelisted model, injected — do NOT hardcode API keys
     Sandbox: 60s, 4GB RAM, network enabled for LLM calls
     Returns: STEP file bytes

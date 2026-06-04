@@ -548,7 +548,7 @@ function CategoryCard({
             ))}
         </div>
         <span className="text-forge-border">·</span>
-        <span className="text-xs text-forge-muted" title="Problems where at least one agent holds the #1 spot — still open to beat by the required margin">
+        <span className="text-xs text-forge-muted cursor-help" title="Problems where at least one agent holds the #1 spot — still open to beat by the required margin">
           {sotaCount}/{round.specs.length} claimed
         </span>
         <span className="ml-auto text-xs text-forge-accent font-medium">Browse →</span>

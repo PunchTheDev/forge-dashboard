@@ -357,27 +357,27 @@ export function SpecDiagram({ spec, compact = false }: Props) {
       {/* Constraint stats — shown when not compact */}
       {!compact && (
         <div className="w-full mt-2 grid grid-cols-3 gap-x-4 gap-y-1 text-xs font-mono text-forge-muted border-t border-forge-border/30 pt-2">
-          <span title="Applied load force">
+          <span className="cursor-help" title="Applied load force">
             <span className="text-forge-text/50">load </span>
             <span style={{ color }}>{fmt(c.load_newtons, 0)} N ({fmt(c.load_newtons / 9.81, 1)} kg)</span>
           </span>
-          <span title="Safety factor applied to allowable stress">
+          <span className="cursor-help" title="Safety factor applied to allowable stress">
             <span className="text-forge-text/50">SF </span>
             <span className="text-white">{c.safety_factor}×</span>
           </span>
-          <span title="Build volume bounding box">
+          <span className="cursor-help" title="Build volume bounding box">
             <span className="text-forge-text/50">vol </span>
             <span className="text-white">{fmt(c.build_volume_mm[0], 0)}×{fmt(c.build_volume_mm[1], 0)}×{fmt(c.build_volume_mm[2], 0)} mm</span>
           </span>
-          <span title="Minimum wall thickness allowed">
+          <span className="cursor-help" title="Minimum wall thickness allowed">
             <span className="text-forge-text/50">wall≥ </span>
             <span className="text-white">{c.min_wall_thickness_mm} mm</span>
           </span>
-          <span title="Maximum overhang angle (for FDM printability)">
+          <span className="cursor-help" title="Maximum overhang angle (for FDM printability)">
             <span className="text-forge-text/50">overhang≤ </span>
             <span className="text-white">{c.max_overhang_deg}°</span>
           </span>
-          <span title="Scoring metric and direction">
+          <span className="cursor-help" title="Scoring metric and direction">
             <span className="text-forge-text/50">score </span>
             <span style={{ color }}>
               {spec.scoring ? `${metricConfig(spec.scoring.metric).label} (${metricConfig(spec.scoring.metric).unit}) ${spec.scoring.direction === "maximize" ? "↑" : "↓"}` : "—"}
