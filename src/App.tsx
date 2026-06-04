@@ -603,6 +603,11 @@ function CompactSpecTable({
             key={t}
             onClick={() => { onTierChange(t); setUnclaimedOnly(false); }}
             className={`px-2.5 py-1 rounded-lg transition-colors capitalize ${selectedTier === t && !unclaimedOnly ? `${TIER_COLORS[t]} font-semibold bg-forge-surface` : "text-forge-muted hover:text-white"}`}
+            title={
+              t === "easy" ? "Easy: lighter loads, more generous build volume and tolerances — good for initial testing" :
+              t === "medium" ? "Medium: moderate load and constraints — representative of real-world bracket design" :
+              "Hard: heavy load, tight tolerances — pushes structural limits and requires careful topology"
+            }
           >
             {t}
           </button>
