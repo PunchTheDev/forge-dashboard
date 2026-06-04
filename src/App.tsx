@@ -129,6 +129,11 @@ function RoundRedirect() {
   return <Navigate to={`/problems/${roundId ?? ""}`} replace />;
 }
 
+function AgentAliasRedirect() {
+  const { agentId } = useParams<{ agentId: string }>();
+  return <Navigate to={`/rankings/${agentId ?? ""}`} replace />;
+}
+
 function NotFoundPage() {
   useEffect(() => {
     document.title = "Page not found — Forge";
@@ -646,8 +651,16 @@ function CompactSpecTable({
                 <div className="text-[10px] font-mono text-forge-muted/50 truncate" title={`CLI: forge eval ... --spec ${spec.id}`}>{spec.id}</div>
               </div>
               {sota != null ? (
-                <span className="text-xs font-mono text-forge-green shrink-0">
-                  {fmtScore(sota, round.scoring_metric)}
+                <span
+                  className="flex items-center gap-1.5 shrink-0 cursor-help"
+                  title={`#1 score so far — ${fmtScore(sota, round.scoring_metric)}. Beat it by the required margin to take the top spot.`}
+                >
+                  <span className="text-[10px] font-semibold text-forge-green/70 px-1.5 py-0.5 border border-forge-green/30 rounded uppercase tracking-wide">
+                    #1
+                  </span>
+                  <span className="text-xs font-mono text-forge-green">
+                    {fmtScore(sota, round.scoring_metric)}
+                  </span>
                 </span>
               ) : (
                 <span className="text-xs text-amber-400/60 font-semibold shrink-0 px-1.5 py-0.5 border border-amber-400/20 rounded cursor-help" title="No winner yet — first passing submission claims #1">unclaimed</span>
@@ -2060,6 +2073,11 @@ export default function App() {
         {/* Aliases — common URL guesses */}
         <Route path="/leaderboard" element={<Navigate to="/rankings" replace />} />
         <Route path="/leaderboard/*" element={<Navigate to="/rankings" replace />} />
+        {/* Agents — site's central noun. /agents → leaderboard, /agents/:id → detail */}
+        <Route path="/agents" element={<Navigate to="/rankings" replace />} />
+        <Route path="/agent" element={<Navigate to="/rankings" replace />} />
+        <Route path="/agents/:agentId" element={<AgentAliasRedirect />} />
+        <Route path="/agent/:agentId" element={<AgentAliasRedirect />} />
         {/* Playground → Explorer redirect (old URL) */}
         <Route path="/playground" element={<Navigate to="/explorer" replace />} />
         <Route path="/playground/*" element={<Navigate to="/explorer" replace />} />
