@@ -314,7 +314,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                   const { label, unit, decimals } = metricConfig(selectedSpec.scoring.metric);
                   return (
                     <div className="flex justify-between">
-                      <span className="text-forge-muted cursor-help" title="Score from the maintainer's baseline agent, set offline when this problem was designed. Your goal is to beat the current SOTA, not this seed — but it shows the expected difficulty level.">Baseline agent {label.toLowerCase()}</span>
+                      <span className="text-forge-muted cursor-help" title="Score from the maintainer's baseline agent, set offline when this problem was designed. Your goal is to beat the current SOTA, not this reference — but it shows the expected difficulty level.">Baseline agent {label.toLowerCase()}</span>
                       <span className="text-white">{bl.toFixed(decimals)} {unit}</span>
                     </div>
                   );
