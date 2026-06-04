@@ -520,11 +520,18 @@ function CompactSpecTable({
   const roundSpecIds = new Set(round.specs.map((s) => s.id));
   const tierMap = Object.fromEntries(round.specs.map((s) => [s.id, s.tier]));
 
-  const visibleSpecs = specs.filter((s) => {
-    if (!roundSpecIds.has(s.id)) return false;
-    if (selectedTier && tierMap[s.id] !== selectedTier) return false;
-    return true;
-  });
+  const TIER_ORDER: Record<string, number> = { easy: 0, medium: 1, hard: 2 };
+  const visibleSpecs = specs
+    .filter((s) => {
+      if (!roundSpecIds.has(s.id)) return false;
+      if (selectedTier && tierMap[s.id] !== selectedTier) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const ta = TIER_ORDER[tierMap[a.id] ?? ""] ?? 3;
+      const tb = TIER_ORDER[tierMap[b.id] ?? ""] ?? 3;
+      return ta !== tb ? ta - tb : a.id.localeCompare(b.id);
+    });
 
   const tiers = ["easy", "medium", "hard"].filter((t) => round.specs.some((s) => s.tier === t));
 
@@ -984,9 +991,9 @@ function CategoryPage({ data }: { data: SharedData }) {
               <div className="text-xs text-forge-muted font-mono uppercase tracking-wider mb-0.5">
                 {round.name.match(/Round \d+/)?.[0] ?? round.id}
               </div>
-              <div className="text-lg font-bold text-white">
+              <h1 className="text-lg font-bold text-white">
                 {round.name.replace(/Round \d+ — /, "")}
-              </div>
+              </h1>
             </div>
           </div>
           <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-xl">
