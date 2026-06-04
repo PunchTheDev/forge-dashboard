@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore } from "../lib/api";
+import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore, SotaRecord, sotaCodeUrl } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
 
@@ -135,9 +135,10 @@ interface Props {
   specs: Spec[];
   loading?: boolean;
   sotaBySpec?: Record<string, number>;
+  sotaRecordsBySpec?: Record<string, SotaRecord>;
 }
 
-export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
+export function Playground({ specs, loading, sotaBySpec = {}, sotaRecordsBySpec = {} }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedSpecId, setSelectedSpecId] = useState<string>(searchParams.get("spec") ?? "");
   const [search, setSearch] = useState("");
@@ -356,6 +357,57 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                   <span className="text-forge-accent text-xs">→</span>
                 </Link>
               )}
+
+              {/* Current #1 — fork the leader (or claim #1 if unclaimed). The fastest path
+                  to compete is to fork the SOTA agent and beat it by ≥0.5%. */}
+              {(() => {
+                const sota = sotaRecordsBySpec[selectedSpec.id];
+                if (sota) {
+                  const { unit, label: metricLabel } = metricConfig(selectedSpec.scoring.metric);
+                  return (
+                    <div className="mb-3 px-3 py-2 bg-forge-accent/5 border border-forge-accent/30 rounded-lg">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[10px] uppercase tracking-wide text-forge-accent font-semibold">Current #1 — fork to beat</div>
+                          <div className="text-xs text-white mt-0.5 truncate">
+                            <Link
+                              to={`/rankings/${sota.contributor}`}
+                              className="font-semibold hover:text-forge-accent transition-colors"
+                              title={`View ${sota.contributor}'s submissions`}
+                            >
+                              {sota.contributor}
+                            </Link>
+                            <span className="text-forge-muted"> · </span>
+                            <span className="font-mono text-forge-green">{fmtScore(sota.score, sota.score_metric)}</span>
+                            <span className="text-forge-muted ml-1">({metricLabel.toLowerCase()})</span>
+                          </div>
+                        </div>
+                        <a
+                          href={sotaCodeUrl(sota)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 text-[11px] px-2 py-1 rounded border border-forge-accent/50 text-forge-accent hover:bg-forge-accent/10 transition-colors font-semibold"
+                          title={`Open ${sota.agent} at commit ${sota.commit_hash.slice(0, 7)} on GitHub — copy, modify, resubmit. Beat by ≥0.5% to claim #1.`}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          ↗ fork code
+                        </a>
+                      </div>
+                      <div className="text-[10px] text-forge-muted mt-1">
+                        Copy the winning agent, iterate, beat by ≥0.5% in {selectedSpec.scoring.direction === "minimize" ? "lower" : "higher"} {unit} to claim #1.
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="mb-3 px-3 py-2 bg-amber-400/5 border border-amber-400/30 rounded-lg">
+                    <div className="text-[10px] uppercase tracking-wide text-amber-400 font-semibold">Unclaimed</div>
+                    <div className="text-xs text-white mt-0.5">
+                      No submissions yet — first passing design claims #1 and becomes the fork target for everyone after.
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Constraints explained in plain language */}
               <div className="text-xs font-semibold text-forge-muted uppercase tracking-wide mb-2">Constraints</div>
