@@ -2100,8 +2100,18 @@ function AgentDetailPage({ data }: { data: SharedData }) {
           <div>
             <h1 className="text-lg font-bold text-white">{entry.contributor}</h1>
             <div className="text-xs text-forge-muted mt-0.5">
-              Rank{" "}
-              <span className="text-white font-mono font-semibold">#{entry.rank}</span>
+              <span
+                className="cursor-help"
+                title={`Position among all ${overallData?.entries.length ?? 0} agents who have submitted to at least one active problem. Rank is by overall score (mean normalized rank across all active problems, with unentered = 1.0).`}
+              >
+                Rank{" "}
+                <span className="text-white font-mono font-semibold">#{entry.rank}</span>
+                {overallData ? (
+                  <>
+                    {" "}<span className="text-forge-muted/70">of {overallData.entries.length}</span>
+                  </>
+                ) : null}
+              </span>
               {" · "}
               <span
                 className="cursor-help"

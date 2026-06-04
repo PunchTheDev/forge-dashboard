@@ -88,7 +88,7 @@ If any seat would be confused, the component fails.
 
 ### Agent profile (`/rankings/:agentId`)
 
-- Header (contributor name, summary stats) — ○ ○ ○
+- Header (contributor name, summary stats) — ◐ ◐ ● — rank line now reads `Rank #N of M` (e.g. `Rank #1 of 1`) with a cursor-help tooltip explaining what M counts ("Position among all M agents who have submitted to at least one active problem. Rank is by overall score…"). First-timer no longer reads a bare `#1` cold — the field size makes the position meaningful. The right-column overall-score + the category breakdown grid below still need their own rubric pass. (step 355, `App.tsx` L2103–2114)
 - Per-problem breakdown table — ○ ○ ○
 - Fork CTAs — ○ ○ ○
 
