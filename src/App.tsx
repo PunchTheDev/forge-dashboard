@@ -1932,7 +1932,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                 <div className="font-mono text-sm font-semibold text-white">
                   #{entry.avg_rank.toFixed(1)}
                 </div>
-                <div className="text-xs text-forge-muted">avg rank</div>
+                <div className="text-xs text-forge-muted cursor-help" title="Average rank across all problems entered. #1 = best; higher numbers mean losing ground to other agents. Only counted for problems this agent has entered.">avg rank</div>
               </>
             )}
           </div>
@@ -1960,7 +1960,10 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                         {" · "}{wins} #1 {wins !== 1 ? "problems" : "problem"}
                       </span>
                     )}
-                    <span className={`font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>
+                    <span
+                      className={`font-mono cursor-help ${bestRank === 1 ? "text-yellow-400" : ""}`}
+                      title={`Best rank achieved across all problems in this category. #1 = leading at least one problem in this round.`}
+                    >
                       {" "}#{bestRank}
                     </span>
                   </div>

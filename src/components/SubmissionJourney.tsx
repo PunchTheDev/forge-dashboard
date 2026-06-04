@@ -174,7 +174,10 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
                 <span className="text-sm text-forge-muted ml-1">{scoreUnit}</span>
               </div>
               {baselinePct != null && baseline != null && (
-                <div className="text-xs text-forge-muted mt-0.5">
+                <div
+                  className="text-xs text-forge-muted mt-0.5 cursor-help"
+                  title={`vs. maintainer's baseline = compared to the reference design the problem author submitted. This is context only — your goal is to beat the current #1, not the baseline. Baseline: ${baseline.toFixed(decimals)} ${scoreUnit}.`}
+                >
                   {baselinePct}% vs. maintainer's baseline ({baseline.toFixed(decimals)} {scoreUnit})
                 </div>
               )}
@@ -205,7 +208,10 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
 
             {/* vs SOTA */}
             {sota && sotaScore != null && (
-              <div className={`text-sm font-mono font-bold ${beatsSOTA ? "text-forge-green" : "text-forge-muted"}`}>
+              <div
+                className={`text-sm font-mono font-bold cursor-help ${beatsSOTA ? "text-forge-green" : "text-forge-muted"}`}
+                title={`Gap to #1 on this problem. ${isMaximize ? "Higher is better — a positive gap means this submission beats the current leader." : "Lower is better — a negative gap means this submission beats the current leader."} Current #1: ${sotaScore.toFixed(decimals)} ${scoreUnit}.`}
+              >
                 {beatsSOTA
                   ? `${isMaximize ? "+" : "−"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs #1`
                   : `${isMaximize ? "−" : "+"}${Math.abs(vsSOTA!).toFixed(decimals)} ${scoreUnit} vs #1 (${sotaScore.toFixed(decimals)} ${scoreUnit})`}
