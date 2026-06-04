@@ -95,7 +95,7 @@ If any seat would be confused, the component fails.
 ### Explorer (`/explorer`)
 
 - Page intro — ● ◐ ◐ — defines "problem" but mixes with "spec" elsewhere on the site.
-- `Browse Problems` panel — ● ● ◐ — material/tier filters work; row labels (`PETG · 15 kg load · 78mm arm`) need literacy.
+- `Browse Problems` panel — ● ● ● — material/tier filters work; row buttons now carry a `title=` tooltip on hover that names the problem in plain English using the spec-detail header's canonical phrasing: `"r01_001_easy — a PETG bracket that must hold 15 kg pulling straight down at the tip of a 78 mm cantilever arm. Click to load constraints + 3D viewer."` Arm length sourced from `load_point_mm[0]` (same field HeroStats uses, NOT `build_volume_mm[0]`) so the tooltip and the spec-detail prose agree on the number. (`Playground.tsx` L303–311)
 - `Constraints` card (material / load / arm / SF / build volume / bolts / optimize) — ● ● ● — Safety factor row now reads `1.5× (≤{computed} MPa max stress)` so the abstract multiplier resolves to the concrete stress ceiling a designer reasons about. Allowable pulled from `allowableStress(spec)` (material-aware: PETG → 27 MPa, harder PLA-based spec → 33 MPa). Tooltip rewritten to spell the division: "Yield stress ÷ 1.5 = 27 MPa max allowable stress." (`Playground.tsx` L448–457)
 - `Eval Command` panel — ● ● ● — copy-pasteable, well annotated.
 - `Sample Eval Output` panel — ● ● ●
