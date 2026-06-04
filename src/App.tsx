@@ -659,7 +659,9 @@ function SidebarSpecList({
                         {fmtScore(sota, round.scoring_metric)}
                       </span>
                     ) : (
-                      <span className="shrink-0 text-forge-border text-xs">—</span>
+                      <span className="shrink-0 text-forge-accent/50 text-xs font-semibold" title="No SOTA claimed yet — first passing submission wins">
+                        open
+                      </span>
                     )}
                   </button>
                 );
