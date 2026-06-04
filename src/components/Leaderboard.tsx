@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Submission, Spec, allowableStress, metricConfig, specBaseline } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -72,9 +73,9 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
       {ranked.length === 0 && (
         <div className="px-4 py-8 text-center text-forge-muted text-sm">
           No passing submissions yet —{" "}
-          <a href="/guide" className="text-forge-accent hover:underline">
+          <Link to="/guide" className="text-forge-accent hover:underline">
             read the guide
-          </a>{" "}
+          </Link>{" "}
           and claim #1.
         </div>
       )}
