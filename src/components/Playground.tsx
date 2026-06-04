@@ -230,7 +230,17 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
             {loading && specs.length === 0 ? (
               <div className="text-forge-muted text-xs py-3 text-center">Loading problems…</div>
             ) : filteredSpecs.length === 0 ? (
-              <div className="text-forge-muted text-xs py-3 text-center">No matches</div>
+              <div className="text-forge-muted text-xs py-3 text-center">
+                No matches
+                <div className="mt-1">
+                  <button
+                    onClick={() => { setSearch(""); setCategoryFilter(null); setOpenOnly(false); }}
+                    className="text-forge-accent hover:underline text-[11px]"
+                  >
+                    reset filters
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
                 {filteredSpecs.map((s) => {
