@@ -194,11 +194,11 @@ function Header() {
     <header className="border-b border-forge-border bg-forge-bg">
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link to="/problems" className="text-forge-accent font-bold text-sm tracking-wide">
+          <Link to="/" className="text-forge-accent font-bold text-sm tracking-wide">
             FORGE
           </Link>
           <span className="text-forge-border">|</span>
-          <NavLink to="/problems" label="Problems" />
+          <NavLink to="/problems" label="Home" />
           <NavLink to="/rankings" label="Rankings" />
           <NavLink to="/explorer" label="Explorer" />
           <NavLink to="/guide" label="Guide" />
