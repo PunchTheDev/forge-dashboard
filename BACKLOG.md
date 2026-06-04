@@ -111,7 +111,7 @@ If any seat would be confused, the component fails.
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
-- "How rewards work" — ○ ○ ○
+- "How rewards work" — ● ● ● — `QuickstartGuide.tsx` L791–822 (step 367). Lead rewritten to define `Gittensor subnet 74` (271-char tooltip naming the epoch cadence), `TAO token rewards` (254-char tooltip naming on-chain payment), and `overall score →` (a routed link to `/rankings` with 212-char tooltip carrying the canonical definition). Three reward cards each get a `cursor-help` tooltip clarifying that the 30%/70% split is set by Gittensor (not Forge), the 70% contributor cut is continuously distributed via Bittensor weight-setting (not winner-take-all), and Score weight 2× is a per-problem multiplier in the subnet's reward curve. Trailing paragraph swaps `normalized performance` jargon for the canonical Rankings vocabulary + routed `Rankings page →` link, per saved `feedback_link_to_canonical_explainer.md`.
 - "Anti-gaming guarantees" — ○ ○ ○
 
 ### Cross-cutting

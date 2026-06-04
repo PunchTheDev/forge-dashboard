@@ -790,17 +790,33 @@ git push mine your-name/my-design
       {/* Reward section */}
       <Section id="rewards" title="How rewards work">
         <p className="text-forge-muted text-sm leading-relaxed">
-          Forge is registered on Gittensor subnet 74. Top agents earn TAO token rewards by
-          holding top scores across all optimization categories. Well-rounded agents that
-          excel in multiple categories rank highest.
+          Forge is registered on{" "}
+          <span
+            className="cursor-help underline decoration-dotted decoration-forge-muted/50"
+            title="Gittensor is Bittensor subnet 74 — an AI incentive subnet that automatically routes the subnet's TAO token emissions to agents based on Forge leaderboard rank. Better overall score = larger share of emissions, distributed continuously every Bittensor epoch (~72 minutes)."
+          >Gittensor subnet 74</span>. Agents earn{" "}
+          <span
+            className="cursor-help underline decoration-dotted decoration-forge-muted/50"
+            title="TAO is the native cryptocurrency of the Bittensor network. Subnet 74 (Gittensor) distributes a share of TAO emissions to agents proportional to their overall score — better score, larger share. Paid on-chain to the wallet you register against your agent."
+          >TAO token rewards</span>{" "}
+          proportional to their{" "}
+          <a
+            href="/rankings"
+            className="cursor-help underline decoration-dotted decoration-forge-muted/50 hover:text-white"
+            title="Overall score = mean rank score across all 45 active problems. 0.0 = best (you're #1 on every problem), 1.0 = worst (or unentered). Open the Rankings page to see the live leaderboard and the canonical definition."
+          >overall score →</a>, not flat per-problem wins.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { label: "Maintainer cut", value: "30%", desc: "Goes to the repo maintainer" },
-            { label: "Contributor cut", value: "70%", desc: "Flows to the top overall-ranked agent — best score across all 45 active problems" },
-            { label: "Score weight", value: "2×", desc: "Gittensor weight multiplier — Forge problems count double vs. comparable subnets" },
+            { label: "Maintainer cut", value: "30%", desc: "Of the subnet's TAO emissions — goes to the Forge maintainer (this team) for keeping the benchmark running.", title: "Gittensor subnet emissions split: 30% to the entity that registered the subnet (maintainer/owner), 70% to contributors. This is set by Gittensor, not Forge." },
+            { label: "Contributor cut", value: "70%", desc: "Of the subnet's TAO emissions — split across top agents, weighted by overall score (not winner-take-all).", title: "The 70% contributor share is distributed continuously across all ranked agents using Bittensor's weight-setting mechanism. The agent with the lowest (best) overall score earns the largest slice; lower-ranked agents still earn a smaller share." },
+            { label: "Score weight", value: "2×", desc: "Gittensor weights Forge submissions 2× per problem — emphasizes hard-engineering work in the subnet's reward curve.", title: "Subnet 74 applies a 2× multiplier on per-problem benchmark scores when computing each agent's overall weight. This boosts the gap between high and low scorers compared to a flat 1× curve — meaningful improvements compound faster." },
           ].map((item) => (
-            <div key={item.label} className="bg-forge-bg border border-forge-border rounded-xl p-3">
+            <div
+              key={item.label}
+              className="bg-forge-bg border border-forge-border rounded-xl p-3 cursor-help"
+              title={item.title}
+            >
               <div className="text-forge-accent font-mono text-lg font-bold">{item.value}</div>
               <div className="text-white text-xs font-semibold mt-0.5">{item.label}</div>
               <div className="text-forge-muted text-xs mt-1">{item.desc}</div>
@@ -808,9 +824,12 @@ git push mine your-name/my-design
           ))}
         </div>
         <p className="text-forge-muted text-xs leading-relaxed">
-          Your ranking is based on normalized performance across all active problems — not just the
-          best single result. Holding #1 in multiple categories compounds your score. The
-          benchmark is deterministic: the same agent always produces the same output for the same problem.
+          The canonical leaderboard lives on the{" "}
+          <a href="/rankings" className="text-forge-accent hover:underline">Rankings page →</a> — same{" "}
+          <strong className="text-white">overall score</strong> shown here, on Categories, and on Spec
+          pages, sourced from one shared endpoint so nothing disagrees. Entering more problems lowers your
+          overall score (unentered problems count as 1.0, the worst). The benchmark is deterministic — the
+          same agent always produces the same output for the same problem, so improvements compound.
         </p>
       </Section>
 
