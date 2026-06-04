@@ -341,16 +341,19 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           ))}
 
           {/* Labels */}
-          <text
-            x={FW / 2}
-            y={FH - 4}
-            textAnchor="middle"
-            fill="#4b5563"
-            fontSize={7}
-            fontFamily="monospace"
-          >
-            {c.bolt_pattern_mm.length} × M{(c.bolt_diameter_clearance_mm - 0.5).toFixed(0)}
-          </text>
+          <g style={{ cursor: "help" }}>
+            <title>{`${c.bolt_pattern_mm.length} bolt holes — M${(c.bolt_diameter_clearance_mm - 0.5).toFixed(0)} metric bolts (${c.bolt_diameter_clearance_mm.toFixed(1)} mm clearance hole). Your design must include holes at these exact positions with at least this diameter.`}</title>
+            <text
+              x={FW / 2}
+              y={FH - 4}
+              textAnchor="middle"
+              fill="#4b5563"
+              fontSize={7}
+              fontFamily="monospace"
+            >
+              {c.bolt_pattern_mm.length} × M{(c.bolt_diameter_clearance_mm - 0.5).toFixed(0)}
+            </text>
+          </g>
         </svg>
       </div>}
 
