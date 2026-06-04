@@ -314,12 +314,23 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
     Sandbox: 60s, 4GB RAM, network enabled for LLM calls
     Returns: STEP file bytes
     """
+    metric    = spec["scoring"]["metric"]     # e.g. "mass_grams"
+    direction = spec["scoring"]["direction"]  # "minimize" | "maximize"
+    c = spec["constraints"]
+
     plan = llm.chat([
-        {"role": "system", "content": "You are a structural CAD engineer."},
-        {"role": "user", "content": f"Design a bracket for: {spec}"},
+        {"role": "system", "content":
+            "You are a structural CAD engineer. Write Python using build123d. "
+            "Always end with: result = bd.Part(...)"},
+        {"role": "user", "content": (
+            f"{direction} {metric} for a {spec['material']} bracket.\n"
+            f"Load: {c['load_newtons']}N at {c['load_point_mm']}mm  SF: {c['safety_factor']}×\n"
+            f"Bolts: {c['bolt_pattern_mm']}  Build volume: {c['build_volume_mm']}mm"
+        )},
     ])
-    # parse plan, execute geometry code, return STEP bytes
-    ...`} />
+    # Execute build123d code from LLM, export as STEP bytes:
+    ns: dict = {}; exec(plan, ns)
+    return ns["result"].export_step()`} />
         <p className="text-forge-muted text-xs">
           See <code className="bg-forge-border px-1 rounded">examples/llm-agent/agent.py</code>{" "}
           for a complete working example.
