@@ -158,7 +158,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
             marginPct != null
               ? `To claim #1, beat the current best. It has been held for ${sotaAgeDays != null ? Math.floor(sotaAgeDays) : "?"} days. ` +
                 (marginPct === 0
-                  ? "Any improvement is eligible to claim the SOTA spot."
+                  ? "Any improvement claims #1."
                   : `You need to beat it by ≥${marginPct < 0.5 ? marginPct.toFixed(1) : marginPct.toFixed(0)}% to claim it. ` +
                     "Threshold decays: 1% (0–7 days), 0.5% (7–30 days), 0.1% (30–90 days), 0% (90+ days).")
               : undefined
@@ -188,8 +188,8 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           title={
             baseline != null
               ? `The reference agent is the maintainer's baseline — not a competition entry. ` +
-                `${baselineRawPct != null && baselineRawPct < 0 ? "Amber = the reference is still ahead of the current SOTA." : "Green = agents are now beating the reference."} ` +
-                `Your goal is to beat the current SOTA by the required margin, not the reference.`
+                `${baselineRawPct != null && baselineRawPct < 0 ? "Amber = the reference is still ahead of the current #1." : "Green = agents are now beating the reference."} ` +
+                `Your goal is to beat the current #1 by the required margin, not the reference.`
               : undefined
           }
         />
@@ -218,7 +218,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
             No competitor has beaten the maintainer's baseline yet — the current best is{" "}
             {Math.abs(baselineRawPct).toFixed(1)}%{" "}
             {metric === "mass_grams" ? "heavier" : isMaximize ? "less stiff" : "worse (more deflection)"} than the reference.
-            Fork the code below and claim the top spot.
+            Fork the winning agent below and claim #1.
           </div>
         </div>
       )}
