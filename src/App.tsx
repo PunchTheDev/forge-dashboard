@@ -982,7 +982,7 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
           <tr className="text-forge-muted border-b border-forge-border">
             <th className="px-4 py-1.5 text-left font-medium">Rank</th>
             <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
-            <th className="px-4 py-1.5 text-right font-medium cursor-help" title="Problems where this agent holds the best score (State Of The Art — the #1 submission). SOTA = current record-holder.">#1 problems</th>
+            <th className="px-4 py-1.5 text-right font-medium cursor-help" title="Problems where this agent currently holds the #1 spot — the best score on record.">#1 problems</th>
             <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Score <span className="text-forge-muted/60 font-normal">(↓ 0 best)</span></th>
           </tr>
         </thead>
