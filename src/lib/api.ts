@@ -188,6 +188,7 @@ export const MATERIAL_META: Record<string, { label: string; density: string; not
   petg:          { label: "PETG",         density: "1.27 g/cm³", note: "FDM plastic — tougher than PLA, food-safe" },
   aluminum_6061: { label: "Al 6061-T6",   density: "2.70 g/cm³", note: "Machined aluminum — lightweight, high strength" },
   stainless_316: { label: "SS 316",       density: "7.99 g/cm³", note: "Stainless steel — heaviest, corrosion-resistant" },
+  steel_mild:    { label: "Mild Steel",   density: "7.85 g/cm³", note: "Carbon steel — heavy, high yield strength" },
 };
 
 async function get<T>(path: string): Promise<T> {
