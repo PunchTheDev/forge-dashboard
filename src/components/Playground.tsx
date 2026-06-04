@@ -3,7 +3,6 @@ import { useSearchParams, Link } from "react-router-dom";
 import { Spec, API_BASE_URL, metricConfig, specBaseline, specLabel, MATERIAL_META, fmtScore } from "../lib/api";
 import { SpecDiagram } from "./SpecDiagram";
 
-const FORGE_REPO = "https://github.com/PunchTheDev/forge";
 
 /** Build a sample eval output block tailored to the selected spec's scoring metric. */
 function buildSampleOutput(spec: Spec | null): string {
@@ -77,6 +76,58 @@ function EvalCommandBox({ command }: { command: string }) {
         {copied ? "copied ✓" : "copy"}
       </button>
     </div>
+  );
+}
+
+function QuickStartBlock({ evalCommand, apiBase }: { evalCommand: string; apiBase: string }) {
+  const [copied, setCopied] = useState(false);
+  const fullScript = [
+    `# 1. clone the repo`,
+    `git clone https://github.com/PunchTheDev/forge && cd forge && pip install -e .`,
+    ``,
+    `# 2. scaffold your agent`,
+    `forge new my-agent`,
+    ``,
+    `# 3. run eval (Docker builds the sandbox)`,
+    evalCommand,
+    ``,
+    `# 4. see open problems via API`,
+    `curl '${apiBase}/specs?active=true&unclaimed=true'`,
+  ].join("\n");
+
+  return (
+    <>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm font-semibold text-white">Quick Start</div>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(fullScript);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          }}
+          className="text-[10px] px-2 py-0.5 rounded border border-forge-border bg-forge-bg text-forge-muted hover:text-white hover:border-forge-accent/50 transition-colors"
+          title="Copy all setup commands to clipboard"
+        >
+          {copied ? "copied ✓" : "copy all"}
+        </button>
+      </div>
+      <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
+        <div><span className="text-forge-muted"># 1. clone the repo</span></div>
+        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone https://github.com/PunchTheDev/forge && cd forge && pip install -e .</span></div>
+        <div className="mt-2"><span className="text-forge-muted"># 2. scaffold your agent</span></div>
+        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge new my-agent</span></div>
+        <div className="mt-2"><span className="text-forge-muted"># 3. run eval (Docker builds the sandbox)</span></div>
+        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
+        <div className="mt-2"><span className="text-forge-muted"># 4. see open problems via API</span></div>
+        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{"curl '" + apiBase + "/specs?active=true&unclaimed=true'"}</span></div>
+      </div>
+      <div className="mt-3 text-xs text-forge-muted">
+        Full guide:{" "}
+        <Link to="/guide" className="text-forge-accent hover:underline">Forge Guide →</Link>
+        {" · "}
+        Results are written to <code className="text-forge-accent">.forge/results/</code>
+      </div>
+    </>
   );
 }
 
@@ -403,23 +454,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
 
           {/* Quick-start */}
           <div className="bg-forge-surface border border-forge-border rounded-xl p-4">
-            <div className="text-sm font-semibold text-white mb-2">Quick Start</div>
-            <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
-              <div><span className="text-forge-muted"># 1. clone the repo</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone {FORGE_REPO} && cd forge && pip install -e .</span></div>
-              <div className="mt-2"><span className="text-forge-muted"># 2. scaffold your agent</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge new my-agent</span></div>
-              <div className="mt-2"><span className="text-forge-muted"># 3. run eval (Docker builds the sandbox)</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
-              <div className="mt-2"><span className="text-forge-muted"># 4. see open problems via API</span></div>
-              <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{"curl '" + API_BASE_URL + "/specs?active=true&unclaimed=true'"}</span></div>
-            </div>
-            <div className="mt-3 text-xs text-forge-muted">
-              Full guide:{" "}
-              <Link to="/guide" className="text-forge-accent hover:underline">Forge Guide →</Link>
-              {" · "}
-              Results are written to <code className="text-forge-accent">.forge/results/</code>
-            </div>
+            <QuickStartBlock evalCommand={evalCommand} apiBase={API_BASE_URL} />
           </div>
         </div>
       </div>
