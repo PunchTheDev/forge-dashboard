@@ -1686,27 +1686,49 @@ function RankingsPage({ data }: { data: SharedData }) {
               loading={overallLoading}
               rounds={allRounds}
             />
-            {!overallLoading && (overallData?.entries.length ?? 0) < 5 && (
-              <div className="mt-8 border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center">
-                {(overallData?.entries.length ?? 0) === 0 ? (
-                  <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+            {!overallLoading && (
+              <div className="mt-6 flex items-center justify-between gap-4 px-1">
+                {(overallData?.entries.length ?? 0) < 5 ? (
+                  <div className="border border-forge-border/50 border-dashed rounded-xl px-6 py-5 text-center w-full">
+                    {(overallData?.entries.length ?? 0) === 0 ? (
+                      <div className="text-sm text-white font-semibold mb-1">Be the first to compete</div>
+                    ) : (
+                      <div className="text-sm text-white font-semibold mb-1">
+                        {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+                      </div>
+                    )}
+                    <div className="text-xs text-forge-muted mb-3">
+                      {(overallData?.total_specs ?? 45)} active problems across mass, stiffness/weight, and deflection.{" "}
+                      {(overallData?.entries.length ?? 0) > 0
+                        ? "Fork the best agent and beat it."
+                        : "No #1 claimed yet — first passing submission wins."}
+                    </div>
+                    <Link
+                      to="/guide"
+                      className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
+                    >
+                      Read the quickstart guide →
+                    </Link>
+                  </div>
                 ) : (
-                  <div className="text-sm text-white font-semibold mb-1">
-                    {(overallData?.total_specs ?? 45) - (overallData?.entries.flatMap(e => e.best).length ?? 0)} problems still unclaimed — grab one
+                  <div className="flex items-center gap-3 text-xs text-forge-muted w-full">
+                    <span className="flex-1">Want to compete? Build an agent, open a PR — CI scores it automatically.</span>
+                    <Link
+                      to="/guide"
+                      className="shrink-0 text-forge-accent hover:underline"
+                    >
+                      Guide →
+                    </Link>
+                    <a
+                      href="https://github.com/PunchTheDev/forge/fork"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent px-3 py-1.5 rounded-lg hover:bg-forge-accent/20 transition-colors"
+                    >
+                      Fork →
+                    </a>
                   </div>
                 )}
-                <div className="text-xs text-forge-muted mb-3">
-                  {(overallData?.total_specs ?? 45)} active problems across mass, stiffness/weight, and deflection.{" "}
-                  {(overallData?.entries.length ?? 0) > 0
-                    ? "Fork the best agent and beat it."
-                    : "No #1 claimed yet — first passing submission wins."}
-                </div>
-                <Link
-                  to="/guide"
-                  className="inline-block text-xs bg-forge-accent/10 border border-forge-accent/40 text-forge-accent rounded-lg px-4 py-2 hover:bg-forge-accent/20 transition-colors"
-                >
-                  Read the quickstart guide →
-                </Link>
               </div>
             )}
           </>
