@@ -152,6 +152,16 @@ function CategoryAliasRedirect() {
   return <Navigate to={round ? `/problems/${round}` : "/problems"} replace />;
 }
 
+/** /specs/<id>, /spec/<id>, /explorer/<id> all route through /problems/<id>.
+ *  CategoryPage at /problems/:roundId resolves bare spec IDs to their owner
+ *  round and redirects to /problems/<round>/<spec> — so spec-as-id, round-as-id,
+ *  and legacy-spec-as-id all work via that one resolver. */
+function SpecAliasRedirect() {
+  const { id, specId } = useParams<{ id?: string; specId?: string }>();
+  const target = specId ?? id ?? "";
+  return <Navigate to={target ? `/problems/${target}` : "/explorer"} replace />;
+}
+
 /**
  * Redirect to an external URL. React Router's <Navigate> only supports
  * in-app routes, so for URL-guess aliases that should land on GitHub
@@ -2280,6 +2290,34 @@ export default function App() {
         <Route path="/leaderboards" element={<Navigate to="/rankings" replace />} />
         {/* Changelog — external to forge-api CHANGELOG.md (the version-pinned record). */}
         <Route path="/changelog" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
+
+        {/* Specs — the noun the API exposes (GET /specs). Routes through /problems/<id>
+            which already resolves bare specIds via CategoryPage's owner-round lookup. */}
+        <Route path="/specs" element={<Navigate to="/explorer" replace />} />
+        <Route path="/spec" element={<Navigate to="/explorer" replace />} />
+        <Route path="/specs/:specId" element={<SpecAliasRedirect />} />
+        <Route path="/spec/:specId" element={<SpecAliasRedirect />} />
+        {/* Explorer/<id> — first-timers see "Explorer" in the navbar then guess /explorer/<round>
+            or /explorer/<spec>. Both flow through /problems/<id> resolution. */}
+        <Route path="/explorer/:id" element={<SpecAliasRedirect />} />
+        {/* Universal leaderboard nouns — "results", "winners", "podium" all land on rankings. */}
+        <Route path="/results" element={<Navigate to="/rankings" replace />} />
+        <Route path="/winners" element={<Navigate to="/rankings" replace />} />
+        <Route path="/podium" element={<Navigate to="/rankings" replace />} />
+        {/* Active / competition — API exposes /rounds/active; "competition" is the universal noun. */}
+        <Route path="/active" element={<Navigate to="/problems" replace />} />
+        <Route path="/competitions" element={<Navigate to="/problems" replace />} />
+        <Route path="/competition" element={<Navigate to="/problems" replace />} />
+        {/* Bare category nouns — "/mass", "/stiffness", "/deflection" use the same lookup
+            as /categories/<name>. The round name IS the URL guess after seeing the round headers. */}
+        <Route path="/mass" element={<Navigate to="/problems/round_001" replace />} />
+        <Route path="/stiffness" element={<Navigate to="/problems/round_002" replace />} />
+        <Route path="/stiffness-to-weight" element={<Navigate to="/problems/round_002" replace />} />
+        <Route path="/deflection" element={<Navigate to="/problems/round_003" replace />} />
+        {/* Tier nouns — easy/medium/hard filter shortcuts; land on explorer where the filter lives. */}
+        <Route path="/tiers" element={<Navigate to="/explorer" replace />} />
+        <Route path="/tier" element={<Navigate to="/explorer" replace />} />
+        <Route path="/tier/:tier" element={<Navigate to="/explorer" replace />} />
 
         {/* Fallback */}
         <Route path="*" element={<NotFoundPage />} />
