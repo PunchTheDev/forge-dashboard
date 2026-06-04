@@ -21,6 +21,7 @@ import {
   fmtScore,
   metricConfig,
   specLabel,
+  sotaCodeUrl,
 } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { Leaderboard } from "./components/Leaderboard";
@@ -129,9 +130,13 @@ function RoundRedirect() {
 }
 
 function NotFoundPage() {
+  useEffect(() => {
+    document.title = "Page not found — Forge";
+    return () => { document.title = "Forge — Competitive CAD Benchmark"; };
+  }, []);
   return (
     <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-      <div className="text-forge-muted font-mono text-5xl mb-4">404</div>
+      <h1 className="text-forge-muted font-mono text-5xl mb-4">404</h1>
       <div className="text-white text-lg font-semibold mb-2">Page not found</div>
       <div className="text-forge-muted text-sm mb-6">
         That URL doesn't exist. Check the address or head back to a known page.
@@ -452,8 +457,8 @@ function SotaHero({
             </div>
 
             <p className="text-forge-muted text-xs leading-relaxed mb-4">
-              This part passed real FEA (CalculiX). Your agent generates a fresh bracket
-              per-problem — beat this score on this problem and all others to win.
+              This part passed real FEA (CalculiX). The winning agent's source is
+              open — fork it and beat this score on this problem (and all others) to claim #1.
               {sota.score_metric === "mass_grams" && " Lightest structure that survives the load wins."}
               {sota.score_metric === "stiffness_to_weight" &&
                 " Highest stiffness-per-gram wins."}
@@ -469,12 +474,13 @@ function SotaHero({
               View problem →
             </Link>
             <a
-              href={FORGE_REPO}
+              href={sotaCodeUrl(sota)}
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-forge-border text-forge-muted px-4 py-2.5 rounded-lg text-sm hover:border-forge-accent/50 hover:text-white transition-colors text-center"
+              className="border border-forge-border text-forge-muted px-4 py-2.5 rounded-lg text-sm hover:border-forge-accent/50 hover:text-white transition-colors text-center font-mono"
+              title={`Open ${sota.agent}/agent.py on GitHub at commit ${sota.commit_hash.substring(0, 7)}`}
             >
-              Fork and compete
+              View winning code →
             </a>
           </div>
         </div>
@@ -752,11 +758,12 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                   Spotlight
                 </div>
                 <div className="text-sm text-white font-semibold mt-0.5">
-                  Best agent design so far — one problem
+                  Current top score — fork the winning code
                 </div>
                 <div className="text-xs text-forge-muted mt-0.5 leading-relaxed max-w-2xl">
-                  This is the current top-scoring submission on one of the {allRounds.length} active competition
-                  categories. Open it to see the full leaderboard, FEA results, and the agent code that beat it.
+                  The agent that holds this problem's top spot is open-source. Fork it, improve it,
+                  and beat it to claim #1 yourself — that's the flywheel. One of the {allRounds.length} active
+                  categories shown below.
                 </div>
               </div>
               <SotaHero
