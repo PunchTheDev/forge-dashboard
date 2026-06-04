@@ -950,6 +950,15 @@ function CategoryPage({ data }: { data: SharedData }) {
     60000,
   );
 
+  // useEffect must be called unconditionally (Rules of Hooks) — before any
+  // early returns below. When round is null the title is left unchanged.
+  const roundLabel = round ? round.name.replace(/Round \d+ — /, "") : "";
+  useEffect(() => {
+    if (!roundLabel) return;
+    document.title = `${roundLabel} — Forge`;
+    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
+  }, [roundLabel]);
+
   if (!round) {
     // Legacy URL pattern: /problems/:specId (pre-round routing).
     // If roundId matches a spec that belongs to a known round, redirect there.
@@ -978,12 +987,6 @@ function CategoryPage({ data }: { data: SharedData }) {
     borderColor: "border-forge-border",
     hex: "#6b7280",
   };
-
-  const roundLabel = round.name.replace(/Round \d+ — /, "");
-  useEffect(() => {
-    document.title = `${roundLabel} — Forge`;
-    return () => { document.title = "Forge — Competitive Parametric CAD Benchmark"; };
-  }, [roundLabel]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
@@ -1452,12 +1455,12 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                   <div className="text-xs text-forge-muted mt-0.5">
                     {bests.length} spec{bests.length !== 1 ? "s" : ""}
                     {wins > 0 && (
-                      <span className="text-yellow-400 ml-1">
-                        · {wins} win{wins !== 1 ? "s" : ""}
+                      <span className="text-yellow-400">
+                        {" · "}{wins} win{wins !== 1 ? "s" : ""}
                       </span>
                     )}
-                    <span className={`ml-1 font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>
-                      #{bestRank}
+                    <span className={`font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>
+                      {" "}#{bestRank}
                     </span>
                   </div>
                 </div>
