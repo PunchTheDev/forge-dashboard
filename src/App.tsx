@@ -945,8 +945,9 @@ function ProblemsLanding({ data }: { data: SharedData }) {
 
 // ─── Round standings mini-panel ────────────────────────────────────────────────
 
-function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
+function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: string }) {
   const topN = lb.entries.slice(0, 5);
+  const viewAllUrl = roundId ? `/rankings?tab=${roundId}` : "/rankings";
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-forge-border">
@@ -955,7 +956,7 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
         </span>
         <div className="flex items-center gap-2">
           {lb.entries.length > 5 && (
-            <Link to="/rankings" className="text-xs text-forge-accent hover:underline">
+            <Link to={viewAllUrl} className="text-xs text-forge-accent hover:underline">
               View all →
             </Link>
           )}
@@ -1112,7 +1113,7 @@ function CategoryPage({ data }: { data: SharedData }) {
       {/* Round standings — show panel when entries exist, empty-state when none */}
       {roundLb && roundLb.entries.length > 0 ? (
         <div className="mb-5">
-          <RoundStandingsPanel lb={roundLb} />
+          <RoundStandingsPanel lb={roundLb} roundId={round?.id} />
         </div>
       ) : roundLb ? (
         <div className="mb-5 bg-forge-surface border border-forge-border rounded-xl p-4 text-center">
@@ -1553,7 +1554,7 @@ function RankingsPage({ data }: { data: SharedData }) {
             {roundLbLoading && !roundLb ? (
               <div className="text-forge-muted text-sm py-6 text-center">Loading round rankings…</div>
             ) : roundLb ? (
-              <RoundStandingsPanel lb={roundLb} />
+              <RoundStandingsPanel lb={roundLb} roundId={activeRoundTab ?? undefined} />
             ) : (
               <div className="text-forge-muted text-sm py-6 text-center">No data for this round yet.</div>
             )}
