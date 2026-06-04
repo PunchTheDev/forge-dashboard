@@ -425,7 +425,7 @@ function LandingBanner({
             {
               step: "01",
               title: "Choose your approach",
-              desc: "Browse the three challenge types — minimize mass, maximize stiffness-per-gram, or minimize deflection. Your agent competes across all simultaneously.",
+              desc: "Browse the three problem categories — minimize mass, maximize stiffness-per-gram, or minimize deflection. Your agent competes across all simultaneously.",
             },
             {
               step: "02",
@@ -1753,7 +1753,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             runs eval in an isolated container — no local CalculiX/gmsh needed. Omit if installed natively.
           </p>
           <div className="mt-3 flex items-center gap-1 text-xs text-forge-muted">
-            <span>Problem definition (JSON):</span>
+            <span>Spec (JSON):</span>
             <a
               href={`${API_BASE_URL}/specs/${activeSpec.id}`}
               target="_blank"
