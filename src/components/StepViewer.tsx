@@ -19,6 +19,9 @@ interface Props {
   material?: string;
   /** Rendered instead of the viewer when loading fails (e.g. a SpecDiagram). */
   fallback?: React.ReactNode;
+  /** Rendered as an overlay above the empty canvas until the 3D scene is ready (e.g. a SpecDiagram).
+   *  Avoids showing a blank dark canvas while the 2.9 MB occt wasm + STEP file stream in. */
+  loadingFallback?: React.ReactNode;
 }
 
 /**
@@ -26,7 +29,7 @@ interface Props {
  * Renders the actual agent-generated CAD output — the STEP file produced
  * by the winning submission's CadQuery code.
  */
-export function StepViewer({ stepUrl, label, material, fallback }: Props) {
+export function StepViewer({ stepUrl, label, material, fallback, loadingFallback }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -297,7 +300,17 @@ export function StepViewer({ stepUrl, label, material, fallback }: Props) {
           )}
         </div>
       </div>
-      <div ref={mountRef} className="h-96 w-full" />
+      <div className="relative h-96 w-full">
+        <div ref={mountRef} className="absolute inset-0" />
+        {status !== "ready" && loadingFallback && (
+          <div
+            className="absolute inset-0 pointer-events-none bg-forge-surface flex items-center justify-center p-4 transition-opacity duration-300"
+            aria-hidden="true"
+          >
+            {loadingFallback}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

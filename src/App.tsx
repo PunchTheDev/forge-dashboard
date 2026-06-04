@@ -482,7 +482,7 @@ function SotaHero({
           {sota.has_step ? (
             <StepViewerBoundary fallback={spec ? <div className="h-full flex flex-col p-5 gap-3"><div className="text-xs text-forge-muted uppercase tracking-wider opacity-60 shrink-0">Problem constraints</div><div className="flex-1 flex items-center"><SpecDiagram spec={spec} /></div></div> : <ViewerSkeleton />}>
               <Suspense fallback={<ViewerSkeleton />}>
-                <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} material={spec?.material} />
+                <StepViewer stepUrl={stepUrl(sota.submission_id)} label={undefined} material={spec?.material} loadingFallback={spec ? <SpecDiagram spec={spec} compact /> : undefined} />
               </Suspense>
             </StepViewerBoundary>
           ) : spec ? (
@@ -1627,6 +1627,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
                 label={`Current best — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
                 material={activeSpec?.material}
                 fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
+                loadingFallback={activeSpec ? <SpecDiagram spec={activeSpec} compact /> : undefined}
               />
             </Suspense>
           </StepViewerBoundary>
