@@ -1092,7 +1092,7 @@ function CategoryPage({ data }: { data: SharedData }) {
               return claimed > 0 ? (
                 <>
                   <span className="text-forge-border">·</span>
-                  <span title="Problems that have at least one valid SOTA submission">
+                  <span title="Problems that have at least one valid passing submission">
                     <span className="text-forge-green">{claimed}</span>
                     <span className="text-forge-muted">/{round.specs.length} solved</span>
                   </span>
@@ -1889,7 +1889,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                                 </span>
                                 {sota != null ? (
                                   <span className="shrink-0 text-forge-muted font-mono">
-                                    SOTA: {fmtScore(sota, round.scoring_metric)}
+                                    #1: {fmtScore(sota, round.scoring_metric)}
                                   </span>
                                 ) : (
                                   <span className="shrink-0 text-forge-accent font-mono text-xs font-semibold">

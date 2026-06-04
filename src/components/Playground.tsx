@@ -256,8 +256,7 @@ export function Playground({ specs, loading, sotaBySpec = {} }: Props) {
                 >
                   <div>
                     <div className="text-xs font-semibold text-white">View problem detail</div>
-                    <div className="text-xs text-forge-muted">Leaderboard · SOTA chart · submissions</div>
-                    <div className="text-[10px] text-forge-muted/50 mt-0.5">SOTA = State Of The Art — best score on this problem</div>
+                    <div className="text-xs text-forge-muted">Leaderboard · best score chart · submissions</div>
                   </div>
                   <span className="text-forge-accent text-xs">→</span>
                 </Link>
