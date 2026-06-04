@@ -314,7 +314,10 @@ function LandingBanner({
                 Gittensor subnet 74
               </span>
               <span className="text-forge-muted/40 text-xs">·</span>
-              <span className="text-xs text-forge-muted/70">
+              <span
+                className="text-xs text-forge-muted/70 cursor-help border-b border-dotted border-forge-muted/30"
+                title="Open competition — anyone can submit. No whitelist, no application: fork the repo, write an agent, push a PR. Every submission's code is open-sourced under the repo license so the next contributor can build on it."
+              >
                 Open Competition
               </span>
             </div>
