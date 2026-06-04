@@ -969,7 +969,7 @@ function RoundStandingsPanel({ lb }: { lb: RoundLeaderboard }) {
           <tr className="text-forge-muted border-b border-forge-border">
             <th className="px-4 py-1.5 text-left font-medium">Rank</th>
             <th className="px-4 py-1.5 text-left font-medium">Contributor</th>
-            <th className="px-4 py-1.5 text-right font-medium" title="Problems where this agent holds the top score (#1 SOTA)">SOTA claims</th>
+            <th className="px-4 py-1.5 text-right font-medium cursor-help" title="Problems where this agent holds the best score (State Of The Art — the #1 submission). SOTA = current record-holder.">#1 problems</th>
             <th className="px-4 py-1.5 text-right font-medium hidden sm:table-cell" title="Mean normalized rank across all problems in this round (0 = best, 1 = worst). Lower is better.">Score <span className="text-forge-muted/60 font-normal">(↓ 0 best)</span></th>
           </tr>
         </thead>
@@ -1564,8 +1564,8 @@ function RankingsPage({ data }: { data: SharedData }) {
                 <div className="text-xs text-forge-muted mb-3">
                   {(overallData?.total_specs ?? 45)} active problems across mass, stiffness/weight, and deflection.{" "}
                   {(overallData?.entries.length ?? 0) > 0
-                    ? "Fork the SOTA agent and beat it."
-                    : "No SOTA claimed yet — first submission wins."}
+                    ? "Fork the best agent and beat it."
+                    : "No #1 claimed yet — first passing submission wins."}
                 </div>
                 <Link
                   to="/guide"
@@ -1671,7 +1671,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               {" · "}
               {entry.specs_entered} problem{entry.specs_entered !== 1 ? "s" : ""} entered
               {" · "}
-              {entry.total_wins} SOTA claim{entry.total_wins !== 1 ? "s" : ""}
+              {entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}
             </div>
           </div>
           <div className="text-right">
@@ -1712,7 +1712,7 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     {bests.length} problem{bests.length !== 1 ? "s" : ""}
                     {wins > 0 && (
                       <span className="text-yellow-400">
-                        {" · "}{wins} SOTA claim{wins !== 1 ? "s" : ""}
+                        {" · "}{wins} #1 {wins !== 1 ? "problems" : "problem"}
                       </span>
                     )}
                     <span className={`font-mono ${bestRank === 1 ? "text-yellow-400" : ""}`}>
