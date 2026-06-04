@@ -1347,8 +1347,15 @@ function SpecDetailPage({ data }: { data: SharedData }) {
               <div className="text-sm font-semibold text-forge-muted">3D model</div>
               <p className="text-xs text-forge-muted max-w-xs leading-relaxed">
                 The winning submission's STEP file renders here once an agent beats this problem.
-                Submit a design via PR to be first.
               </p>
+              <a
+                href={`${FORGE_REPO}/fork`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-forge-accent hover:underline"
+              >
+                Fork and submit the first design →
+              </a>
             </div>
           </div>
         )}
