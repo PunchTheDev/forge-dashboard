@@ -60,7 +60,7 @@ export function Playground({ specs, loading }: Props) {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <div className="text-lg font-bold text-white">Playground</div>
+        <h1 className="text-lg font-bold text-white">Playground</h1>
         <div className="text-xs text-forge-muted mt-1 leading-relaxed">
           Explore problem specs and learn how to run local evaluations. No live evals run here — everything is read-only.
         </div>

@@ -12,24 +12,23 @@ function Stat({
   value,
   sub,
   accent,
+  valueColor,
   title,
 }: {
   label: string;
   value: string;
   sub?: string;
   accent?: boolean;
+  valueColor?: string;
   title?: string;
 }) {
+  const color = valueColor ?? (accent ? "text-forge-accent" : "text-forge-green");
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl px-5 py-4 flex flex-col gap-1" title={title}>
       <div className="text-forge-muted text-xs font-medium uppercase tracking-wider">
         {label}
       </div>
-      <div
-        className={`font-mono text-2xl font-bold tabular-nums ${
-          accent ? "text-forge-accent" : "text-forge-green"
-        }`}
-      >
+      <div className={`font-mono text-2xl font-bold tabular-nums ${color}`}>
         {value}
       </div>
       {sub && <div className="text-forge-muted text-xs">{sub}</div>}
@@ -131,6 +130,14 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           label="vs. reference agent"
           value={baselineDelta && baselineSign ? `${baselineSign}${baselineDelta}%` : "—"}
           sub={baseline != null ? `ref: ${baseline.toFixed(decimals)} ${scoreUnit} (our seed)` : undefined}
+          valueColor={
+            baselineRawPct == null
+              ? undefined
+              : baselineRawPct > 0
+                ? "text-forge-green"   // SOTA beats reference
+                : "text-amber-400"     // SOTA worse than reference
+          }
+          title="Compares the current SOTA to the maintainer's reference agent (our seed). Green = agents are beating the seed. Amber = the seed is still ahead."
         />
         <Stat
           label="Stress headroom"

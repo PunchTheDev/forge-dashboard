@@ -94,10 +94,11 @@ function CategoryBreakdown({ entry, specToRound }: {
 }
 
 
-function EntryRow({ entry, specToRound, totalEntries, onSelect }: {
+function EntryRow({ entry, specToRound, totalEntries, totalSpecs, onSelect }: {
   entry: OverallEntry;
   specToRound: Record<string, string>;
   totalEntries: number;
+  totalSpecs: number;
   onSelect?: (contributor: string) => void;
 }) {
   return (
@@ -113,7 +114,7 @@ function EntryRow({ entry, specToRound, totalEntries, onSelect }: {
           <div>
             <div className="text-sm font-semibold text-white">{entry.contributor}</div>
             <div className="text-xs text-forge-muted mt-0.5">
-              {entry.specs_entered} spec{entry.specs_entered !== 1 ? "s" : ""}
+              {entry.specs_entered}/{totalSpecs} spec{entry.specs_entered !== 1 ? "s" : ""}
               {" · "}
               {entry.total_wins} win{entry.total_wins !== 1 ? "s" : ""}
             </div>
@@ -203,6 +204,7 @@ export function OverallLeaderboard({ data, loading, rounds = [], onSelectAgent }
             entry={entry}
             specToRound={specToRound}
             totalEntries={data.entries.length}
+            totalSpecs={data.total_specs}
             onSelect={onSelectAgent}
           />
         ))
