@@ -1180,8 +1180,12 @@ function CategoryPage({ data }: { data: SharedData }) {
   }, [roundLabel]);
 
   if (!round) {
-    // Still loading — allRounds hasn't populated yet
-    if (allRounds.length === 0 && !specs) {
+    // Still loading — either allRounds or specs hasn't populated yet.
+    // BOTH must be ready before falling through to the legacy branch, otherwise
+    // a spec belonging to a known round can race-resolve as _legacy when specs
+    // lands before allRounds (the owner-round lookup below returns undefined
+    // against an empty allRounds array).
+    if (allRounds.length === 0 || !specs) {
       return (
         <div className="max-w-7xl mx-auto px-4 py-6 text-forge-muted text-sm">
           Loading…
@@ -1195,7 +1199,7 @@ function CategoryPage({ data }: { data: SharedData }) {
       return <Navigate to={`/problems/${ownerRound.id}/${roundId}`} replace />;
     }
     // Legacy spec not in any active round — render directly without round context.
-    if (specs?.find((s) => s.id === roundId)) {
+    if (specs.find((s) => s.id === roundId)) {
       return <Navigate to={`/problems/_legacy/${roundId}`} replace />;
     }
     return (
