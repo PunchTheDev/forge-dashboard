@@ -1002,7 +1002,12 @@ function RoundStandingsPanel({ lb, roundId }: { lb: RoundLeaderboard; roundId?: 
         <tbody>
           {topN.map((e) => (
             <tr key={e.contributor} className="border-b border-forge-border/30">
-              <td className="px-4 py-1.5 font-mono text-forge-muted">#{e.rank}</td>
+              <td className={`px-4 py-1.5 font-mono font-bold ${
+                e.rank === 1 ? "text-yellow-400" :
+                e.rank === 2 ? "text-slate-300" :
+                e.rank === 3 ? "text-amber-600" :
+                "text-forge-muted font-normal"
+              }`}>#{e.rank}</td>
               <td className="px-4 py-1.5">
                 <Link
                   to={`/rankings/${encodeURIComponent(e.contributor)}`}
