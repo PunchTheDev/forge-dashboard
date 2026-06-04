@@ -2023,7 +2023,7 @@ export default function App() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <span>3 active rounds · 45 problems</span>
+            <span>{activeRounds.length || 3} active rounds · {activeRounds.reduce((n, r) => n + r.specs.length, 0) || 45} problems</span>
             <span>·</span>
             <a href={FORGE_REPO} target="_blank" rel="noopener noreferrer" className="hover:text-forge-muted transition-colors">
               GitHub →

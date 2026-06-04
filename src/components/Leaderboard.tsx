@@ -84,7 +84,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
               {baseline != null && (
                 <th
                   className="px-4 py-2 text-right font-medium hidden sm:table-cell cursor-help"
-                  title="Compared to the reference agent — the maintainer's offline baseline set when this problem was designed. Positive (green) = beats the seed; negative (amber) = seed is still ahead."
+                  title="Compared to the reference agent — the maintainer's offline baseline set when this problem was designed. Positive (green) = beats the reference; negative (amber) = reference is still ahead."
                 >
                   vs. reference
                 </th>
