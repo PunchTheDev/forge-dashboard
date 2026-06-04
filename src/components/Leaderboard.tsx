@@ -143,7 +143,9 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                         </span>
                       )}
                     </div>
-                    <div className="text-forge-muted text-xs font-mono">{s.agent_path.replace("agents/", "")}</div>
+                    <div className="text-forge-muted text-xs font-mono" title={s.agent_path}>
+                      {s.agent_path.split("/").slice(-2, -1)[0] ?? s.agent_path.replace("agents/", "")}
+                    </div>
                   </td>
                   <td className="px-4 py-2.5 text-right font-mono font-semibold tabular-nums">
                     <span className={isLeader ? "text-forge-gold" : "text-forge-green"}>
