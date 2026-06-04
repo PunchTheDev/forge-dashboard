@@ -104,7 +104,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
             className="text-xs bg-forge-border text-forge-muted px-2 py-0.5 rounded cursor-help"
             title={`Max allowable stress = ${spec.material.includes("aluminum") || spec.material.includes("stainless") ? "yield strength" : "tensile strength"} ÷ safety factor ${spec.constraints.safety_factor}×. Your design's peak von Mises stress must stay below this. MPa = megapascals (unit of pressure/stress).`}
           >
-            ≤{allowable.toFixed(0)} MPa
+            ≤{allowable.toFixed(0)} MPa stress limit
           </span>
         </div>
         <p className="text-forge-muted text-xs leading-relaxed max-w-xl mb-4">
@@ -153,11 +153,11 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           }
         />
         <Stat
-          label="Stress headroom"
+          label="Stress margin"
           value={stressHeadroom ? `${stressHeadroom}% free` : "—"}
           sub={sota ? `${sota.fea_stress_mpa.toFixed(1)} MPa actual · ${allowable.toFixed(0)} MPa limit` : "no submission yet"}
           accent
-          title={`Stress headroom = how much of the allowable stress is still unused. ${stressHeadroom}% free means only ${100 - Number(stressHeadroom)}% of the ${allowable.toFixed(0)} MPa limit is used — the design has a lot of room to shed mass.`}
+          title={`Stress margin = how much of the allowable stress is still unused. ${stressHeadroom}% free means the design uses only ${100 - Number(stressHeadroom)}% of the ${allowable.toFixed(0)} MPa structural limit — the design could shed more mass while staying safe.`}
         />
         <Stat
           label="Passing entries"
