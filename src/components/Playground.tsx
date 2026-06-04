@@ -164,8 +164,7 @@ export function Playground({ specs, loading }: Props) {
                           : "hover:bg-forge-bg text-forge-muted hover:text-white border border-transparent"
                       }`}
                     >
-                      <span className="font-medium">{specLabel(s)}</span>
-                      <span className="text-forge-muted/50 ml-1.5 font-mono text-[10px]">{s.id}</span>
+                      <span className="font-medium block truncate">{specLabel(s)}</span>
                     </button>
                   );
                 })}

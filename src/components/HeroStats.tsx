@@ -135,7 +135,13 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <Stat
           label="vs. reference agent"
           value={baselineDelta && baselineSign ? `${baselineSign}${baselineDelta}%` : "—"}
-          sub={baseline != null ? `maintainer seed: ${baseline.toFixed(decimals)} ${scoreUnit}` : undefined}
+          sub={
+            baseline != null
+              ? baselineRawPct != null && baselineRawPct >= 0
+                ? `agents ahead · seed: ${baseline.toFixed(decimals)} ${scoreUnit}`
+                : `seed still winning · ${baseline.toFixed(decimals)} ${scoreUnit}`
+              : undefined
+          }
           valueColor={
             baselineRawPct == null
               ? undefined
@@ -145,10 +151,9 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
           }
           title={
             baseline != null
-              ? `The reference agent is the maintainer's optimized baseline, set offline when this spec was designed — it is not a competition submission. ` +
-                `Current SOTA: ${sotaScore != null ? `${sotaScore.toFixed(decimals)} ${scoreUnit}` : "none yet"}. ` +
-                `Your goal is to beat the SOTA by the required margin (see the SOTA stat), not the reference. ` +
-                `Green = agents are beating the seed; amber = the seed is still ahead.`
+              ? `The reference agent is the maintainer's baseline — not a competition entry. ` +
+                `${baselineRawPct != null && baselineRawPct < 0 ? "Amber = the seed is still ahead of the current SOTA." : "Green = agents are now beating the seed."} ` +
+                `Your goal is to beat the current SOTA by the required margin, not the reference.`
               : undefined
           }
         />
@@ -162,7 +167,7 @@ export function HeroStats({ spec, sota, submissionCount }: Props) {
         <Stat
           label="Passing entries"
           value={String(submissionCount)}
-          sub="passed structural simulation"
+          sub="passed FEA (structural simulation)"
           accent
           title="A passing entry fits in the build volume, has bolt hole clearance, meets wall thickness and overhang constraints, and survives FEA — finite element analysis — where the peak von Mises stress must stay below yield strength ÷ safety factor."
         />
