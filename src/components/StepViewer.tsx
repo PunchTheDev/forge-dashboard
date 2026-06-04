@@ -89,18 +89,45 @@ export function StepViewer({ stepUrl, label, material, fallback }: Props) {
 
     let cancelled = false;
 
-    // occt-import-js is loaded async from CDN — poll until it's ready or timeout.
-    function waitForOcct(timeout = 15000, interval = 100): Promise<() => Promise<unknown>> {
-      return new Promise((resolve, reject) => {
+    // occt-import-js is lazy-loaded from CDN on first StepViewer mount — keeping the
+    // 2.9 MB wasm + loader JS out of the initial page weight on every other route.
+    // Inject the script tag exactly once; subsequent mounts reuse the in-flight or resolved promise.
+    function waitForOcct(timeout = 20000, interval = 100): Promise<() => Promise<unknown>> {
+      const w = window as unknown as {
+        occtimportjs?: () => Promise<unknown>;
+        __occtLoaderPromise?: Promise<() => Promise<unknown>>;
+      };
+      if (w.occtimportjs) return Promise.resolve(w.occtimportjs);
+      if (w.__occtLoaderPromise) return w.__occtLoaderPromise;
+
+      const OCCT_URL = "https://cdn.jsdelivr.net/npm/occt-import-js@0.0.22/dist/occt-import-js.js";
+
+      w.__occtLoaderPromise = new Promise((resolve, reject) => {
         const deadline = Date.now() + timeout;
+
+        // Inject the loader script if it isn't on the page yet. Idempotent across re-mounts.
+        const existing = document.querySelector<HTMLScriptElement>(`script[data-occt-loader="true"]`);
+        if (!existing) {
+          const s = document.createElement("script");
+          s.src = OCCT_URL;
+          s.async = true;
+          s.dataset.occtLoader = "true";
+          s.onerror = () => reject(new Error("occt-import-js loader failed to load — check CDN connectivity"));
+          document.head.appendChild(s);
+        }
+
         function check() {
-          const fn = (window as unknown as { occtimportjs?: () => Promise<unknown> }).occtimportjs;
+          const fn = w.occtimportjs;
           if (fn) return resolve(fn);
           if (Date.now() > deadline) return reject(new Error("occt-import-js timed out — check CDN connectivity"));
           setTimeout(check, interval);
         }
         check();
       });
+
+      // If the load fails, clear the cached promise so a later mount can retry.
+      w.__occtLoaderPromise.catch(() => { w.__occtLoaderPromise = undefined; });
+      return w.__occtLoaderPromise;
     }
 
     type OcctMesh = {
