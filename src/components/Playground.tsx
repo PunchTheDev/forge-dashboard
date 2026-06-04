@@ -13,10 +13,10 @@ function buildSampleOutput(spec: Spec | null): string {
 [forge] Loading spec r01_001_easy...
 [forge] Running agent...
 [forge] PASSED
-  score: 14.23 g  (mass_grams)  ← lower is better`;
+  score: 14.23 g  (mass)  ← lower is better`;
   }
 
-  const { unit, decimals } = metricConfig(spec.scoring.metric);
+  const { unit, decimals, label: metricLabel } = metricConfig(spec.scoring.metric);
   const dir = spec.scoring.direction;
   const baseline = specBaseline(spec.scoring);
   const exampleScore = baseline != null
@@ -36,7 +36,7 @@ function buildSampleOutput(spec: Spec | null): string {
   stress max: 38.2 MPa  (SF: ${spec.constraints.safety_factor}×, within limit)  ✓
   deflection: 0.0412 mm
 [forge] PASSED
-  score:      ${exampleScore.toFixed(decimals)} ${unit}  (${spec.scoring.metric})
+  score:      ${exampleScore.toFixed(decimals)} ${unit}  (${metricLabel.toLowerCase()})
   baseline:   ${baseline != null ? baseline.toFixed(decimals) : "—"} ${unit}
   vs baseline: ${pct}%  ${dirLabel}
 [forge] Result written to .forge/results/${spec.id}.json`;
