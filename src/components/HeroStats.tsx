@@ -249,7 +249,11 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
           <div className="flex-1 min-w-0">
             <div className="text-xs font-semibold text-white mb-0.5">Winning agent — open-source code</div>
             <div className="text-xs text-forge-muted">
-              The current best score was set by this agent. Fork it, beat it by the margin above, and claim #1.
+              The current best score was set by this agent. Fork it,{" "}
+              {marginNote
+                ? <span>beat it by <span className="text-white font-mono">{marginNote}</span>,</span>
+                : "beat it,"}{" "}
+              and claim #1.
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
