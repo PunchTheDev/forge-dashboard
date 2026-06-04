@@ -82,9 +82,19 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                 {metricLabel} {metricUnit ? `(${metricUnit})` : ""}
               </th>
               {baseline != null && (
-                <th className="px-4 py-2 text-right font-medium hidden sm:table-cell">vs Baseline</th>
+                <th
+                  className="px-4 py-2 text-right font-medium hidden sm:table-cell cursor-help"
+                  title="Compared to the reference agent — the maintainer's offline baseline set when this problem was designed. Positive (green) = beats the seed; negative (amber) = seed is still ahead."
+                >
+                  vs. reference
+                </th>
               )}
-              <th className="px-4 py-2 text-left font-medium hidden md:table-cell">Stress</th>
+              <th
+                className="px-4 py-2 text-left font-medium hidden md:table-cell cursor-help"
+                title="FEA (Finite Element Analysis) peak von Mises stress vs. max allowable (yield strength ÷ safety factor), in MPa. Green = well under limit."
+              >
+                Stress (MPa)
+              </th>
               <th className="px-4 py-2 text-left font-medium hidden lg:table-cell">PR</th>
               <th className="px-4 py-2 text-right font-medium hidden xl:table-cell">Date</th>
             </tr>
@@ -128,8 +138,8 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
                         {s.contributor}
                       </span>
                       {s.has_step && (
-                        <span className="text-forge-accent text-xs" title="3D model available">
-                          ◈
+                        <span className="text-forge-accent text-xs font-mono" title="3D STEP model stored — click row to view in the browser">
+                          3D
                         </span>
                       )}
                     </div>

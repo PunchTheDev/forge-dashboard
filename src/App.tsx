@@ -562,7 +562,6 @@ function CompactSpecTable({
   selectedTier: string | null;
   onTierChange: (tier: string | null) => void;
 }) {
-  const navigate = useNavigate();
   const roundSpecIds = new Set(round.specs.map((s) => s.id));
   const tierMap = Object.fromEntries(round.specs.map((s) => [s.id, s.tier]));
 
@@ -609,10 +608,10 @@ function CompactSpecTable({
           const tier = tierMap[spec.id] ?? "easy";
           const sota = sotaBySpec[spec.id];
           return (
-            <button
+            <Link
               key={spec.id}
-              onClick={() => navigate(`/problems/${round.id}/${spec.id}`)}
-              className="text-left flex items-center gap-3 px-3 py-2.5 bg-forge-surface border border-forge-border rounded-lg hover:border-forge-accent/50 transition-all hover:scale-[1.005] active:scale-[0.995]"
+              to={`/problems/${round.id}/${spec.id}`}
+              className="flex items-center gap-3 px-3 py-2.5 bg-forge-surface border border-forge-border rounded-lg hover:border-forge-accent/50 transition-all hover:scale-[1.005] active:scale-[0.995]"
             >
               <span
                 className={`text-xs font-mono shrink-0 px-1.5 py-0.5 rounded border capitalize ${
@@ -636,9 +635,9 @@ function CompactSpecTable({
                   {fmtScore(sota, round.scoring_metric)}
                 </span>
               ) : (
-                <span className="text-xs text-forge-accent/50 text-xs font-semibold shrink-0" title="No SOTA claimed yet — first passing submission wins">open</span>
+                <span className="text-xs text-forge-accent/50 text-xs font-semibold shrink-0" title="No winner yet — first agent to pass FEA claims #1">open</span>
               )}
-            </button>
+            </Link>
           );
         })}
       </div>
@@ -659,13 +658,14 @@ function SidebarSpecList({
   specs,
   sotaBySpec,
   activeSpecId,
-  onSelectSpec,
+  onClearSelection,
 }: {
   round: Round;
   specs: Spec[];
   sotaBySpec: Record<string, number>;
   activeSpecId: string | null;
-  onSelectSpec: (specId: string) => void;
+  /** Called before navigating — use to clear any local selection state. */
+  onClearSelection: () => void;
 }) {
   const roundSpecIds = new Set(round.specs.map((s) => s.id));
   const tierMap = Object.fromEntries(round.specs.map((s) => [s.id, s.tier]));
@@ -688,10 +688,11 @@ function SidebarSpecList({
                 const sota = sotaBySpec[spec.id];
                 const isActive = spec.id === activeSpecId;
                 return (
-                  <button
+                  <Link
                     key={spec.id}
-                    onClick={() => onSelectSpec(spec.id)}
-                    className={`w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${
+                    to={`/problems/${round.id}/${spec.id}`}
+                    onClick={onClearSelection}
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${
                       isActive
                         ? "bg-forge-accent/15 border border-forge-accent/30 text-white"
                         : "hover:bg-forge-surface text-forge-muted hover:text-white"
@@ -704,11 +705,11 @@ function SidebarSpecList({
                         {fmtScore(sota, round.scoring_metric)}
                       </span>
                     ) : (
-                      <span className="shrink-0 text-forge-accent/50 text-xs font-semibold" title="No SOTA claimed yet — first passing submission wins">
+                      <span className="shrink-0 text-forge-accent/50 text-xs font-semibold" title="No winner yet — first to pass FEA claims it">
                         open
                       </span>
                     )}
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -812,12 +813,10 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                   );
                   const meta = round ? CATEGORY_META[round.id] : null;
                   return (
-                    <button
+                    <Link
                       key={sota.spec_id}
-                      onClick={() =>
-                        navigate(`/problems/${round?.id ?? ""}/${sota.spec_id}`)
-                      }
-                      className="text-left p-4 bg-forge-surface border border-forge-border rounded-xl hover:border-forge-accent/50 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                      to={`/problems/${round?.id ?? ""}/${sota.spec_id}`}
+                      className="p-4 bg-forge-surface border border-forge-border rounded-xl hover:border-forge-accent/50 transition-all hover:scale-[1.01] active:scale-[0.99] block"
                     >
                       {spec && (
                         <div className="mb-3 pointer-events-none">
@@ -847,7 +846,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                           {sota.has_step ? "View 3D →" : "Explore →"}
                         </span>
                       </div>
-                    </button>
+                    </Link>
                   );
                 })}
               </div>
@@ -887,10 +886,10 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                     };
                     const pct = Math.round((solved / r.specs.length) * 100);
                     return (
-                      <button
+                      <Link
                         key={r.id}
-                        onClick={() => navigate(`/problems/${r.id}`)}
-                        className={`text-left p-5 rounded-xl border-2 border-dashed transition-all hover:scale-[1.01] active:scale-[0.99] ${meta.borderColor} ${meta.bgColor} hover:border-opacity-80`}
+                        to={`/problems/${r.id}`}
+                        className={`p-5 rounded-xl border-2 border-dashed transition-all hover:scale-[1.01] active:scale-[0.99] block ${meta.borderColor} ${meta.bgColor} hover:border-opacity-80`}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className={`text-xs font-bold uppercase tracking-wide ${meta.color}`}>
@@ -920,7 +919,7 @@ function ProblemsLanding({ data }: { data: SharedData }) {
                             Claim →
                           </span>
                         </div>
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>
@@ -1098,7 +1097,6 @@ function CategoryPage({ data }: { data: SharedData }) {
 function SpecDetailPage({ data }: { data: SharedData }) {
   const { roundId, specId } = useParams<{ roundId: string; specId: string }>();
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const navigate = useNavigate();
   const { specs, allRounds, sotaBySpec } = data;
 
   const round = allRounds.find((r) => r.id === roundId) ?? null;
@@ -1131,12 +1129,12 @@ function SpecDetailPage({ data }: { data: SharedData }) {
   if (!activeSpec) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="text-forge-muted text-sm">Spec not found.</div>
+        <div className="text-forge-muted text-sm mb-2">Problem not found — check the ID or browse all problems.</div>
         <Link
           to={roundId ? `/problems/${roundId}` : "/problems"}
-          className="text-forge-accent text-xs hover:underline mt-2 inline-block"
+          className="text-forge-accent text-xs hover:underline"
         >
-          ← Back
+          ← Browse all problems
         </Link>
       </div>
     );
@@ -1167,10 +1165,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             specs={specs ?? []}
             sotaBySpec={sotaBySpec}
             activeSpecId={specId ?? null}
-            onSelectSpec={(id) => {
-              setSelectedSubmission(null);
-              navigate(`/problems/${round.id}/${id}`);
-            }}
+            onClearSelection={() => setSelectedSubmission(null)}
           />
 
           <div className="mt-4 p-3 bg-forge-surface border border-forge-border rounded-xl">
@@ -1209,7 +1204,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             <Suspense fallback={<ViewerSkeleton />}>
               <StepViewer
                 stepUrl={stepUrl(sota.submission_id)}
-                label={`SOTA — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
+                label={`Current best — ${fmtScore(sota.score, sota.score_metric)} by ${sota.contributor}`}
                 material={activeSpec?.material}
                 fallback={activeSpec ? <SpecDiagram spec={activeSpec} /> : undefined}
               />
@@ -1290,7 +1285,7 @@ function SpecDetailPage({ data }: { data: SharedData }) {
             </p>
           ) : (
             <p className="text-forge-muted text-xs mb-3">
-              No submissions yet — be the first to set the SOTA. Fork the repo and open a PR.
+              No submissions yet — be the first. Fork the repo, run FEA locally, and open a PR.
             </p>
           )}
           <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs text-forge-green space-y-1">
