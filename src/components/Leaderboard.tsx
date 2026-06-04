@@ -53,7 +53,7 @@ function StressBar({ value, max }: { value: number; max: number }) {
 export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Props) {
   const metric = spec.scoring.metric;
   const direction = spec.scoring.direction;
-  const { label: metricLabel, unit: metricUnit } = metricConfig(metric);
+  const { label: metricLabel, unit: metricUnit, description: metricDescription } = metricConfig(metric);
 
   // Rank by the submission's own score field; fall back to mass_grams for legacy rows.
   const scoreOf = (s: Submission) => s.score ?? s.mass_grams;
@@ -107,7 +107,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
             <tr className="text-xs text-forge-muted border-b border-forge-border">
               <th className="px-4 py-2 text-left font-medium">Rank</th>
               <th className="px-4 py-2 text-left font-medium cursor-help" title="Contributor = GitHub username. Agent = the agents/ folder name in the repo.">Agent / Contributor</th>
-              <th className="px-4 py-2 text-right font-medium">
+              <th className="px-4 py-2 text-right font-medium cursor-help" title={metricDescription}>
                 {metricLabel} {metricUnit ? `(${metricUnit})` : ""}
               </th>
               {baseline != null && (
