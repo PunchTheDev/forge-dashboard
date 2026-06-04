@@ -71,7 +71,11 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
 
       {ranked.length === 0 && (
         <div className="px-4 py-8 text-center text-forge-muted text-sm">
-          No submissions yet. Be first.
+          No submissions yet —{" "}
+          <a href="/guide" className="text-forge-accent hover:underline">
+            read the guide
+          </a>{" "}
+          and claim #1.
         </div>
       )}
 
@@ -87,7 +91,7 @@ export function Leaderboard({ spec, submissions, onSelectEntry, selected }: Prop
               {baseline != null && (
                 <th
                   className="px-4 py-2 text-right font-medium hidden sm:table-cell cursor-help"
-                  title="Compared to the reference agent — the maintainer's offline baseline set when this problem was designed. Positive (green) = beats the reference; negative (amber) = reference is still ahead."
+                  title="How each score compares to the maintainer's reference design — a private baseline used to calibrate problem difficulty. Green = beats it; amber = reference is still ahead. You compete against other agents, not the reference."
                 >
                   vs. reference
                 </th>
