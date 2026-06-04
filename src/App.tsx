@@ -128,7 +128,12 @@ interface SharedData {
 /** Redirect /rounds/:roundId and /round/:roundId → /problems/:roundId */
 function RoundRedirect() {
   const { roundId } = useParams<{ roundId: string }>();
-  return <Navigate to={`/problems/${roundId ?? ""}`} replace />;
+  // Normalize short numeric forms: /round/1 → /problems/round_001
+  const raw = roundId ?? "";
+  const normalized = /^\d{1,3}$/.test(raw)
+    ? `round_${raw.padStart(3, "0")}`
+    : raw;
+  return <Navigate to={`/problems/${normalized}`} replace />;
 }
 
 function AgentAliasRedirect() {
@@ -2359,8 +2364,31 @@ export default function App() {
         <Route path="/explore" element={<Navigate to="/explorer" replace />} />
         {/* Leaderboards (plural) — singular /leaderboard already aliased above. */}
         <Route path="/leaderboards" element={<Navigate to="/rankings" replace />} />
-        {/* Changelog — external to forge-api CHANGELOG.md (the version-pinned record). */}
+        {/* Changelog — external to forge-api CHANGELOG.md (the version-pinned record).
+            News/blog/announcement nouns also resolve here — CHANGELOG IS the news. */}
         <Route path="/changelog" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
+        <Route path="/news" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
+        <Route path="/blog" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
+        <Route path="/posts" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
+        <Route path="/announcements" element={<ExternalRedirect url="https://github.com/PunchTheDev/forge-api/blob/main/CHANGELOG.md" />} />
+        {/* Source-code nouns — same class as /fork; universal dev URL guesses. */}
+        <Route path="/code" element={<ExternalRedirect url={FORGE_REPO} />} />
+        <Route path="/source" element={<ExternalRedirect url={FORGE_REPO} />} />
+        <Route path="/repo" element={<ExternalRedirect url={FORGE_REPO} />} />
+        <Route path="/github" element={<ExternalRedirect url={FORGE_REPO} />} />
+        {/* Contributor — the noun used in the Leaderboard column header; first-timers guess this. */}
+        <Route path="/contributor" element={<Navigate to="/rankings" replace />} />
+        <Route path="/contributors" element={<Navigate to="/rankings" replace />} />
+        {/* Health — universal /health probe noun; API exposes /healthz. */}
+        <Route path="/health" element={<ExternalRedirect url={`${API_BASE_URL}/healthz`} />} />
+        {/* Stats / status — surface-level dashboard nouns; rankings is the stats surface. */}
+        <Route path="/stats" element={<Navigate to="/rankings" replace />} />
+        <Route path="/status" element={<Navigate to="/rankings" replace />} />
+        {/* Eval / run nouns — the action verb; lands on the playground spec picker. */}
+        <Route path="/eval" element={<Navigate to="/explorer" replace />} />
+        <Route path="/evaluation" element={<Navigate to="/explorer" replace />} />
+        <Route path="/run" element={<Navigate to="/explorer" replace />} />
+        <Route path="/runs" element={<Navigate to="/rankings" replace />} />
 
         {/* Specs — the noun the API exposes (GET /specs). Routes through /problems/<id>
             which already resolves bare specIds via CategoryPage's owner-round lookup. */}
