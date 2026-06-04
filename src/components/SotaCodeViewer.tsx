@@ -22,7 +22,11 @@ export function SotaCodeViewer({ sota, label }: { sota: SotaRecord; label: strin
 
   const [status, setStatus] = useState<"loading" | "ok" | "error">("loading");
   const [source, setSource] = useState<string>("");
-  const [expanded, setExpanded] = useState<boolean>(false);
+  // Auto-expand when arrived via the `#sota-code` deep-link (rankings/homepage `↗ code` chips
+  // route here instead of GitHub — landing collapsed would hide the very thing they clicked for).
+  const arrivedViaDeepLink =
+    typeof window !== "undefined" && window.location.hash === "#sota-code";
+  const [expanded, setExpanded] = useState<boolean>(arrivedViaDeepLink);
   const [copied, setCopied] = useState<boolean>(false);
 
   useEffect(() => {
@@ -47,6 +51,19 @@ export function SotaCodeViewer({ sota, label }: { sota: SotaRecord; label: strin
       cancelled = true;
     };
   }, [rawUrl]);
+
+  // If arrived via #sota-code (per-category `↗ code` chip), scroll the wrapper into view
+  // once after mount — SPA navigation doesn't auto-honor hash. The wrapper carrying the id
+  // sits on the parent element in HeroStats; we delegate by walking up to it.
+  useEffect(() => {
+    if (!arrivedViaDeepLink) return;
+    // Defer one frame so the SotaCodeViewer is mounted in the DOM tree first.
+    const t = window.setTimeout(() => {
+      const target = document.getElementById("sota-code");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+    return () => window.clearTimeout(t);
+  }, [arrivedViaDeepLink]);
 
   const lineCount = source ? source.split("\n").length : 0;
   // Show ~28 lines collapsed (≈560px @ 20px line-height) — enough to read the agent's

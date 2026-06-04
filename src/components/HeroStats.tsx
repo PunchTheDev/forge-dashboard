@@ -293,9 +293,11 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
       )}
 
       {/* SOTA agent source — the flywheel: read it, fork it, beat it by a decaying margin.
-       *  We pull the file inline (not link-out) so the loop stays on this page. */}
+       *  We pull the file inline (not link-out) so the loop stays on this page.
+       *  id="sota-code" + scroll-margin so per-category `↗ code` chips elsewhere can deep-link
+       *  here (the SotaCodeViewer auto-expands when arrived via that hash). */}
       {sota && (
-        <>
+        <div id="sota-code" style={{ scrollMarginTop: 96 }}>
           <div className="mt-4 px-1 text-xs text-forge-muted leading-relaxed">
             {seedLeads ? (
               <>
@@ -322,7 +324,7 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
             sota={sota}
             label={seedLeads ? "Top competitor agent" : "Current #1 agent"}
           />
-        </>
+        </div>
       )}
     </div>
   );

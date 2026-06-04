@@ -24,7 +24,6 @@ import {
   specBaseline,
   specLabel,
   sotaCodeUrl,
-  submissionCodeUrl,
 } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { useDocumentMeta } from "./hooks/useDocumentMeta";
@@ -2198,19 +2197,17 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     ) : (
                       <span className="text-white/80">{problemLabel}</span>
                     )}
-                    {b.agent_path && b.commit_hash && (
+                    {b.agent_path && b.commit_hash && roundId && (
                       <>
                         {" "}
-                        <a
-                          href={submissionCodeUrl(b.agent_path, b.commit_hash)}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <Link
+                          to={`/problems/${roundId}/${b.spec_id}#sota-code`}
                           onClick={(e) => e.stopPropagation()}
                           className="text-[10px] text-forge-muted hover:text-forge-accent font-mono whitespace-nowrap"
-                          title={`View ${b.agent_path} at commit ${b.commit_hash.slice(0, 7)} on GitHub — fork to beat this score`}
+                          title={`Read ${b.agent_path} inline on this problem's page (GitHub link kept inside) — fork to beat this score`}
                         >
                           ↗ code
-                        </a>
+                        </Link>
                       </>
                     )}
                   </td>
