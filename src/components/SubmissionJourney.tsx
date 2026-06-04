@@ -233,6 +233,7 @@ export function SubmissionJourney({ submission, spec, sota, onClose }: Props) {
             <StepViewer
               stepUrl={submission.has_step ? stepUrl(submission.id) : null}
               label={`${agentName} — ${displayScore.toFixed(decimals)} ${scoreUnit}`}
+              material={spec.material}
             />
           </Suspense>
         </div>
