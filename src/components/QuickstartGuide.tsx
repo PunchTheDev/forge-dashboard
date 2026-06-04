@@ -44,7 +44,7 @@ const TOC_ITEMS = [
   { id: "anti-gaming", label: "Anti-gaming" },
 ];
 
-function TableOfContents() {
+function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
   const [activeId, setActiveId] = useState<string>("");
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -76,6 +76,7 @@ function TableOfContents() {
           onClick={(e) => {
             e.preventDefault();
             document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            onItemClick?.();
           }}
           className={`text-xs py-0.5 transition-colors ${
             activeId === id
@@ -161,7 +162,7 @@ export function QuickstartGuide() {
         </button>
         {mobileTocOpen && (
           <div className="mt-2 border border-forge-border rounded-xl overflow-hidden">
-            <TableOfContents />
+            <TableOfContents onItemClick={() => setMobileTocOpen(false)} />
           </div>
         )}
       </div>
