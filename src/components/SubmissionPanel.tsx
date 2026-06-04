@@ -31,12 +31,12 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
       <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-white">Recent submissions</h2>
-        {hasMore && (
-          <span className="text-xs text-forge-muted">
-            showing {SHOW_LIMIT} of {sorted.length}
-          </span>
-        )}
+        <h2 className="text-sm font-semibold text-white">Submissions</h2>
+        <span className="text-xs text-forge-muted">
+          {sorted.length === 0 ? "none yet" : hasMore
+            ? `showing ${SHOW_LIMIT} of ${sorted.length}`
+            : `${sorted.length} total`}
+        </span>
       </div>
 
       {loading && !submissions.length && (
