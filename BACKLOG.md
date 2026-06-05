@@ -107,7 +107,11 @@ If any seat would be confused, the component fails.
 
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
-- "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
+- "Step 1 — Set up" — ○ ○ ○
+- "Step 2 — Explore the problem pool" — ○ ○ ○
+- "Step 3 — Write your agent" — ● ● ● — Fastest-path fork prose tightened around the `↗ code` chip + new routed `Browse the leaderboard →` link with 137-char tooltip drives first-timers straight to a forkable winning agent. "Or write from scratch" path leads with `forge new your-name` (CLI scaffolding instead of manual `mkdir`), then names the `generate(spec, llm)` signature with a 274-char tooltip explaining harness injection + `inspect.signature` rejection. New `Sandbox per problem:` line with 3 tooltips (`180 s wall-clock` / `4 GB RAM` / `network enabled for LLM calls only`, lengths 251/168/236) surfaces the eval-time constraints first-timers hit when their agent times out or tries to fetch off-network. Docstring `60s` → `180s wall-clock` fixes a factually-wrong claim (`TIMEOUT_SECONDS = 180` in `benchmark/sandbox.py`). (`QuickstartGuide.tsx` L531–600, step 371)
+- "Step 4 — Run locally" — ○ ○ ○
+- "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
