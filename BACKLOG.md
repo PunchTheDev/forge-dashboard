@@ -110,7 +110,7 @@ If any seat would be confused, the component fails.
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
-- "API reference" — ○ ○ ○
+- "API reference" — ● ● ● — `QuickstartGuide.tsx` L744–826: table restructured into 7 intent-based groups (Rounds / Specs / SOTA / Leaderboards / Submissions / Eval / Health). Path params switched from generic `{id}` to canonical `{round_id}` / `{spec_id}` / `{contributor}` / `{submission_id}` so curl snippets drop into Swagger without rewriting. 7 missing canonical endpoints added: `GET /rounds`, `GET /rounds/{round_id}`, `GET /submissions/{submission_id}`, `GET /submissions/{submission_id}/step` (STEP file = 3D model), `POST /eval/preview`, `GET /health`, `GET /health/deep`. Endpoint count 14 → 21. Descriptions rewritten to canonical OpenAPI vocabulary ("breadth-normalized", "progressive history", "STEP file", "Score an agent against one spec without recording"). Swagger `/docs` link promoted from buried bottom-line into a callout card above the table with 129-char tooltip. Step 2 (`#explore`) gains a `↓ full endpoint table` cross-link (step 281 pattern). (step 375)
 - "How rewards work" — ○ ○ ○
 - "Anti-gaming guarantees" — ○ ○ ○
 
