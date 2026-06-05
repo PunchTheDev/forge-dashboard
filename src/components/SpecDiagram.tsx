@@ -99,11 +99,18 @@ export function SpecDiagram({ spec, compact = false }: Props) {
   }
 
   return (
+    <div>
     <div className="flex gap-4 items-start">
       {/* Side view */}
-      <div className="flex-1">
-        <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
-          Side view
+      <div className="flex-1 min-w-0">
+        <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60 flex items-center gap-1.5">
+          <span>Side view</span>
+          <span
+            className="cursor-help text-[10px] normal-case opacity-70 border-b border-dotted border-forge-muted/40"
+            title="XZ plane — looking at the part from the side. Hatched wall is the mount face; arm cantilevers right to the load point. Downward arrow shows where and how hard the load presses."
+          >
+            ⓘ
+          </span>
         </div>
         <svg
           viewBox={`0 0 ${SW} ${SH}`}
@@ -202,13 +209,23 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           />
           <text
             x={lpX + 5}
-            y={lpZ + 16}
+            y={lpZ + 14}
             fill={color}
             fontSize={7}
             fontFamily="monospace"
             opacity={0.85}
           >
-            {fmt(c.load_newtons, 0)}N
+            ↓ {fmt(c.load_newtons, 0)}N
+          </text>
+          <text
+            x={lpX + 5}
+            y={lpZ + 22}
+            fill={color}
+            fontSize={6}
+            fontFamily="monospace"
+            opacity={0.6}
+          >
+            (downward)
           </text>
           <defs>
             <marker
@@ -261,8 +278,14 @@ export function SpecDiagram({ spec, compact = false }: Props) {
 
       {/* Front view — bolt pattern (hidden in compact mode) */}
       {!compact && <div className="shrink-0">
-        <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60">
-          Front view — bolt pattern
+        <div className="text-forge-muted text-xs mb-1 uppercase tracking-wider opacity-60 flex items-center gap-1.5">
+          <span>Front view — bolt pattern</span>
+          <span
+            className="cursor-help text-[10px] normal-case opacity-70 border-b border-dotted border-forge-muted/40"
+            title="YZ plane — looking straight at the mount face. Black circles are the bolt-hole positions your design must include at this exact pattern. Dashed circle is where the load projects onto the plate."
+          >
+            ⓘ
+          </span>
         </div>
         <svg
           viewBox={`0 0 ${FW} ${FH}`}
@@ -356,10 +379,13 @@ export function SpecDiagram({ spec, compact = false }: Props) {
           </g>
         </svg>
       </div>}
+    </div>
 
-      {/* Constraint stats — shown when not compact */}
+      {/* Constraint stats — shown when not compact. Sibling block (NOT a flex
+          child of the diagrams row) so its w-full doesn't squash the side
+          view to a thumbnail. */}
       {!compact && (
-        <div className="w-full mt-2 grid grid-cols-3 gap-x-4 gap-y-1 text-xs font-mono text-forge-muted border-t border-forge-border/30 pt-2">
+        <div className="mt-3 grid grid-cols-3 gap-x-4 gap-y-1 text-xs font-mono text-forge-muted border-t border-forge-border/30 pt-2">
           <span className="cursor-help" title="Applied load force">
             <span className="text-forge-text/50">load </span>
             <span style={{ color }}>{fmt(c.load_newtons, 0)} N ({fmt(c.load_newtons / 9.81, 1)} kg)</span>
