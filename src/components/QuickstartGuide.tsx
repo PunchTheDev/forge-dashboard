@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -339,39 +340,48 @@ function Section({ id, title, children }: { id?: string; title: string; children
   );
 }
 
+// `goal` strings are the canonical one-liners from App.tsx:CATEGORY_META — same vocab the
+// category-page H1 + spec-detail CATEGORY_PILL.goal row use, so the first-timer's mental
+// model carries across pages. `subdesc` adds the engineering rationale below.
 const CATEGORIES = [
   {
     id: "round_001",
     label: "Mass Optimization",
-    metric: "mass_grams",
     unit: "g",
+    unitTip:
+      "g = grams. Lower is better. Score is the mass of the generated part in grams — measured by the FEA harness from the STEP file's volume × material density.",
     direction: "minimize" as const,
     color: "text-forge-green",
     bg: "bg-forge-green/10",
     border: "border-forge-green/30",
-    desc: "Lightest part that passes FEA. Material density and topology matter most.",
+    goal: "Lightest part that survives the load wins.",
+    subdesc: "Material density and topology matter most — every gram pruned that still passes FEA improves your score.",
   },
   {
     id: "round_002",
     label: "Stiffness/Weight",
-    metric: "stiffness_to_weight",
     unit: "N/(mm·g)",
+    unitTip:
+      "N/(mm·g) = newtons per millimetre of deflection, per gram of part. Higher is better. Score = applied load ÷ tip deflection ÷ mass — a structural-efficiency ratio.",
     direction: "maximize" as const,
     color: "text-forge-accent",
     bg: "bg-forge-accent/10",
     border: "border-forge-accent/30",
-    desc: "Stiffness per gram — maximize load resistance while minimizing mass.",
+    goal: "Highest stiffness-per-gram wins.",
+    subdesc: "Maximize load resistance while minimizing mass — geometry-driven, not just heavier-is-better.",
   },
   {
     id: "round_003",
     label: "Deflection",
-    metric: "deflection_mm",
     unit: "mm",
+    unitTip:
+      "mm = millimetres of tip deflection under the applied load. Lower is better. Score is the displacement of the load point measured by CalculiX after applying the spec's load vector.",
     direction: "minimize" as const,
     color: "text-forge-red",
     bg: "bg-forge-red/10",
     border: "border-forge-red/30",
-    desc: "Least tip deflection under load. Rigidity over lightness — thick cross-sections win.",
+    goal: "Least bending under the applied load wins.",
+    subdesc: "Rigidity over lightness — thick cross-sections and well-placed ribs win.",
   },
 ];
 
@@ -442,24 +452,47 @@ export function QuickstartGuide() {
       <Section id="categories" title="The three categories">
         <p className="text-forge-muted text-sm">
           Every PR is evaluated on one problem from each category. Your composite score is what
-          determines your ranking — not just your best single-problem result.
+          determines your ranking — not just your best single-problem result. Click any card
+          below to jump to the live category page and start with a real problem.
         </p>
         <div className="flex flex-col gap-3">
           {CATEGORIES.map((cat) => (
-            <div key={cat.id} className={`rounded-xl border p-4 ${cat.bg} ${cat.border}`}>
+            <Link
+              key={cat.id}
+              to={`/problems/${cat.id}`}
+              title={`Open the ${cat.label} category page — 15 problems at easy / medium / hard, with the current SOTA and unclaimed targets.`}
+              className={`block rounded-xl border p-4 transition-colors hover:border-white/40 ${cat.bg} ${cat.border}`}
+            >
               <div className="flex items-start justify-between gap-3 mb-1">
                 <div className={`text-xs font-bold ${cat.color}`}>{cat.label}</div>
-                <div className={`text-xs font-mono ${cat.color} shrink-0`}>
-                  {cat.direction === "minimize" ? "↓ minimize" : "↑ maximize"} {cat.unit}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    title={cat.unitTip}
+                    className={`text-xs font-mono ${cat.color} cursor-help border-b border-dotted border-current/50`}
+                  >
+                    {cat.direction === "minimize" ? "↓ minimize" : "↑ maximize"} {cat.unit}
+                  </span>
                 </div>
               </div>
-              <div className="text-forge-muted text-xs leading-relaxed">{cat.desc}</div>
-            </div>
+              <div className="text-white text-xs font-medium leading-relaxed mb-1">
+                {cat.goal}
+              </div>
+              <div className="text-forge-muted text-xs leading-relaxed">{cat.subdesc}</div>
+              <div className={`text-[10px] mt-2 ${cat.color} opacity-80`}>
+                Open category →
+              </div>
+            </Link>
           ))}
         </div>
         <p className="text-forge-muted text-xs leading-relaxed">
-          Each category has <strong className="text-white">15 problems</strong> at three difficulty
-          tiers (easy / medium / hard). PR CI runs 1 easy problem per category for a quick pass/fail check (~5 min).
+          Each category has <strong className="text-white">15 problems</strong> at{" "}
+          <span
+            title="Difficulty tiers reflect load magnitude, tolerance tightness, and build-volume freedom — not solver complexity. Easy problems are forgiving entry points; hard problems push structural limits."
+            className="cursor-help border-b border-dotted border-forge-muted/50"
+          >
+            three difficulty tiers (easy / medium / hard)
+          </span>
+          . PR CI runs 1 easy problem per category for a quick pass/fail check (~5 min).
           Full scoring runs across <strong className="text-white">all 45 problems</strong> — no sampling variance in the final rank.
         </p>
       </Section>
