@@ -698,10 +698,15 @@ for chunk in llm.stream([...]):
       {/* Step 4 */}
       <Section id="eval" title="Step 4 — Eval locally">
         <p className="text-forge-muted text-sm">
-          Test your agent before submitting. The local eval runs the same FEA pipeline as CI.
-          Try problems from all three categories to check your agent generalizes.
+          Iterate offline before submitting. CI runs only{" "}
+          <a href="#anti-gaming" className="text-forge-accent hover:underline">3 of 45 problems per PR</a>,
+          so local runs are how you catch regressions and tune without burning PR slots. <code className="bg-forge-border px-1 rounded">forge eval --docker</code> uses the same{" "}
+          <span className="cursor-help border-b border-dotted border-forge-muted" title="forge-eval:latest — the container image GHCR publishes and CI pulls. Running --docker locally hits the same CalculiX/gmsh/OCP versions as the leaderboard run, so a local PASS won't surprise you with a CI FAIL.">
+            <code className="bg-forge-border px-1 rounded">forge-eval:latest</code> image
+          </span>{" "}
+          CI pulls, so a passing local run will pass CI.
         </p>
-        <CodeBlock code={`# Recommended: run inside Docker (no local CalculiX/gmsh needed):
+        <CodeBlock code={`# Recommended: run inside Docker (exact CI parity, no local CalculiX/gmsh needed):
 forge eval agents/your-name/agent.py --spec r01_001_easy --docker  # mass
 forge eval agents/your-name/agent.py --spec r02_001_easy --docker  # stiffness/weight
 forge eval agents/your-name/agent.py --spec r03_001_easy --docker  # deflection
@@ -709,13 +714,38 @@ forge eval agents/your-name/agent.py --spec r03_001_easy --docker  # deflection
 # Or natively if CalculiX + gmsh are installed:
 forge eval agents/your-name/agent.py --spec r01_001_easy
 
-# Compare your agent vs. the current leader:
-forge status agents/your-name/agent.py`} />
-        <p className="text-forge-muted text-xs">
-          A passing result means your design: (1) fits in the build volume, (2) has bolt hole
-          clearance, (3) meets overhang and wall thickness constraints, (4) survives FEA at
-          the specified load × safety factor.
+# Eval + compare against the live SOTA for that spec:
+forge status agents/your-name/agent.py --spec r01_001_easy`} />
+        <p className="text-forge-muted text-sm">
+          A pass means your design cleared every stage of the four-stage pipeline (defined in <code className="bg-forge-border px-1 rounded">benchmark/evaluate.py</code>):
         </p>
+        <ol className="text-forge-muted text-xs space-y-1 list-decimal list-inside">
+          <li>
+            <span className="cursor-help border-b border-dotted border-forge-muted" title="Stage 1 — agent: your generate(spec, llm) returned a non-empty .step file within the 180 s sandbox wall-clock. Defined in benchmark/evaluate.py around the 'agent' stage; failure surfaces as stage='agent' in the eval JSON.">
+              <strong className="text-forge-text">agent</strong>
+            </span>{" "}
+            — your <code className="bg-forge-border px-0.5 rounded">generate(spec, llm)</code> returned a non-empty STEP file inside the 180 s sandbox.
+          </li>
+          <li>
+            <span className="cursor-help border-b border-dotted border-forge-muted" title="Stage 2 — geometry: four sequential checks in benchmark/geometry.py — (a) part fits inside spec.constraints.build_volume_mm, (b) ray-shoot at each spec.constraints.bolt_pattern_mm center finds a hole through the mount face, (c) face normals stay within spec.constraints.max_overhang_deg, (d) inner chords through solid material clear spec.constraints.min_wall_thickness_mm.">
+              <strong className="text-forge-text">geometry</strong>
+            </span>{" "}
+            — fits <code className="bg-forge-border px-0.5 rounded">build_volume_mm</code>, holes present at <code className="bg-forge-border px-0.5 rounded">bolt_pattern_mm</code>, faces within <code className="bg-forge-border px-0.5 rounded">max_overhang_deg</code>, chords ≥ <code className="bg-forge-border px-0.5 rounded">min_wall_thickness_mm</code>.
+          </li>
+          <li>
+            <span className="cursor-help border-b border-dotted border-forge-muted" title="Stage 3 — FEA: CalculiX solves the part under the spec's load_n at the mount face, then compares max von Mises against the allowable stress = material.yield_stress_mpa / spec.constraints.safety_factor. This is the correctness gate; failure means your part would yield under the rated load before the safety margin runs out.">
+              <strong className="text-forge-text">fea</strong>
+            </span>{" "}
+            — max von Mises ≤ <code className="bg-forge-border px-0.5 rounded">yield_stress_mpa / safety_factor</code> under the rated load. The correctness gate.
+          </li>
+          <li>
+            <span className="cursor-help border-b border-dotted border-forge-muted" title="Stage 4 — similarity: scripts/check_source_similarity.py compares your agent.py against every other passing agent at the AST level. Above the configured threshold the submission is rejected as a copy. See the Anti-gaming section for the full list of guarantees.">
+              <strong className="text-forge-text">similarity</strong>
+            </span>{" "}
+            — your <code className="bg-forge-border px-0.5 rounded">agent.py</code> isn't a near-copy of an existing passing agent (
+            <a href="#anti-gaming" className="text-forge-accent hover:underline">anti-gaming</a> details).
+          </li>
+        </ol>
       </Section>
 
       {/* Step 5 */}
