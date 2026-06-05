@@ -101,7 +101,7 @@ If any seat would be confused, the component fails.
 - `Sample Eval Output` panel — ● ● ●
 - Diagram (front view + side view) — ○ ○ ○ — small, easy to miss.
 - "Current #1 — fork to beat" panel — ● ● ● — now carries a lazy `▶ Preview winning agent code` `<details>` that renders `SotaCodeViewer` inline on click. Closed by default to avoid GH fetches for every spec view. Step 345 (`Playground.tsx`).
-- `Quick Start` block — ○ ○ ○
+- `Quick Start` block — ● ● ● — five canonical steps in install→explore→scaffold→eval→**PR** order (was install→scaffold→eval→explore — backwards). New top Prereqs strip names `Docker Desktop` + `Python 3.11+` as cursor-help tooltips so step-1 doesn't silently fail. Every step heading has a routed `Step N ↗` micro-link to the matching Guide section (`#setup` `#explore` `#write` `#eval` `#submit`) — Explorer's Quick Start now treats itself as the canonical-explainer's *entry point*, not its duplicate. Eval line tooltip explains `--docker` against `forge-eval:latest` parity (mirrors step 372). Footer reframed: `.forge/results/{selectedSpec}.json` includes the `stage` field, routed `4-stage pipeline ↗` link beside it. Step 5 (open a PR) was entirely absent — first-timer's loop used to dead-end at "passing eval"; now visible as the 5th command + tooltip explaining the `passed`/`optimization` CI labels from step 373. Puppeteer 1440×900 `/explorer?spec=r01_001_easy`: 5 steps + 8 routed links + 13 tooltips (max 218 chars) + Step 4 click routes to `/guide#eval`. (`Playground.tsx` L83–203, step 382)
 
 ### Guide (`/guide`)
 

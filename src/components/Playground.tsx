@@ -80,20 +80,26 @@ function EvalCommandBox({ command }: { command: string }) {
   );
 }
 
-function QuickStartBlock({ evalCommand, apiBase }: { evalCommand: string; apiBase: string }) {
+function QuickStartBlock({ evalCommand, apiBase, selectedSpecId }: { evalCommand: string; apiBase: string; selectedSpecId: string }) {
   const [copied, setCopied] = useState(false);
+  const specForCurl = selectedSpecId || "r01_001_easy";
   const fullScript = [
-    `# 1. clone the repo`,
+    `# Prereqs: Docker Desktop + Python 3.11+`,
+    ``,
+    `# 1. clone + install the forge CLI`,
     `git clone https://github.com/PunchTheDev/forge && cd forge && pip install -e .`,
     ``,
-    `# 2. scaffold your agent`,
+    `# 2. pick a problem (browse all 45, or filter to unclaimed)`,
+    `curl '${apiBase}/specs?active=true&unclaimed=true'`,
+    ``,
+    `# 3. scaffold an agent (copies agents/template/agent.py)`,
     `forge new my-agent`,
     ``,
-    `# 3. run eval (Docker builds the sandbox)`,
+    `# 4. eval against the picked spec in Docker (mirrors CI)`,
     evalCommand,
     ``,
-    `# 4. see open problems via API`,
-    `curl '${apiBase}/specs?active=true&unclaimed=true'`,
+    `# 5. open a PR — passing + ≥0.5% better than SOTA claims the spot`,
+    `git checkout -b my-agent && git add agents/my-agent && git commit -m "add my-agent" && gh pr create`,
   ].join("\n");
 
   return (
@@ -107,26 +113,104 @@ function QuickStartBlock({ evalCommand, apiBase }: { evalCommand: string; apiBas
             setTimeout(() => setCopied(false), 1500);
           }}
           className="text-[10px] px-2 py-0.5 rounded border border-forge-border bg-forge-bg text-forge-muted hover:text-white hover:border-forge-accent/50 transition-colors"
-          title="Copy all setup commands to clipboard"
+          title="Copy all 5 setup commands (Docker + Python 3.11+ assumed) to clipboard"
         >
           {copied ? "copied ✓" : "copy all"}
         </button>
       </div>
-      <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
-        <div><span className="text-forge-muted"># 1. clone the repo</span></div>
-        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone https://github.com/PunchTheDev/forge && cd forge && pip install -e .</span></div>
-        <div className="mt-2"><span className="text-forge-muted"># 2. scaffold your agent</span></div>
-        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">forge new my-agent</span></div>
-        <div className="mt-2"><span className="text-forge-muted"># 3. run eval (Docker builds the sandbox)</span></div>
-        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{evalCommand}</span></div>
-        <div className="mt-2"><span className="text-forge-muted"># 4. see open problems via API</span></div>
-        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">{"curl '" + apiBase + "/specs?active=true&unclaimed=true'"}</span></div>
+
+      {/* Prerequisites callout — first-timers fail Step 1 silently without these */}
+      <div className="bg-forge-bg/60 border border-forge-border/50 rounded-md px-3 py-2 mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+        <span className="text-forge-muted uppercase tracking-wider text-[9px] font-semibold">Prereqs</span>
+        <span
+          className="cursor-help border-b border-dotted border-forge-muted/50 text-white"
+          title="Docker Desktop (or Docker Engine on Linux). The eval harness builds a forge-eval:latest image on first --docker run; it ships with CalculiX, gmsh, and OCP pre-installed so you don't have to install any of them locally."
+        >
+          Docker Desktop
+        </span>
+        <span className="text-forge-border">·</span>
+        <span
+          className="cursor-help border-b border-dotted border-forge-muted/50 text-white"
+          title="Python 3.11 or newer — the forge CLI installs as a pip package. 3.10 will fail on type-hint syntax used in forge/sdk."
+        >
+          Python 3.11+
+        </span>
+        <span className="text-forge-border">·</span>
+        <Link
+          to="/guide#setup"
+          className="text-forge-accent hover:underline"
+          title="Guide → Step 1: full setup explainer with check-deps verification + Docker rationale."
+        >
+          full setup →
+        </Link>
       </div>
-      <div className="mt-3 text-xs text-forge-muted">
-        Full guide:{" "}
-        <Link to="/guide" className="text-forge-accent hover:underline">Forge Guide →</Link>
-        {" · "}
-        Results are written to <code className="text-forge-accent">.forge/results/</code>
+
+      <div className="bg-forge-bg rounded-lg p-3 font-mono text-xs space-y-1">
+        {/* Step 1 — clone + install */}
+        <div className="flex items-baseline justify-between">
+          <span className="text-forge-muted"># 1. clone + install the forge CLI</span>
+          <Link to="/guide#setup" className="text-forge-muted/60 hover:text-forge-accent text-[10px]" title="Guide → Step 1 — Set up">Step 1 ↗</Link>
+        </div>
+        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git clone https://github.com/PunchTheDev/forge && cd forge && pip install -e .</span></div>
+
+        {/* Step 2 — explore (moved up: must pick a spec BEFORE eval) */}
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-forge-muted"># 2. pick a problem (browse all 45, or filter to unclaimed)</span>
+          <Link to="/guide#explore" className="text-forge-muted/60 hover:text-forge-accent text-[10px]" title="Guide → Step 2 — Explore the problem pool (CLI + API)">Step 2 ↗</Link>
+        </div>
+        <div>
+          <span className="text-forge-muted">$ </span>
+          <span
+            className="text-forge-green cursor-help border-b border-dotted border-forge-border/40"
+            title="Returns a JSON array of every spec without a passing #1 — the easiest entry points: any passing submission claims them outright, no margin to beat."
+          >
+            {"curl '" + apiBase + "/specs?active=true&unclaimed=true'"}
+          </span>
+        </div>
+
+        {/* Step 3 — scaffold */}
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-forge-muted"># 3. scaffold an agent</span>
+          <Link to="/guide#write" className="text-forge-muted/60 hover:text-forge-accent text-[10px]" title="Guide → Step 3 — Write your agent (fork-the-current-#1 path + generate signature)">Step 3 ↗</Link>
+        </div>
+        <div>
+          <span className="text-forge-muted">$ </span>
+          <span
+            className="text-forge-green cursor-help border-b border-dotted border-forge-border/40"
+            title="Copies agents/template/agent.py → agents/my-agent/agent.py. The template implements generate(spec, llm) -> bytes — the canonical two-param contract. Edit that file to build your geometry."
+          >
+            forge new my-agent
+          </span>
+        </div>
+
+        {/* Step 4 — eval */}
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-forge-muted"># 4. eval in Docker (mirrors CI exactly)</span>
+          <Link to="/guide#eval" className="text-forge-muted/60 hover:text-forge-accent text-[10px]" title="Guide → Step 4 — Eval locally (4-stage pipeline: agent → geometry → fea → similarity)">Step 4 ↗</Link>
+        </div>
+        <div>
+          <span className="text-forge-muted">$ </span>
+          <span
+            className="text-forge-green cursor-help border-b border-dotted border-forge-border/40"
+            title="The --docker flag runs the eval inside the forge-eval:latest image — the same image CI uses, so a local PASS won't surprise you with a CI FAIL. Drop --docker only if you have CalculiX + gmsh + OCP installed natively."
+          >
+            {evalCommand}
+          </span>
+        </div>
+
+        {/* Step 5 — submit PR (NEW: was absent — onboarding loop ended at eval) */}
+        <div className="mt-2 flex items-baseline justify-between">
+          <span className="text-forge-muted"># 5. open a PR (CI samples 3 specs; passing + ≥0.5% gain claims the spot)</span>
+          <Link to="/guide#submit" className="text-forge-muted/60 hover:text-forge-accent text-[10px]" title="Guide → Step 5 — Submit (CI labels: passed / optimization; score.yml runs full pool after merge)">Step 5 ↗</Link>
+        </div>
+        <div><span className="text-forge-muted">$ </span><span className="text-forge-green">git checkout -b my-agent &amp;&amp; git commit -am "add my-agent" &amp;&amp; gh pr create</span></div>
+      </div>
+
+      <div className="mt-3 text-xs text-forge-muted flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span>Results land in <code className="text-forge-accent">.forge/results/{specForCurl}.json</code> — the JSON includes a <code className="text-forge-accent">stage</code> field naming where it stopped:</span>
+        <Link to="/guide#eval" className="text-forge-accent hover:underline" title="The 4-stage pipeline (agent → geometry → fea → similarity) and what each stage gates on.">4-stage pipeline ↗</Link>
+        <span className="text-forge-border">·</span>
+        <Link to="/guide" className="text-forge-accent hover:underline" title="Canonical onboarding explainer — TOC, models, patterns, API, rewards, anti-gaming.">Full Guide ↗</Link>
       </div>
     </>
   );
@@ -530,7 +614,7 @@ export function Playground({ specs, loading, sotaBySpec = {}, sotaRecordsBySpec 
 
           {/* Quick-start */}
           <div className="bg-forge-surface border border-forge-border rounded-xl p-4">
-            <QuickStartBlock evalCommand={evalCommand} apiBase={API_BASE_URL} />
+            <QuickStartBlock evalCommand={evalCommand} apiBase={API_BASE_URL} selectedSpecId={selectedSpecId} />
           </div>
         </div>
       </div>
