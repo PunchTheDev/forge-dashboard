@@ -105,7 +105,7 @@ If any seat would be confused, the component fails.
 
 ### Guide (`/guide`)
 
-- TOC / sticky nav — ○ ○ ○
+- TOC / sticky nav — ● ● ● — flat 12-item list grouped into Concepts · Onboarding · Reference buckets so first-timer sees the onboarding arc at a glance. Per-item `title=` tooltip (113–134 chars) previews each section's content (e.g. Step 3 → "Implement the canonical generate(spec, llm) -> bytes contract returning a STEP file. Two reference patterns in examples/."). Clicks now `history.replaceState` the URL hash so refresh + back-button + share-link all round-trip (deep-link refresh-proofing item). Modifier-key click (cmd/ctrl/shift/alt) honors browser default so links open in new tab. (`QuickstartGuide.tsx` L271–425)
 - "The three categories" section — ○ ○ ○
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
