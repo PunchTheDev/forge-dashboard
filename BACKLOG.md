@@ -69,7 +69,7 @@ If any seat would be confused, the component fails.
 
 - Spec header + plain-English summary — ● ● ● — sentence above diagram ties material+load+arm+MPa together; chips on H1 row carry tooltips. (step 344, `735dbec`)
 - Spec spec-card (material / load / wall / overhang / score) — ◐ ◐ ○ — units (N vs kg) repeated; "SF 1.5×" cryptic.
-- `SpecDiagram` (front view + side view miniature) — ○ ○ ○ — too small; load arrow direction not labeled.
+- `SpecDiagram` (front view + side view miniature) — ● ● ● — layout bug fixed: the side view was rendering at 31×23px (a thumbnail) on every consumer because the constraint stats div with `w-full` was a sibling flex child squashing the `flex-1` side view. `SpecDiagram.tsx` parent rewritten as `<div>` wrapping (a) a `flex gap-4 items-start` row containing JUST the two SVGs and (b) the stats grid as a sibling block below. Side view now renders at 178–744px wide depending on container. Load arrow gains `↓ 149N (downward)` explicit-direction label (was just `149N`); both view-headers gain dotted-underline `ⓘ` tooltips naming the plane (XZ side / YZ front) + what each visual element means. (`SpecDiagram.tsx` L101–112, L196–215, L264–275, step 379)
 - 4 KPI tiles (best mass / vs reference / stress margin / passing entries) — ● ● ● — clean.
 - "Maintainer reference still leads" banner — ● ● ● — banner now front-loads the category direction sentence ("Lower mass wins this category" / "Higher stiffness wins this category" / "Lower deflection wins this category") before the gap %, and uses metric-specific gap verbs ("is 5.2% heavier than the reference at 263.20 g" / "still falls X% short of the reference at Y N/(mm·g)" / "deflects X% more than the reference at Y mm"). Bar-to-beat is inline with the percentage so a first-timer reads direction → gap → concrete target in one pass. (`HeroStats.tsx` L281–319, step 352)
 - **"Top competitor — open-source code"** panel — ● ● ● — `SotaCodeViewer` now renders `agent.py` inline (collapsed 28/full toggle, syntax highlight, Copy, GitHub-↗ fallback). Shipped step 343.
@@ -99,7 +99,7 @@ If any seat would be confused, the component fails.
 - `Constraints` card (material / load / arm / SF / build volume / bolts / optimize) — ● ● ● — Safety factor row now reads `1.5× (≤{computed} MPa max stress)` so the abstract multiplier resolves to the concrete stress ceiling a designer reasons about. Allowable pulled from `allowableStress(spec)` (material-aware: PETG → 27 MPa, harder PLA-based spec → 33 MPa). Tooltip rewritten to spell the division: "Yield stress ÷ 1.5 = 27 MPa max allowable stress." (`Playground.tsx` L448–457)
 - `Eval Command` panel — ● ● ● — copy-pasteable, well annotated.
 - `Sample Eval Output` panel — ● ● ●
-- Diagram (front view + side view) — ○ ○ ○ — small, easy to miss.
+- Diagram (front view + side view) — ● ● ● — fixed in step 379 via the shared `SpecDiagram.tsx` layout repair (see Spec detail row above for full rationale). Diagram on `/explorer` now renders the side view at 178px wide (was 31px) with explicit `↓ downward` load arrow + plane-axis tooltips on both view headers. (`SpecDiagram.tsx`)
 - "Current #1 — fork to beat" panel — ● ● ● — now carries a lazy `▶ Preview winning agent code` `<details>` that renders `SotaCodeViewer` inline on click. Closed by default to avoid GH fetches for every spec view. Step 345 (`Playground.tsx`).
 - `Quick Start` block — ○ ○ ○
 
