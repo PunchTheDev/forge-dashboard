@@ -107,7 +107,11 @@ If any seat would be confused, the component fails.
 
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
-- "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
+- "Step 1 — Set up" — ○ ○ ○
+- "Step 2 — Explore the problem pool" — ○ ○ ○
+- "Step 3 — Write your agent" — ○ ○ ○
+- "Step 4 — Eval locally" — ● ● ● — Lead rewritten around the *why* of local eval ("3 of 45 problems per PR" with a routed `#anti-gaming` link + `forge-eval:latest` Docker-image parity tooltip, 209 chars) instead of generic "test before submitting". Bottom 4-item list rebuilt as the canonical pipeline stages from `benchmark/evaluate.py` (`agent → geometry → fea → similarity`) — each as a dotted-underline tooltip naming the source file + concrete spec field (`build_volume_mm`, `bolt_pattern_mm`, `max_overhang_deg`, `min_wall_thickness_mm`, `yield_stress_mpa / safety_factor`); tooltip lengths 221/373/323/261. Fixes prior factually-wrong "bolt hole clearance" copy (the geometry check is hole *presence* via ray-shoot at the bolt center, not clearance). Similarity stage routed to `#anti-gaming` so the new section sibling is reachable in one click. (`QuickstartGuide.tsx` L698–752, step 372)
+- "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
