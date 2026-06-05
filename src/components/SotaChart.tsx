@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { Link } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -139,7 +140,13 @@ export function SotaChart({ spec }: Props) {
       <div className="bg-forge-surface border border-forge-border rounded-xl px-4 py-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-white cursor-help" title="Best score — the highest-ranking submission on this problem. Each step up marks a new agent beating the previous record.">Best score over time</h2>
-          <span className="text-xs text-forge-muted">1 submission</span>
+          <a
+            href="#sota-code"
+            className="text-xs text-forge-accent hover:underline cursor-help"
+            title="Jump to the inline agent.py viewer above — read the winning code, then fork it and beat the score by a decaying margin."
+          >
+            ↑ Fork the winning agent.py
+          </a>
         </div>
         <div className="flex items-center gap-4">
           <div className="h-8 w-8 rounded-full bg-forge-green/15 border border-forge-green/30 flex items-center justify-center text-forge-green text-xs font-bold">
@@ -150,7 +157,14 @@ export function SotaChart({ spec }: Props) {
               {p.score}{unit}
             </div>
             <div className="text-xs text-forge-muted mt-0.5">
-              Sole submission · by <span className="text-white">{p.contributor}</span> · {p.date}
+              Sole submission · by{" "}
+              <Link
+                to={`/rankings/${encodeURIComponent(p.contributor)}`}
+                className="text-white hover:text-forge-accent hover:underline"
+              >
+                {p.contributor}
+              </Link>
+              {" · "}{p.date}
             </div>
           </div>
         </div>
@@ -168,12 +182,18 @@ export function SotaChart({ spec }: Props) {
   }
 
   const currentSota = points[points.length - 1].score;
+  const currentHolder = points[points.length - 1].contributor;
   const domain = smartDomain(direction, baseline);
+  // Distinct record-holders in submission order (each entry held #1 at some point)
+  const holders = points.reduce<string[]>((acc, p) => {
+    if (acc[acc.length - 1] !== p.contributor) acc.push(p.contributor);
+    return acc;
+  }, []);
 
   return (
     <div className="bg-forge-surface border border-forge-border rounded-xl overflow-hidden">
-      <div className="px-4 py-3 border-b border-forge-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="px-4 py-3 border-b border-forge-border flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <h2 className="text-sm font-semibold text-white cursor-help" title="Best score — the highest-ranking submission on this problem. Chart shows how the record has improved over time as agents beat each other.">Best score over time</h2>
           <span className="text-xs text-forge-muted">
             {direction === "minimize" ? "↓ lower is better" : "↑ higher is better"}
@@ -187,10 +207,28 @@ export function SotaChart({ spec }: Props) {
             </span>
           )}
         </div>
-        <span className="font-mono text-forge-green text-sm font-semibold">
-          {currentSota}
-          {unit}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-forge-green text-sm font-semibold">
+            {currentSota}
+            {unit}
+          </span>
+          <span className="text-xs text-forge-muted">
+            by{" "}
+            <Link
+              to={`/rankings/${encodeURIComponent(currentHolder)}`}
+              className="text-white hover:text-forge-accent hover:underline"
+            >
+              {currentHolder}
+            </Link>
+          </span>
+          <a
+            href="#sota-code"
+            className="text-xs text-forge-accent hover:underline cursor-help"
+            title="Jump to the inline agent.py viewer above — read the winning code, then fork it and beat the score by a decaying margin."
+          >
+            ↑ Fork
+          </a>
+        </div>
       </div>
       <div className="px-2 py-4 h-52">
         <ResponsiveContainer width="100%" height="100%">
@@ -250,6 +288,29 @@ export function SotaChart({ spec }: Props) {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      {holders.length > 1 && (
+        <div
+          className="px-4 py-2 border-t border-forge-border/30 text-xs text-forge-muted flex flex-wrap items-center gap-1"
+          title="Each name held #1 at some point. Click any to see their other submissions — they may have published a better agent on a different problem."
+        >
+          <span className="text-[10px] uppercase tracking-wide text-forge-muted/70 mr-1">Held #1</span>
+          {holders.map((h, i) => (
+            <span key={`${h}-${i}`} className="flex items-center gap-1">
+              <Link
+                to={`/rankings/${encodeURIComponent(h)}`}
+                className={
+                  i === holders.length - 1
+                    ? "text-forge-green hover:underline font-medium"
+                    : "text-white/80 hover:text-forge-accent hover:underline"
+                }
+              >
+                {h}
+              </Link>
+              {i < holders.length - 1 && <span className="text-forge-muted/50">→</span>}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
