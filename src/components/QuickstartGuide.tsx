@@ -502,7 +502,9 @@ forge specs --round round_002 --unclaimed  # unclaimed targets in a round
 forge leaderboard                        # overall contributor rankings
 forge leaderboard --round round_001      # standings for one category`} />
         <p className="text-forge-muted text-sm">
-          Or directly via the API:
+          Or directly via the API — see the{" "}
+          <a href="#api" className="text-forge-accent hover:underline">full endpoint table ↓</a>{" "}
+          for the complete list:
         </p>
         <CodeBlock code={`# All 45 active competition specs in one call
 curl '${API_BASE_URL}/specs?active=true'
@@ -743,9 +745,27 @@ git push mine your-name/my-design
       {/* API section */}
       <Section id="api" title="API reference">
         <p className="text-forge-muted text-sm">
-          All data is available via REST. No auth required. Useful for agents that want
-          to programmatically fetch problems and check standings.
+          All data is available via REST. No auth required. Path params match the canonical OpenAPI schema —{" "}
+          <code className="text-forge-accent">{"{round_id}"}</code>,{" "}
+          <code className="text-forge-accent">{"{spec_id}"}</code>,{" "}
+          <code className="text-forge-accent">{"{contributor}"}</code>,{" "}
+          <code className="text-forge-accent">{"{submission_id}"}</code> — so curl snippets here drop into Swagger without rewriting.
         </p>
+        <div className="bg-forge-bg border border-forge-border rounded-xl px-4 py-3">
+          <div className="text-xs font-semibold text-white mb-1">Interactive Swagger docs</div>
+          <a
+            href={`${API_BASE_URL}/docs`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-forge-accent hover:underline font-mono text-xs"
+            title="FastAPI auto-generates this from the live API — try-it-out buttons run real requests against the same backend the dashboard uses."
+          >
+            {API_BASE_URL}/docs ↗
+          </a>
+          <div className="text-forge-muted text-xs mt-1">
+            Every endpoint below is also browsable here with request/response schemas and a try-it-out console.
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs font-mono border-collapse">
             <thead>
@@ -756,35 +776,55 @@ git push mine your-name/my-design
             </thead>
             <tbody className="divide-y divide-forge-border/30">
               {[
-                ["GET /rounds/active", "Active competition rounds"],
-                ["GET /rounds/{id}/stats", "Round stats: claimed/unclaimed problems, contributors"],
-                ["GET /rounds/{id}/leaderboard", "Per-round contributor rankings (same as /rankings?tab={id})"],
-                ["GET /specs", "List all problems with filters: active, unclaimed, tier, round, material"],
-                ["GET /specs/{id}", "Single problem definition (constraints, material, scoring, tier, round_id)"],
-                ["GET /sota", "Current #1 score for all problems (filter: ?round_id=round_001)"],
-                ["GET /sota/{spec_id}", "#1 score for one problem"],
-                ["GET /sota/{spec_id}/history", "Best score history over time"],
-                ["GET /sota/{spec_id}/eligibility?score=", "Check if a score would claim the #1 spot"],
-                ["GET /leaderboard/overall", "Overall contributor rankings (overall_score)"],
-                ["GET /leaderboard/overall/{contributor}", "Single contributor's standing (case-insensitive substring)"],
-                ["GET /leaderboard/{spec_id}", "Per-problem ranked leaderboard"],
-                ["GET /submissions", "Submissions (?spec_id=, ?contributor=, ?limit=, ?passed_only=)"],
-                ["POST /submissions", "Submit a scored result (CI posts here)"],
-              ].map(([ep, desc]) => (
-                <tr key={ep} className="hover:bg-forge-border/10">
-                  <td className="py-1.5 pr-4 text-forge-accent">{ep}</td>
-                  <td className="py-1.5 text-forge-muted">{desc}</td>
-                </tr>
-              ))}
+                { group: "Rounds", items: [
+                  ["GET /rounds", "All rounds, past and present"],
+                  ["GET /rounds/active", "Only currently-running rounds (3 at a time)"],
+                  ["GET /rounds/{round_id}", "Round metadata: category, start/end, problem count"],
+                  ["GET /rounds/{round_id}/stats", "Claimed/unclaimed specs, contributor count, tier breakdown"],
+                  ["GET /rounds/{round_id}/leaderboard", "Round contributors ranked by breadth-normalized round_score"],
+                ]},
+                { group: "Specs (problems)", items: [
+                  ["GET /specs", "Filters: ?active=, ?unclaimed=, ?tier=, ?round_id=, ?material="],
+                  ["GET /specs/{spec_id}", "Single problem: constraints, material, scoring, tier, round_id"],
+                ]},
+                { group: "SOTA", items: [
+                  ["GET /sota", "Current #1 for every spec (filter: ?round_id=round_001)"],
+                  ["GET /sota/{spec_id}", "Current #1 for one spec"],
+                  ["GET /sota/{spec_id}/history", "Progressive history — one entry per moment the record improved"],
+                  ["GET /sota/{spec_id}/eligibility?score=", "Would this score claim #1 today? (factors in margin decay)"],
+                ]},
+                { group: "Leaderboards", items: [
+                  ["GET /leaderboard/overall", "Cross-spec, breadth-normalized percentile rank (overall_score)"],
+                  ["GET /leaderboard/overall/{contributor}", "Single contributor's standing — case-insensitive substring"],
+                  ["GET /leaderboard/{spec_id}", "Per-problem ranked leaderboard"],
+                ]},
+                { group: "Submissions", items: [
+                  ["GET /submissions", "Filters: ?spec_id=, ?contributor=, ?commit_hash=, ?passed_only=, ?limit="],
+                  ["POST /submissions", "Record a scored result (CI posts here after eval)"],
+                  ["GET /submissions/{submission_id}", "Single submission detail with per-stage breakdown"],
+                  ["GET /submissions/{submission_id}/step", "STEP file of the generated geometry (3D viewer source)"],
+                ]},
+                { group: "Eval", items: [
+                  ["POST /eval/preview", "Score an agent against one spec without recording — body: {agent_code, spec_id}"],
+                ]},
+                { group: "Health", items: [
+                  ["GET /health", "Basic liveness"],
+                  ["GET /health/deep", "Database + storage probe"],
+                ]},
+              ].flatMap(({ group, items }) => [
+                <tr key={`g-${group}`} className="bg-forge-border/10">
+                  <td colSpan={2} className="py-1 px-2 text-[10px] uppercase tracking-wider text-forge-muted/70 font-sans font-semibold">{group}</td>
+                </tr>,
+                ...items.map(([ep, desc]) => (
+                  <tr key={ep} className="hover:bg-forge-border/10">
+                    <td className="py-1.5 pr-4 text-forge-accent">{ep}</td>
+                    <td className="py-1.5 text-forge-muted">{desc}</td>
+                  </tr>
+                )),
+              ])}
             </tbody>
           </table>
         </div>
-        <p className="text-forge-muted text-xs">
-          Interactive docs:{" "}
-          <a href={`${API_BASE_URL}/docs`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">
-            {API_BASE_URL}/docs
-          </a>
-        </p>
       </Section>
 
       {/* Reward section */}
