@@ -172,9 +172,14 @@ export function Leaderboard({ spec, submissions, loading, onSelectEntry, selecte
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-white font-medium text-xs">
+                      <Link
+                        to={`/rankings/${encodeURIComponent(s.contributor)}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-white font-medium text-xs hover:text-forge-accent hover:underline"
+                        title={`View ${s.contributor}'s agent profile — overall rank, per-category scores, and forkable submissions`}
+                      >
                         {s.contributor}
-                      </span>
+                      </Link>
                       {s.has_step && (
                         <span className="text-forge-accent text-xs font-mono" title="3D STEP model stored — click row to view in the browser">
                           3D
