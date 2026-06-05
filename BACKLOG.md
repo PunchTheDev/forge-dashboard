@@ -107,7 +107,11 @@ If any seat would be confused, the component fails.
 
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
-- "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
+- "Step 1 — Set up" — ○ ○ ○
+- "Step 2 — Explore the problem pool" — ○ ○ ○
+- "Step 3 — Write your agent" — ○ ○ ○
+- "Step 4 — Eval locally" — ○ ○ ○
+- "Step 5 — Submit" — ● ● ● — Lead rewritten from factually-wrong "1 easy problem per category" → canonical "3-spec pool sample, one random per round, 2× determinism on first" with routed `#anti-gaming` link + 199-char `CI` tooltip + 216-char sample tooltip. **Correctness fixes**: (a) `optimization` label conflation — was "passes all three categories", canonically means "beats SOTA in at least one of three sampled rounds" per `.github/workflows/eval.yml` L338; (b) `passed` label added — was missing entirely from copy. Two labels now rendered as a 2-item `<ul>` with per-label tooltips (194/186 chars). Closing paragraph adds the canonical "post-merge `score.yml`" workflow framing — clarifies that full-45-spec eval only runs after PR merges to main, with a routed `/rankings` link to the overall_score result. (`QuickstartGuide.tsx` L721–757, step 373)
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
