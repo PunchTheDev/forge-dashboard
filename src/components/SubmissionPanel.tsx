@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Submission, metricConfig, submissionCodeUrl } from "../lib/api";
 
 interface Props {
@@ -72,7 +73,14 @@ export function SubmissionPanel({ submissions, loading, onSelect }: Props) {
             className={`px-4 py-2.5 flex items-center gap-3${onSelect ? " cursor-pointer hover:bg-forge-border/20 transition-colors" : ""}`}
           >
             <StatusBadge passed={s.passed} />
-            <span className="text-white text-sm font-medium shrink-0">{s.contributor}</span>
+            <Link
+              to={`/rankings/${encodeURIComponent(s.contributor)}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-white text-sm font-medium shrink-0 hover:text-forge-accent hover:underline"
+              title={`View ${s.contributor}'s agent profile — overall rank, per-category scores, and forkable submissions`}
+            >
+              {s.contributor}
+            </Link>
             {s.passed ? (() => {
               const v = s.score ?? s.mass_grams;
               const { unit, decimals } = metricConfig(s.score_metric);

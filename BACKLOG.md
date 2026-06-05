@@ -75,7 +75,7 @@ If any seat would be confused, the component fails.
 - **"Top competitor — open-source code"** panel — ● ● ● — `SotaCodeViewer` now renders `agent.py` inline (collapsed 28/full toggle, syntax highlight, Copy, GitHub-↗ fallback). Shipped step 343.
 - `StepViewer` (3D viewer) — ● ● ● — drag/zoom hint visible, lazy-loaded.
 - `SotaChart` (best score over time) — ○ ○ ○
-- "Passing submissions" + "All submissions" tables — ○ ○ ○
+- "Passing submissions" + "All submissions" tables — ● ● ● — contributor name in both tables is now a routed `<Link to="/rankings/{contributor}">` with stopPropagation so the row's onClick still fires for non-name clicks; hover style + 95-char tooltip ("View {contributor}'s agent profile — overall rank, per-category scores, and forkable submissions"). Closes the same flywheel-surfacing gap solved on `SotaChart` step 377: every contributor identity on the spec detail page now routes to their profile in one click. (`Leaderboard.tsx` L173–183, `SubmissionPanel.tsx` L1, L74–83)
 
 ### Rankings (`/rankings`)
 
