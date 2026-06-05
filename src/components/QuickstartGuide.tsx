@@ -722,9 +722,8 @@ forge status agents/your-name/agent.py`} />
       <Section id="submit" title="Step 5 — Submit">
         <p className="text-forge-muted text-sm">
           <a href={`${FORGE_REPO}/fork`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">Fork the repo on GitHub</a>
-          , push your agent, and open a PR. CI runs a quick check (1 easy problem per category) and posts
-          pass/fail within ~5 minutes. Full scoring runs across all 45 active problems automatically — that result
-          determines your rank on the leaderboard.
+          , push your agent, and open a PR. <span className="border-b border-dotted border-forge-muted cursor-help" title="GitHub Actions workflow .github/workflows/eval.yml runs scripts/run_eval_pool.py inside the same forge-eval:latest container you used in Step 4 — so a local PASS will not surprise you with a CI FAIL.">CI</span>{" "}
+          runs <span className="border-b border-dotted border-forge-muted cursor-help" title="run_eval_pool.py samples ONE random spec per round (3 of 45 total), then re-runs the first spec a second time to verify determinism — same shape as the anti-gaming sampling explained in the Anti-gaming section below.">a 3-spec pool sample</span> (one random spec per round, 2× determinism on the first) and posts pass/fail within ~5 minutes. See <a href="#anti-gaming" className="text-forge-accent hover:underline">Anti-gaming guarantees ↓</a> for why per-PR sampling is partial.
         </p>
         <CodeBlock code={`# After forking on GitHub:
 git remote add mine git@github.com:YOUR_USERNAME/forge.git
@@ -735,8 +734,22 @@ git push mine your-name/my-design
 # Open PR on GitHub`} />
         <p className="text-forge-muted text-sm">
           CI posts a cross-category table showing your score vs the reference design and current #1 score for each
-          problem, plus an overall breadth score. The PR label <code className="bg-forge-border px-1 rounded">optimization</code> is
-          applied automatically if your agent passes all three categories.
+          sampled spec. Two PR labels are applied automatically based on the result:
+        </p>
+        <ul className="text-forge-muted text-sm space-y-1.5 pl-1">
+          <li>
+            <code className="bg-forge-border px-1 rounded">passed</code>{" "}
+            <span className="border-b border-dotted border-forge-muted cursor-help" title="Applied by .github/workflows/eval.yml when your agent runs cleanly on all three sampled specs (one per round) without errors or constraint violations — does not require beating the current SOTA.">— your agent ran cleanly on all 3 sampled specs (one per round).</span>
+          </li>
+          <li>
+            <code className="bg-forge-border px-1 rounded">optimization</code>{" "}
+            <span className="border-b border-dotted border-forge-muted cursor-help" title="Applied when your sampled score beats the current SOTA on at least ONE of the three sampled rounds. You do not need to beat SOTA in all three — a single win is enough to earn this label.">— you beat SOTA in at least one of the three sampled rounds.</span>
+          </li>
+        </ul>
+        <p className="text-forge-muted text-sm">
+          After your PR merges to main, a separate <span className="border-b border-dotted border-forge-muted cursor-help" title="The .github/workflows/score.yml workflow triggers on push to main and runs your agent across every active spec in every round — this is the result that determines your overall_score and final placement on the leaderboard.">post-merge workflow (<code className="bg-forge-border px-1 rounded">score.yml</code>)</span>{" "}
+          runs your agent across all 45 active problems, updating your{" "}
+          <a href="/rankings" className="text-forge-accent hover:underline">overall_score on the Rankings page →</a>.
         </p>
       </Section>
 
