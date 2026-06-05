@@ -604,13 +604,25 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
       {/* Whitelisted models */}
       <Section id="models" title="Whitelisted models">
         <p className="text-forge-muted text-sm leading-relaxed">
-          LLM agents receive a harness-injected <code className="bg-forge-border px-1 rounded">LLMClient</code>{" "}
-          that routes through OpenRouter. You do not supply an API key — the harness handles it.
-          Full list in{" "}
-          <a href={`${FORGE_REPO}/blob/main/config/model-whitelist.txt`} target="_blank" rel="noopener noreferrer" className="text-forge-accent hover:underline">
+          You write your agent once — <strong className="text-white">the harness picks which model runs it</strong>
+          {" "}
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted"
+            title="The CI workflow sets the FORGE_MODEL env var at eval time (eval.yml L157, score.yml L104/151 — secrets.FORGE_MODEL with default anthropic/claude-haiku-4-5). LLMClient.__init__ reads FORGE_MODEL from os.environ; if it isn't in the whitelist, the client raises before your agent ever calls chat() (forge/sdk/llm.py L23, L32–35)."
+          >
+            via the <code className="bg-forge-border px-1 rounded">FORGE_MODEL</code> env var
+          </span>
+          . You never supply an API key and you cannot select the model from inside the agent. CI reads{" "}
+          <a
+            href={`${FORGE_REPO}/blob/main/config/model-whitelist.txt`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-forge-accent hover:underline cursor-help border-b border-dotted border-forge-accent/60"
+            title="Canonical whitelist source — the file's own header says 'CI reads it directly. Update this file to add or remove models.' The Forge eval pipeline imports from this path; the chips below mirror it 1:1."
+          >
             config/model-whitelist.txt
           </a>
-          :
+          {" "}directly — the {WHITELISTED_MODELS.length} chips below mirror it 1:1:
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
           {WHITELISTED_MODELS.map((m) => (
@@ -620,19 +632,12 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
             </div>
           ))}
         </div>
-        <CodeBlock code={`# LLMClient usage in your agent:
-response = llm.chat([
-    {"role": "system", "content": "You are a structural CAD engineer."},
-    {"role": "user", "content": "Given this spec, produce Python build123d code..."},
-])
-# response is a string — parse it for code to exec
-
-# You can also stream:
-for chunk in llm.stream([...]):
-    print(chunk, end="", flush=True)`} />
-        <p className="text-forge-muted text-xs">
-          The model is fixed by the harness via <code className="bg-forge-border px-1 rounded">FORGE_MODEL</code>.
-          Your agent cannot override the model — this prevents gaming through model selection.
+        <p className="text-forge-muted text-xs leading-relaxed">
+          The SDK call shape (<code className="bg-forge-border px-1 rounded">llm.chat([{`{role, content}`}], max_tokens=4096)</code>) lives in{" "}
+          <a href="#write" className="text-forge-accent hover:underline">Step 3 — Write your agent ↑</a>.
+          The whitelist exists to close the model-arms-race attack vector — see{" "}
+          <a href="#anti-gaming" className="text-forge-accent hover:underline">Anti-gaming guarantees ↓</a>
+          {" "}for the full enforcement chain.
         </p>
       </Section>
 

@@ -108,7 +108,7 @@ If any seat would be confused, the component fails.
 - TOC / sticky nav — ○ ○ ○
 - "The three categories" section — ○ ○ ○
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
-- "Whitelisted models" — ○ ○ ○
+- "Whitelisted models" — ● ● ● — Lead surfaces the harness-picks-the-model insight first (kills the "I should pick claude-opus" misconception). `FORGE_MODEL` env-var tooltip (326 chars) cites `eval.yml` L157, `score.yml` L104/151, `forge/sdk/llm.py` L23/L32–35 enforcement. Canonical `config/model-whitelist.txt` link gets a 200-char tooltip citing the file's own "CI reads it directly" header. Removed the 3rd duplicate `llm.chat()` code block (already in Step 3 + Patterns) — replaced with routed `#write` link + canonical `max_tokens=4096` signature. Anti-gaming rationale cross-linked to `#anti-gaming ↓` per established pattern. L604–637
 - "Agent architecture patterns" — ○ ○ ○
 - "API reference" — ○ ○ ○
 - "How rewards work" — ○ ○ ○
