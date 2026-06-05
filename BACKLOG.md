@@ -106,7 +106,7 @@ If any seat would be confused, the component fails.
 ### Guide (`/guide`)
 
 - TOC / sticky nav — ○ ○ ○
-- "The three categories" section — ○ ○ ○
+- "The three categories" section — ● ● ● — three round cards now use the canonical one-liner goal strings from `App.tsx:CATEGORY_META` (verified character-exact: "Lightest part that survives the load wins." / "Highest stiffness-per-gram wins." / "Least bending under the applied load wins.") so the Guide / category-page / spec-detail trio agree on vocabulary. Each card is now a routed `<Link to="/problems/round_NNN">` with hover state + `Open category →` CTA — first-timer who reads "mass = lightest wins" can click straight to the 15 live problems instead of hunting through the TOC. Unit chips become cursor-help `↓ minimize g` / `↑ maximize N/(mm·g)` / `↓ minimize mm` (154/162/179-char tooltips defining each unit + describing how the FEA harness computes the score). Tier line "easy / medium / hard" wrapped in a 191-char cursor-help tooltip reusing the canonical wording from `App.tsx:711` (step 354) so the same difficulty explanation appears in Guide + Category-page filter row. Puppeteer-verified live at 1440×900 on `/guide#categories`: 3 routed cards · all 3 canonical goal strings present · old "Lightest part that passes FEA" copy gone · click on Mass card navigates to `/problems/round_001`. (`QuickstartGuide.tsx` L343–384 + L443–489)
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
 - "Agent architecture patterns" — ○ ○ ○
