@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../lib/api";
 
 const FORGE_REPO = "https://github.com/PunchTheDev/forge";
@@ -530,11 +531,10 @@ curl ${API_BASE_URL}/rounds/round_001/leaderboard`} />
             Fastest path — fork the current #1
           </div>
           <p className="text-forge-muted text-sm leading-relaxed">
-            Every leaderboard row links to the exact commit of the winning agent.
-            Click the <code className="bg-forge-border px-1 rounded">↗ code</code> link on
-            any problem page, a homepage agent card, or an agent detail page — you land on the
-            <code className="bg-forge-border px-1 rounded">agents/&lt;winner&gt;/agent.py</code> that
-            earned that score. Copy it into <code className="bg-forge-border px-1 rounded">agents/your-name/</code>,
+            Every leaderboard row exposes a <code className="bg-forge-border px-1 rounded">↗ code</code> chip
+            pinned to the exact commit of{" "}
+            <code className="bg-forge-border px-1 rounded">agents/&lt;winner&gt;/agent.py</code> that earned
+            the score. Copy it into <code className="bg-forge-border px-1 rounded">agents/your-name/</code>,
             iterate, and resubmit. Beating the current #1 by{" "}
             <span title="Per-problem margin: a new submission must score ≥0.5% better than the current SOTA to take #1. Prevents trivial-improvement spam." className="cursor-help border-b border-dotted border-forge-muted/50">
               ≥0.5%
@@ -542,6 +542,16 @@ curl ${API_BASE_URL}/rounds/round_001/leaderboard`} />
             {" "}claims the spot — and the next person forks <em>your</em> code to try to beat you.
             That open-source ratchet is the whole flywheel.
           </p>
+          <div className="flex items-center gap-2 text-xs">
+            <Link
+              to="/rankings"
+              className="text-forge-accent hover:underline font-medium"
+              title="Open the leaderboard — every agent row has a ↗ code chip per category that opens the winning agent.py inline. Pick one, fork it, beat it."
+            >
+              Browse the leaderboard →
+            </Link>
+            <span className="text-forge-muted">to grab a <code className="bg-forge-border px-1 rounded">↗ code</code> chip now.</span>
+          </div>
           <RatchetChart />
           <p className="text-forge-muted text-xs leading-relaxed">
             Unclaimed problems have no #1 yet — any passing submission claims them outright, no
@@ -550,12 +560,19 @@ curl ${API_BASE_URL}/rounds/round_001/leaderboard`} />
           </p>
         </div>
         <p className="text-forge-muted text-sm">
-          Or write from scratch. Create a folder{" "}
-          <code className="bg-forge-border px-1 rounded">agents/your-name/</code> with
-          an <code className="bg-forge-border px-1 rounded">agent.py</code> that implements{" "}
-          <code className="bg-forge-border px-1 rounded">generate(spec, llm) → bytes</code>.
-          The harness injects the LLM client — your agent must accept both parameters.
-          Agents that only accept <code className="bg-forge-border px-1 rounded">spec</code> are rejected at eval.
+          Or write from scratch. The CLI scaffolds the directory for you —{" "}
+          <code className="bg-forge-border px-1 rounded">forge new your-name</code> creates{" "}
+          <code className="bg-forge-border px-1 rounded">agents/your-name/agent.py</code> with the right
+          imports and signature already wired. Your <code className="bg-forge-border px-1 rounded">agent.py</code> must
+          implement{" "}
+          <code className="bg-forge-border px-1 rounded">generate(spec, llm) → bytes</code>{" "}
+          —{" "}
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted/50"
+            title="The harness instantiates LLMClient per problem (using the whitelisted model fixed in FORGE_MODEL) and injects it as the second arg. Agents whose generate() signature only takes spec are rejected at eval load time — enforced by an inspect.signature check in run_eval_pool.py."
+          >
+            the harness injects <code className="bg-forge-border px-1 rounded">llm</code>; your agent must accept both parameters
+          </span>.
         </p>
         <CodeBlock code={`# Scaffold from template:
 forge new your-name
@@ -563,6 +580,23 @@ forge new your-name
 # Or manually:
 mkdir -p agents/your-name
 # Then write agents/your-name/agent.py`} />
+        <p className="text-forge-muted text-xs leading-relaxed">
+          <strong className="text-white">Sandbox per problem:</strong>{" "}
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted/50"
+            title="180 seconds wall-clock from generate() entry to STEP-bytes return (TIMEOUT_SECONDS in benchmark/sandbox.py). Exceed it and the run is marked timeout — no partial credit. Plan for LLM round-trip + build123d exec + STEP export to fit inside this budget."
+          >180 s wall-clock</span>{" "}
+          ·{" "}
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted/50"
+            title="4 GB of RAM available to your Python process. Mesh-heavy build123d ops can spike — keep intermediate Part objects scoped and let GC reclaim them between LLM iterations."
+          >4 GB RAM</span>{" "}
+          ·{" "}
+          <span
+            className="cursor-help border-b border-dotted border-forge-muted/50"
+            title="Outbound HTTPS is enabled for LLM calls only (OpenRouter via the injected LLMClient). Do not hardcode API keys — the harness routes through FORGE_LLM_KEY internally. Direct fetches to other endpoints are blocked at the sandbox firewall."
+          >network enabled for LLM calls only</span>.
+        </p>
         <CodeBlock code={`# agents/your-name/agent.py
 from forge.sdk import LLMClient  # injected by harness
 
@@ -575,7 +609,7 @@ def generate(spec: dict, llm: LLMClient) -> bytes:
     spec["scoring"]: {"metric": "mass_grams"|"stiffness_to_weight"|"deflection_mm",
                       "direction": "minimize"|"maximize"}
     llm: whitelisted model, injected — do NOT hardcode API keys
-    Sandbox: 60s, 4GB RAM, network enabled for LLM calls
+    Sandbox: 180s wall-clock, 4GB RAM, network enabled for LLM calls
     Returns: STEP file bytes
     """
     metric    = spec["scoring"]["metric"]     # e.g. "mass_grams"
