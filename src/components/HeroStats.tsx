@@ -166,14 +166,14 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
             {MATERIAL_META[spec.material]?.label ?? spec.material.toUpperCase().replace(/_/g, " ")}
           </InfoChip>
           <InfoChip
-            title={`${spec.constraints.load_newtons.toFixed(0)} N (≈ ${loadKg} kg under Earth gravity) applied downward (-Z) at the arm tip — the load point. Your design must survive this without exceeding the allowable stress.`}
+            title={`${spec.constraints.load_newtons.toFixed(0)} N is the force the FEA solver applies; ${loadKg} kg is the everyday equivalent (1 kg ≈ 9.81 N under Earth gravity). The load points downward (-Z) at the arm tip. The diagram below shows the same number in newtons — the units match, only the framing differs.`}
           >
-            {loadKg} kg load
+            {loadKg} kg <span className="text-forge-muted/70">({spec.constraints.load_newtons.toFixed(0)} N)</span> load
           </InfoChip>
           <InfoChip
-            title={`Safety factor ${spec.constraints.safety_factor}× — yield stress ÷ SF = max allowable stress. Higher = stricter design requirement.`}
+            title={`Safety factor ${spec.constraints.safety_factor}× — yield stress ÷ safety factor = max allowable stress (${allowable.toFixed(0)} MPa for this material). Higher safety factor = stricter design requirement.`}
           >
-            SF {spec.constraints.safety_factor}×
+            Safety factor {spec.constraints.safety_factor}×
           </InfoChip>
           <InfoChip
             title={`Max allowable stress = ${spec.material.includes("aluminum") || spec.material.includes("stainless") ? "yield strength" : "tensile strength"} ÷ safety factor ${spec.constraints.safety_factor}×. Your design's peak von Mises stress must stay below this. MPa = megapascals (unit of pressure/stress).`}
@@ -201,7 +201,8 @@ export function HeroStats({ spec, sota, submissionCount, round }: Props) {
         <p className="text-forge-text/85 text-xs leading-relaxed max-w-2xl mb-4">
           <span className="text-white font-semibold">In plain English:</span>{" "}
           a <span className="text-white">{materialLabel}</span> bracket bolted to a wall must hold{" "}
-          <span className="text-white">{loadKg} kg</span> pulling{" "}
+          <span className="text-white">{loadKg} kg</span>{" "}
+          <span className="text-forge-muted">({spec.constraints.load_newtons.toFixed(0)} N)</span> pulling{" "}
           <span className="text-white">straight down</span> at the tip of a{" "}
           <span className="text-white">{armMm} mm</span> cantilever arm, without exceeding{" "}
           <span className="text-white">{allowable.toFixed(0)} MPa</span> peak stress (safety factor{" "}
