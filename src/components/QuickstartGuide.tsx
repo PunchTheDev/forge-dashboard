@@ -268,20 +268,103 @@ function MarginDecayChart() {
   );
 }
 
-const TOC_ITEMS = [
-  { id: "categories", label: "Three categories" },
-  { id: "setup", label: "Step 1 — Set up" },
-  { id: "explore", label: "Step 2 — Explore" },
-  { id: "write", label: "Step 3 — Write agent" },
-  { id: "models", label: "Whitelisted models", indent: true },
-  { id: "patterns", label: "Agent patterns", indent: true },
-  { id: "fea", label: "What is FEA?", indent: true },
-  { id: "eval", label: "Step 4 — Eval locally" },
-  { id: "submit", label: "Step 5 — Submit" },
-  { id: "api", label: "API reference" },
-  { id: "rewards", label: "How rewards work" },
-  { id: "anti-gaming", label: "Anti-gaming" },
+type TocItem = { id: string; label: string; indent?: boolean; preview: string };
+type TocGroup = { heading: string; items: TocItem[] };
+
+const TOC_GROUPS: TocGroup[] = [
+  {
+    heading: "Concepts",
+    items: [
+      {
+        id: "categories",
+        label: "Three categories",
+        preview:
+          "Mass · Stiffness/Weight · Deflection — what each round optimizes, the unit it scores, and the direction (minimize/maximize) that wins.",
+      },
+    ],
+  },
+  {
+    heading: "Onboarding",
+    items: [
+      {
+        id: "setup",
+        label: "Step 1 — Set up",
+        preview:
+          "Clone the repo, install Python 3.11+, optional Docker Desktop to run evals in the same image CI uses (forge-eval:latest).",
+      },
+      {
+        id: "explore",
+        label: "Step 2 — Explore",
+        preview:
+          "List active specs via the API, pick an unclaimed one as your first target, and read its constraints + load + bolt pattern.",
+      },
+      {
+        id: "write",
+        label: "Step 3 — Write agent",
+        preview:
+          "Implement the canonical generate(spec, llm) -> bytes contract returning a STEP file. Two reference patterns in examples/.",
+      },
+      {
+        id: "models",
+        label: "Whitelisted models",
+        indent: true,
+        preview:
+          "18 cheap, on-par OSS models. The harness — not you — picks which one runs your agent via the FORGE_MODEL env var.",
+      },
+      {
+        id: "patterns",
+        label: "Agent patterns",
+        indent: true,
+        preview:
+          "Pattern A — deterministic geometry (no LLM). Pattern B — Observe / Plan / Act using llm.chat() to drive shape decisions.",
+      },
+      {
+        id: "fea",
+        label: "What is FEA?",
+        indent: true,
+        preview:
+          "Finite element analysis — how the harness physically validates your part survives the spec's applied load before scoring.",
+      },
+      {
+        id: "eval",
+        label: "Step 4 — Eval locally",
+        preview:
+          "Run the 4-stage pipeline (image parity → agent gen → geometry → FEA, plus similarity gate for ranked submissions) before opening a PR.",
+      },
+      {
+        id: "submit",
+        label: "Step 5 — Submit",
+        preview:
+          "Open a PR with the canonical `passed` and `optimization` labels — CI re-runs the same eval, then the leaderboard updates.",
+      },
+    ],
+  },
+  {
+    heading: "Reference",
+    items: [
+      {
+        id: "api",
+        label: "API reference",
+        preview:
+          "21 REST endpoints grouped by intent (Rounds · Specs · SOTA · Leaderboards · Submissions · Eval · Health). Swagger try-it-out at /docs.",
+      },
+      {
+        id: "rewards",
+        label: "How rewards work",
+        preview:
+          "Breadth-normalized percentile rank across all 3 categories. Specialists lose to generalists; new #1 must beat by a decaying margin.",
+      },
+      {
+        id: "anti-gaming",
+        label: "Anti-gaming",
+        preview:
+          "Stage 1 image parity (same Docker image) · Stage 4 similarity gate (anti-copy) · ephemeral-TEE seam for tamper-proof inference.",
+      },
+    ],
+  },
 ];
+
+const TOC_ITEMS: TocItem[] = TOC_GROUPS.flatMap((g) => g.items);
 
 function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
   const [activeId, setActiveId] = useState<string>("");
@@ -306,25 +389,40 @@ function TableOfContents({ onItemClick }: { onItemClick?: () => void }) {
   }, []);
 
   return (
-    <nav className="bg-forge-surface border border-forge-border rounded-xl p-4 flex flex-col gap-1.5">
-      <p className="text-xs font-semibold text-forge-muted uppercase tracking-wider mb-1">Contents</p>
-      {TOC_ITEMS.map(({ id, label, indent }) => (
-        <a
-          key={id}
-          href={`#${id}`}
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            onItemClick?.();
-          }}
-          className={`text-xs py-0.5 transition-colors ${indent ? "pl-3" : ""} ${
-            activeId === id
-              ? "text-forge-accent font-semibold"
-              : "text-forge-muted hover:text-white"
-          }`}
-        >
-          {label}
-        </a>
+    <nav className="bg-forge-surface border border-forge-border rounded-xl p-4 flex flex-col gap-3">
+      <p className="text-xs font-semibold text-forge-muted uppercase tracking-wider">Contents</p>
+      {TOC_GROUPS.map((group) => (
+        <div key={group.heading} className="flex flex-col gap-1.5">
+          <p className="text-[10px] font-semibold text-forge-muted/70 uppercase tracking-wider">
+            {group.heading}
+          </p>
+          {group.items.map(({ id, label, indent, preview }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              title={preview}
+              onClick={(e) => {
+                // Honor modifier keys so cmd/ctrl-click can open in a new tab
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                e.preventDefault();
+                const el = document.getElementById(id);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  // Sync URL hash so refresh + back-button + share-link all round-trip
+                  history.replaceState(null, "", `#${id}`);
+                }
+                onItemClick?.();
+              }}
+              className={`text-xs py-0.5 transition-colors ${indent ? "pl-3" : ""} ${
+                activeId === id
+                  ? "text-forge-accent font-semibold"
+                  : "text-forge-muted hover:text-white"
+              }`}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
       ))}
     </nav>
   );
