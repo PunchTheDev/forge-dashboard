@@ -24,6 +24,7 @@ import {
   specBaseline,
   specLabel,
   sotaCodeUrl,
+  submissionCodeUrl,
 } from "./lib/api";
 import { useApi } from "./hooks/useApi";
 import { useDocumentMeta } from "./hooks/useDocumentMeta";
@@ -2082,8 +2083,15 @@ function AgentDetailPage({ data }: { data: SharedData }) {
   }
   const knownRounds = Object.keys(CATEGORY_META_OL).filter((rid) => byRound[rid]?.length);
 
-  // Sort worst rank score first — surfaces problems where the agent is losing ground
-  const sorted = [...entry.best].sort((a, b) => b.normalized_score - a.normalized_score);
+  // Sort: #1 wins pinned at top (fork targets — that's the flywheel), then the rest
+  // worst-first so the agent can see where they're losing ground.
+  const sorted = [...entry.best].sort((a, b) => {
+    const aWin = a.rank === 1 ? 1 : 0;
+    const bWin = b.rank === 1 ? 1 : 0;
+    if (aWin !== bWin) return bWin - aWin;
+    return b.normalized_score - a.normalized_score;
+  });
+  const firstWinSpecId = sorted.find((b) => b.rank === 1)?.spec_id ?? null;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
@@ -2126,6 +2134,18 @@ function AgentDetailPage({ data }: { data: SharedData }) {
               >
                 {entry.total_wins} #1 {entry.total_wins !== 1 ? "problems" : "problem"}
               </span>
+              {entry.total_wins > 0 && firstWinSpecId && (
+                <>
+                  {" · "}
+                  <a
+                    href="#fork-targets"
+                    className="text-forge-accent hover:underline font-semibold"
+                    title={`Jump to this agent's ${entry.total_wins} champion ${entry.total_wins !== 1 ? "rows" : "row"} in the table below — each has a direct GitHub link to the winning agent.py at its exact commit, ready to fork.`}
+                  >
+                    Fork {entry.total_wins} {entry.total_wins !== 1 ? "wins" : "win"} ↓
+                  </a>
+                </>
+              )}
             </div>
           </div>
           <div className="text-right">
@@ -2215,8 +2235,13 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     : "text-forge-red";
               const fullSpec = specs?.find((s) => s.id === b.spec_id);
               const problemLabel = fullSpec ? specLabel(fullSpec) : b.spec_id;
+              const isFirstWin = b.spec_id === firstWinSpecId;
               return (
-                <tr key={b.spec_id} className="border-b border-forge-border/40 last:border-0">
+                <tr
+                  key={b.spec_id}
+                  id={isFirstWin ? "fork-targets" : undefined}
+                  className={`border-b border-forge-border/40 last:border-0 scroll-mt-4 ${isSota ? "bg-yellow-400/5" : ""}`}
+                >
                   <td className="py-1.5">
                     {roundId ? (
                       <Link
@@ -2228,17 +2253,37 @@ function AgentDetailPage({ data }: { data: SharedData }) {
                     ) : (
                       <span className="text-white/80">{problemLabel}</span>
                     )}
-                    {b.agent_path && b.commit_hash && roundId && (
+                    {b.agent_path && b.commit_hash && (
                       <>
                         {" "}
-                        <Link
-                          to={`/problems/${roundId}/${b.spec_id}#sota-code`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-[10px] text-forge-muted hover:text-forge-accent font-mono whitespace-nowrap"
-                          title={`Read ${b.agent_path} inline on this problem's page (GitHub link kept inside) — fork to beat this score`}
-                        >
-                          ↗ code
-                        </Link>
+                        {isSota && roundId ? (
+                          // Champion row: link to the spec page's inline SotaCodeViewer
+                          // (which renders THIS agent's code since they hold #1) AND keep a
+                          // direct GitHub anchor so the GH chip still works.
+                          <Link
+                            to={`/problems/${roundId}/${b.spec_id}#sota-code`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[10px] text-yellow-400 hover:underline font-mono font-semibold whitespace-nowrap"
+                            title={`Read ${b.agent_path} inline on this problem's page — this agent holds #1, so the spec page's inline code viewer shows their winning agent.py. Fork to beat the score by the decaying margin.`}
+                          >
+                            ↗ Fork champion
+                          </Link>
+                        ) : (
+                          // Non-champion row: must link DIRECTLY to this submission's GitHub
+                          // blob at its exact commit. The spec page's #sota-code viewer always
+                          // shows the current #1's code — NOT this agent's — so routing there
+                          // would misdirect a visitor expecting this row's code.
+                          <a
+                            href={submissionCodeUrl(b.agent_path, b.commit_hash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[10px] text-forge-muted hover:text-forge-accent font-mono whitespace-nowrap"
+                            title={`Open ${b.agent_path} at commit ${b.commit_hash.slice(0, 7)} on GitHub — this agent's exact submission code for this problem, ready to fork.`}
+                          >
+                            ↗ Fork
+                          </a>
+                        )}
                       </>
                     )}
                   </td>

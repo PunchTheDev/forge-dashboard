@@ -89,8 +89,8 @@ If any seat would be confused, the component fails.
 ### Agent profile (`/rankings/:agentId`)
 
 - Header (contributor name, summary stats) — ◐ ◐ ● — rank line now reads `Rank #N of M` (e.g. `Rank #1 of 1`) with a cursor-help tooltip explaining what M counts ("Position among all M agents who have submitted to at least one active problem. Rank is by overall score…"). First-timer no longer reads a bare `#1` cold — the field size makes the position meaningful. The right-column overall-score + the category breakdown grid below still need their own rubric pass. (step 355, `App.tsx` L2103–2114)
-- Per-problem breakdown table — ○ ○ ○
-- Fork CTAs — ○ ○ ○
+- Per-problem breakdown table — ● ● ● — fixed the silent misdirection: every row's `↗ code` chip used to route to `/problems/{round}/{spec}#sota-code`, but `SotaCodeViewer` only ever renders the CURRENT SOTA's code, so non-#1 rows were quietly loading a different agent's code under a tooltip naming this agent's path. Now branches on `isSota`: champion rows keep the routed in-page viewer link (it correctly shows this agent's code since they hold #1), non-champion rows go DIRECTLY to `submissionCodeUrl(agent_path, commit_hash)` — the canonical helper proven on `Leaderboard.tsx:185` builds `github.com/.../blob/{commit}/{path}`. Sort also flipped: #1 wins are now pinned at the top of the table (fork targets first), then worst-first within the rest. Champion rows tinted `bg-yellow-400/5`. (step 380, `App.tsx` L2086–2103, L2218–2275)
+- Fork CTAs — ● ● ● — Fork verb is now everywhere it belongs. Header carries a `Fork {N} win{s} ↓` routed anchor (147-char tooltip) that scrolls to the first SOTA row in the table (carries `id="fork-targets"`); shown only when `total_wins > 0`. Per-row chips renamed `↗ code` → `↗ Fork champion` (champion rows, 200-char tooltip naming exact code path + decaying-margin language) and `↗ Fork` (non-champion rows, tooltip names exact commit hash + agent path). The whole "surface the winning code for forking" goal is now reachable in ≤1 click from this page. (step 380, `App.tsx` L2127–2138, L2218–2275)
 
 ### Explorer (`/explorer`)
 
