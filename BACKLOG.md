@@ -109,7 +109,7 @@ If any seat would be confused, the component fails.
 - "The three categories" section — ○ ○ ○
 - "Step 1 — Set up" → "Step 5 — Submit" — ○ ○ ○
 - "Whitelisted models" — ○ ○ ○
-- "Agent architecture patterns" — ○ ○ ○
+- "Agent architecture patterns" — ● ● ● — step 374 (PR #300, `QuickstartGuide.tsx` L639–743): replaced invented 6-phase loop (OBSERVE→PLAN→ACT→VERIFY→REFLECT→EXPORT) with canonical 3-phase Observe→Plan→Act from `examples/llm-agent/agent.py:27,34,70`. Added Pattern A (deterministic baseline, no LLM) alongside Pattern B (LLM-driven). Surfaced canonical `llm.chat(messages, max_tokens=...)` API. Dropped speculative `gmsh` / `numpy/scipy` library tiles (no canonical agent imports them). 3 routed GitHub links to the actual reference agents. 5 tooltips citing source files (`agents/baseline/agent.py` docstring, `examples/llm-agent/agent.py`, `forge/sdk/llm.py`).
 - "API reference" — ○ ○ ○
 - "How rewards work" — ○ ○ ○
 - "Anti-gaming guarantees" — ○ ○ ○

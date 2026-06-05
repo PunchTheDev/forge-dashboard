@@ -639,32 +639,107 @@ for chunk in llm.stream([...]):
       {/* Agent architecture patterns */}
       <Section id="patterns" title="Agent architecture patterns">
         <p className="text-forge-muted text-sm leading-relaxed">
-          The best LLM agents use a structured observe → plan → act loop rather than a single prompt.
+          Two patterns ship as canonical references. Pick the one that fits your strategy — both are legitimate.
         </p>
-        <div className="bg-forge-surface border border-forge-border rounded-lg p-4">
-          <div className="text-xs text-forge-accent font-semibold mb-2">Recommended loop pattern:</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="bg-forge-surface border border-forge-border rounded-lg p-4">
+            <div className="text-xs text-forge-accent font-semibold mb-2">
+              <span
+                className="border-b border-dotted border-forge-muted cursor-help"
+                title="agents/baseline/agent.py docstring: 'This agent accepts the LLMClient parameter but does not use it — it is purely deterministic geometry. This is permitted; the harness requires the parameter to be present in the signature, not necessarily used.'"
+              >
+                Pattern A — Deterministic geometry
+              </span>
+            </div>
+            <p className="text-forge-muted text-xs leading-relaxed mb-2">
+              No LLM call. Parametrise directly from <code className="bg-forge-border px-1 rounded">spec["constraints"]</code> and emit STEP bytes.
+              {" "}<code className="bg-forge-border px-1 rounded">llm</code> stays in the signature (or the harness rejects you), unused.
+            </p>
+            <p className="text-forge-muted text-xs leading-relaxed">
+              Reference: <code className="bg-forge-border px-1 rounded">agents/baseline/agent.py</code> — raw OCP, ~80 lines.
+            </p>
+          </div>
+          <div className="bg-forge-surface border border-forge-border rounded-lg p-4">
+            <div className="text-xs text-forge-accent font-semibold mb-2">
+              <span
+                className="border-b border-dotted border-forge-muted cursor-help"
+                title="examples/llm-agent/agent.py uses the literal three-phase loop in comments: '── Observe ──', '── Plan (LLM proposes dimensions) ──', '── Act (build geometry) ──'. Canonical structure, not an invention."
+              >
+                Pattern B — Observe → Plan → Act
+              </span>
+            </div>
+            <p className="text-forge-muted text-xs leading-relaxed mb-2">
+              Three phases. LLM proposes dimensions or topology as JSON, your code parses + builds + clamps + exports.
+            </p>
+            <p className="text-forge-muted text-xs leading-relaxed">
+              References: <code className="bg-forge-border px-1 rounded">examples/llm-agent/agent.py</code> (single prompt) and{" "}
+              <code className="bg-forge-border px-1 rounded">examples/metric-aware-agent/agent.py</code> (strategy per category).
+            </p>
+          </div>
+        </div>
+        <div className="bg-forge-surface border border-forge-border rounded-lg p-4 mt-1">
+          <div className="text-xs text-forge-accent font-semibold mb-2">Pattern B — canonical three-phase loop:</div>
           <p className="text-forge-muted text-xs leading-relaxed font-mono whitespace-pre">
-            {`1. OBSERVE   — read spec constraints, compute allowable stress
-2. PLAN      — prompt LLM: "given load X at point Y, what topology?"
-3. ACT       — execute geometry code from LLM output
-4. VERIFY    — check build volume, bolt holes, wall thickness
-5. REFLECT   — if check fails, prompt LLM for correction
-6. EXPORT    — return STEP bytes`}
+            {`1. OBSERVE  — read spec["constraints"]: build_volume_mm, load_point_mm,
+                                    bolt_pattern_mm, min_wall_thickness_mm
+2. PLAN     — raw = llm.chat([{"role":"user","content": prompt}], max_tokens=256)
+                                    dims = json.loads(raw)
+3. ACT      — build geometry (build123d), clamp to build volume, export STEP bytes`}
+          </p>
+          <p className="text-forge-muted text-xs leading-relaxed mt-2">
+            The harness <span
+              className="border-b border-dotted border-forge-muted cursor-help"
+              title="forge/sdk/llm.py: LLMClient.chat(messages, max_tokens=...) routes to the model named by FORGE_MODEL, rejected if not in FORGE_MODEL_WHITELIST. Your agent cannot pick the model — see the Whitelisted models section."
+            >injects the <code className="bg-forge-border px-1 rounded">LLMClient</code></span>{" "}
+            already bound to a whitelisted model. No API key, no model selection.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
           {[
-            { title: "build123d", desc: "High-level OCP wrapper — easiest for complex shapes" },
-            { title: "Raw OCP (BRep)", desc: "Lower-level, more control — used in the reference agents" },
-            { title: "gmsh (Python)", desc: "Mesh generation — useful for lattice/truss shapes" },
-            { title: "numpy/scipy", desc: "Topology optimization, stress calculation helpers" },
+            {
+              title: "build123d",
+              desc: "High-level OCP wrapper — recommended. Used by both LLM example agents.",
+              tip: "Template agent.py: '# from build123d import ...          # recommended'. Both examples/llm-agent and examples/metric-aware-agent build geometry with BuildPart + Box + Cylinder.",
+            },
+            {
+              title: "Raw OCP (BRep)",
+              desc: "Lower-level — used by the baseline. BRepPrimAPI primitives, BRepAlgoAPI booleans.",
+              tip: "agents/baseline/agent.py uses BRepPrimAPI_MakeBox + BRepAlgoAPI_Fuse + BRepAlgoAPI_Cut + STEPControl_Writer (AP214IS schema, required).",
+            },
           ].map((item) => (
             <div key={item.title} className="bg-forge-bg border border-forge-border rounded-lg p-3">
-              <div className="text-white text-xs font-semibold">{item.title}</div>
+              <div className="text-white text-xs font-semibold">
+                <span className="border-b border-dotted border-forge-muted cursor-help" title={item.tip}>
+                  {item.title}
+                </span>
+              </div>
               <div className="text-forge-muted text-xs mt-0.5">{item.desc}</div>
             </div>
           ))}
         </div>
+        <p className="text-forge-muted text-xs leading-relaxed mt-1">
+          Working source on GitHub:{" "}
+          <a
+            href={`${FORGE_REPO}/blob/main/examples/llm-agent/agent.py`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-forge-accent hover:underline"
+          >examples/llm-agent/agent.py ↗</a>
+          {" · "}
+          <a
+            href={`${FORGE_REPO}/blob/main/examples/metric-aware-agent/agent.py`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-forge-accent hover:underline"
+          >examples/metric-aware-agent/agent.py ↗</a>
+          {" · "}
+          <a
+            href={`${FORGE_REPO}/blob/main/agents/baseline/agent.py`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-forge-accent hover:underline"
+          >agents/baseline/agent.py ↗</a>
+        </p>
       </Section>
 
       {/* FEA explainer */}
